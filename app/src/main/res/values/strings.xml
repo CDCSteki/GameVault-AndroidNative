@@ -1,3 +1,159 @@
 <resources>
+    <!-- App -->
     <string name="app_name">GameVault</string>
+
+    <!-- Auth -->
+    <string name="login_title">GAMEVAULT</string>
+    <string name="login_subtitle">Welcome back, Hunter</string>
+    <string name="login_email_label">Email or Username</string>
+    <string name="login_email_placeholder">Enter your credentials</string>
+    <string name="login_password_label">Password</string>
+    <string name="login_forgot_password">Forgot Password?</string>
+    <string name="login_button">LOGIN</string>
+    <string name="login_no_account">Don\'t have an account?</string>
+    <string name="login_sign_up">Sign Up</string>
+    <string name="register_title">Create your account</string>
+    <string name="register_username_label">Username</string>
+    <string name="register_username_placeholder">Choose a username</string>
+    <string name="register_email_label">Email</string>
+    <string name="register_email_placeholder">Enter your email</string>
+    <string name="register_password_label">Password</string>
+    <string name="register_password_placeholder">Min. 6 characters</string>
+    <string name="register_confirm_password_label">Confirm Password</string>
+    <string name="register_confirm_password_placeholder">Repeat your password</string>
+    <string name="register_button">CREATE ACCOUNT</string>
+    <string name="register_have_account">Already have an account?</string>
+    <string name="register_sign_in">Sign In</string>
+
+    <!-- Validation -->
+    <string name="error_empty_email">Enter your email or username</string>
+    <string name="error_empty_password">Enter your password</string>
+    <string name="error_invalid_credentials">Invalid email or password</string>
+    <string name="error_empty_username">Enter a username</string>
+    <string name="error_username_too_short">Username must be at least 3 characters</string>
+    <string name="error_invalid_email">Enter a valid email address</string>
+    <string name="error_password_too_short">Password must be at least 6 characters</string>
+    <string name="error_passwords_no_match">Passwords do not match</string>
+    <string name="error_email_exists">This email is already registered</string>
+    <string name="error_username_exists">This username is already taken</string>
+
+    <!-- Bottom Nav -->
+    <string name="nav_home">HOME</string>
+    <string name="nav_search">SEARCH</string>
+    <string name="nav_library">LIBRARY</string>
+    <string name="nav_profile">PROFILE</string>
+    <string name="nav_settings">SETTINGS</string>
+
+    <!-- Home -->
+    <string name="home_welcome">Welcome Back,</string>
+    <string name="home_subtitle">Your next legendary adventure is just a click away.</string>
+    <string name="home_popular_this_year">Popular This Year</string>
+    <string name="home_all_time_legends">All-Time Legends</string>
+    <string name="home_discover">Discover</string>
+    <string name="home_view_all">VIEW ALL</string>
+    <string name="home_hall_of_fame">HALL OF FAME</string>
+    <string name="home_online">ONLINE</string>
+    <string name="home_trending">TRENDING</string>
+    <string name="discover_indie">Indie Gems</string>
+    <string name="discover_competitive">Competitive</string>
+    <string name="discover_coop">Co-Op</string>
+    <string name="discover_retro">Retro</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">Search titles, genres…</string>
+    <string name="search_filter">FILTER</string>
+    <string name="search_filter_active">FILTER (ACTIVE)</string>
+    <string name="search_results">Search Results</string>
+    <string name="search_titles_found">TITLES FOUND</string>
+    <string name="search_no_results">No results found</string>
+    <string name="search_recent">Recent Searches</string>
+    <string name="search_clear_all">CLEAR ALL</string>
+    <string name="search_trending_tags">TRENDING TAGS</string>
+    <string name="filter_title">Filter Games</string>
+    <string name="filter_genre">Genre</string>
+    <string name="filter_platform">Platform</string>
+    <string name="filter_sort_by">Sort By</string>
+    <string name="filter_clear">CLEAR</string>
+    <string name="filter_apply">APPLY</string>
+
+    <!-- Game Detail -->
+    <string name="detail_add_collection">ADD TO COLLECTION</string>
+    <string name="detail_in_collection">IN COLLECTION</string>
+    <string name="detail_wishlist">WISHLIST</string>
+    <string name="detail_developer">DEVELOPER</string>
+    <string name="detail_release">RELEASE</string>
+    <string name="detail_platform">PLATFORM</string>
+    <string name="detail_playtime">PLAYTIME</string>
+    <string name="detail_private_notes">Private Notes</string>
+    <string name="detail_notes_placeholder">Your private notes on this game…</string>
+    <string name="detail_about">About the Game</string>
+    <string name="detail_screenshots">Screenshots</string>
+    <string name="detail_trailers">Trailers</string>
+    <string name="detail_watch_trailer">WATCH OFFICIAL TRAILER</string>
+    <string name="detail_videos_available">Videos Available</string>
+    <string name="detail_user_sentiment">USER SENTIMENT</string>
+    <string name="detail_retry">Retry</string>
+    <string name="detail_notes_write">Write your notes here…</string>
+    <string name="detail_notes_save">Save</string>
+    <string name="detail_notes_cancel">Cancel</string>
+
+    <!-- Library -->
+    <string name="library_my_collection">MY COLLECTION</string>
+    <string name="library_wishlist">WISHLIST</string>
+    <string name="library_filter_all">All</string>
+    <string name="library_filter_played">Played</string>
+    <string name="library_filter_not_played">Not Played</string>
+    <string name="library_games_count">Games in library</string>
+    <string name="library_status_played">✓ Played</string>
+    <string name="library_status_not_played">Not Played</string>
+    <string name="library_mark_played">Mark as Played</string>
+    <string name="library_mark_not_played">Mark as Not Played</string>
+    <string name="library_remove">Remove</string>
+    <string name="library_add_to_collection">+ Add to Collection</string>
+    <string name="library_empty_collection">Your collection is empty.\nSearch for games to add!</string>
+    <string name="library_empty_played">No played games yet</string>
+    <string name="library_empty_not_played">No unplayed games</string>
+    <string name="library_empty_wishlist">Your wishlist is empty.\nAdd games you want to play!</string>
+
+    <!-- Profile -->
+    <string name="profile_title">← PROFILE</string>
+    <string name="profile_username_label">Username</string>
+    <string name="profile_password_label">Password</string>
+    <string name="profile_save_changes">SAVE CHANGES</string>
+    <string name="profile_logout">LOGOUT</string>
+    <string name="profile_updated">Profile updated successfully!</string>
+    <string name="profile_error_empty_username">Username cannot be empty</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_system_prefs">SYSTEM PREFERENCES</string>
+    <string name="settings_display_theme">Display Theme</string>
+    <string name="settings_theme_dark">Cyber Dark (Default)</string>
+    <string name="settings_theme_light">Light Mode</string>
+    <string name="settings_language">System Language</string>
+    <string name="settings_language_en">English (US)</string>
+    <string name="settings_language_ro">Romanian</string>
+    <string name="settings_privacy">PRIVACY &amp; DATA</string>
+    <string name="settings_search_history">Search History</string>
+    <string name="settings_clear_now">Clear Now</string>
+    <string name="settings_history_cleared">Cleared!</string>
+    <string name="settings_history_never">Last cleared: Never</string>
+    <string name="settings_account_control">ACCOUNT CONTROL</string>
+    <string name="settings_deactivate_title">Deactivate Account</string>
+    <string name="settings_deactivate_desc">Permanently deletes your profile, game library, and all associated data. This action is irreversible.</string>
+    <string name="settings_delete_profile">DELETE PROFILE</string>
+
+    <!-- Delete Dialog -->
+    <string name="delete_dialog_title">Delete Account</string>
+    <string name="delete_dialog_message">Are you sure? All your data will be permanently deleted.</string>
+    <string name="delete_dialog_confirm">DELETE</string>
+    <string name="delete_dialog_cancel">Cancel</string>
+
+    <!-- General -->
+    <string name="general_na">N/A</string>
+    <string name="general_loading">Loading…</string>
+    <string name="general_error_connection">Failed to load. Check your connection.</string>
+    <string name="general_playtime_format">%1$sh avg</string>
+    <string name="general_rating_format">%.1f</string>
+    <string name="general_sentiment_format">%1$d%%</string>
 </resources>

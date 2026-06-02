@@ -6,42 +6,57 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.gamevault.ui.navigation.BottomNavigationBar
+import com.example.gamevault.ui.navigation.NavGraph
+import com.example.gamevault.ui.navigation.NavRoutes
 import com.example.gamevault.ui.theme.GameVaultTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val appContainer = (application as GameVaultApplication).container
+
         setContent {
-            GameVaultTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+            val isDarkTheme by appContainer.preferences.isDarkTheme
+                .collectAsState(initial = true)
+
+            GameVaultTheme(darkTheme = isDarkTheme) {
+                val navController = rememberNavController()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+
+                val showBottomBar = currentRoute !in listOf(
+                    NavRoutes.Login.route,
+                    NavRoutes.Register.route,
+                    NavRoutes.Splash.route
+                ) && !currentRoute.orEmpty().startsWith("game_detail")
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = MaterialTheme.colorScheme.background,
+                    bottomBar = {
+                        if (showBottomBar) {
+                            BottomNavigationBar(navController = navController)
+                        }
+                    }
+                ) { innerPadding ->
+                    NavGraph(
+                        navController = navController,
+                        startDestination = NavRoutes.Splash.route,
+                        appContainer = appContainer,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    GameVaultTheme {
-        Greeting("Android")
     }
 }

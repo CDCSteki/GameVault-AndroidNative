@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Brand -->
+    <color name="neon_purple">#FF9B59F5</color>
+    <color name="neon_purple_light">#FFB47FFF</color>
+    <color name="neon_cyan">#FF00D4FF</color>
+    <color name="neon_cyan_dark">#FF0099BB</color>
+
+    <!-- Backgrounds -->
+    <color name="dark_navy">#FF0A0E1A</color>
+    <color name="dark_navy_secondary">#FF111827</color>
+    <color name="dark_card">#FF1A2235</color>
+    <color name="dark_card_secondary">#FF1E2A3D</color>
+    <color name="dark_surface">#FF152030</color>
+
+    <!-- Borders -->
+    <color name="border_cyan">#FF1A4A5A</color>
+    <color name="border_purple">#FF3D2A6B</color>
+
+    <!-- Text -->
+    <color name="text_primary">#FFFFFFFF</color>
+    <color name="text_secondary">#FFB0BEC5</color>
+    <color name="text_muted">#FF607D8B</color>
+
+    <!-- Status -->
+    <color name="status_green">#FF4CAF50</color>
+    <color name="status_orange">#FFFF9800</color>
+    <color name="status_red">#FFE53935</color>
+    <color name="status_yellow">#FFFFD700</color>
+
+    <!-- Legacy (nu le sterge, folosite de system) -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
