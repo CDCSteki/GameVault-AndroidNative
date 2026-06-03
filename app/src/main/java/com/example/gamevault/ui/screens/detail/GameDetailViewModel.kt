@@ -46,14 +46,35 @@ class GameDetailViewModel(
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
 
             val detailResult = gameRepository.getGameDetails(gameId)
-            val screenshotsResult = gameRepository.getGameScreenshots(gameId)
 
-            _uiState.value = _uiState.value.copy(
-                gameDetail = detailResult.getOrNull(),
-                screenshots = screenshotsResult.getOrNull()?.results ?: emptyList(),
-                isLoading = false,
-                errorMessage = if (detailResult.isFailure) "Failed to load game details." else null
-            )
+            if (detailResult.isSuccess) {
+                // Online: date complete de la API
+                val screenshotsResult = gameRepository.getGameScreenshots(gameId)
+                _uiState.value = _uiState.value.copy(
+                    gameDetail = detailResult.getOrNull(),
+                    screenshots = screenshotsResult.getOrNull()?.results ?: emptyList(),
+                    isLoading = false,
+                    errorMessage = null
+                )
+            } else {
+                // Offline: încearcă din Room
+                val localGame = gameRepository.getGameById(gameId)
+                if (localGame != null) {
+                    val localDetail = with(gameRepository) { localGame.toDetailDto() }
+                    _uiState.value = _uiState.value.copy(
+                        gameDetail = localDetail,
+                        screenshots = emptyList(),
+                        isLoading = false,
+                        errorMessage = null
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        gameDetail = null,
+                        isLoading = false,
+                        errorMessage = "No internet connection and game not in local library."
+                    )
+                }
+            }
         }
     }
 

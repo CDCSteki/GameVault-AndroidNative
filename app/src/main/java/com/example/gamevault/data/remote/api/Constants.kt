@@ -1,7 +1,7 @@
 package com.example.gamevault.data.remote.api
 
 object Constants {
-    const val RAWG_API_KEY = "ea61ca8358f246d1b662fdd8ce958fb1"
+    const val RAWG_API_KEY = "6a7b617119f04886808e5c670096218a"
 
     // Genre slugs
     const val GENRE_INDIE = "indie"

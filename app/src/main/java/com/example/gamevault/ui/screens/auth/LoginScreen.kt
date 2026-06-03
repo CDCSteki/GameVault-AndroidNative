@@ -11,8 +11,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,13 +24,12 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gamevault.data.repository.AuthRepository
+import com.example.gamevault.ui.components.GameVaultTextField
 import com.example.gamevault.ui.theme.*
 
 
@@ -278,80 +275,4 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(40.dp))
         }
     }
-}
-
-// --- Reusable TextField Component ---
-@Composable
-fun GameVaultTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    leadingIcon: androidx.compose.ui.graphics.vector.ImageVector,
-    modifier: Modifier = Modifier,
-    isPassword: Boolean = false,
-    isPasswordVisible: Boolean = false,
-    onTogglePasswordVisibility: (() -> Unit)? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-    enabled: Boolean = true
-) {
-    val visualTransformation = if (isPassword && !isPasswordVisible) {
-        PasswordVisualTransformation()
-    } else {
-        VisualTransformation.None
-    }
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier.fillMaxWidth(),
-        placeholder = {
-            Text(
-                text = placeholder,
-                color = TextMuted,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        },
-        leadingIcon = {
-            Icon(
-                imageVector = leadingIcon,
-                contentDescription = null,
-                tint = TextMuted,
-                modifier = Modifier.size(20.dp)
-            )
-        },
-        trailingIcon = if (isPassword && onTogglePasswordVisibility != null) {
-            {
-                IconButton(onClick = onTogglePasswordVisibility) {
-                    Icon(
-                        imageVector = if (isPasswordVisible) {
-                            Icons.Default.Visibility
-                        } else {
-                            Icons.Default.VisibilityOff
-                        },
-                        contentDescription = if (isPasswordVisible) "Hide password" else "Show password",
-                        tint = TextMuted,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-        } else null,
-        visualTransformation = visualTransformation,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        enabled = enabled,
-        singleLine = true,
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = TextPrimary,
-            unfocusedTextColor = TextPrimary,
-            focusedBorderColor = NeonCyan,
-            unfocusedBorderColor = BorderCyan,
-            focusedContainerColor = DarkCard,
-            unfocusedContainerColor = DarkCard,
-            cursorColor = NeonCyan,
-            focusedLeadingIconColor = NeonCyan,
-            unfocusedLeadingIconColor = TextMuted
-        )
-    )
 }

@@ -88,7 +88,6 @@ fun SearchScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
-                    // Starea implicită: Fără query + Fără filtre -> Afișăm Istoric
                     val isDefaultState = uiState.query.isEmpty() && uiState.filters == SearchFilters()
 
                     if (isDefaultState && uiState.searchHistory.isNotEmpty()) {
@@ -104,7 +103,6 @@ fun SearchScreen(
                         }
                     }
 
-                    // Alegem ce listă afișăm: Sugestiile implicite sau Rezultatele de la search/filtre
                     val displayList = if (isDefaultState) uiState.defaultGames else uiState.searchResults
                     val listTitle = if (isDefaultState) "Trending Suggestions" else "Search Results"
 

@@ -11,6 +11,10 @@ import com.example.gamevault.data.remote.api.RawgApiService
 import com.example.gamevault.data.remote.dto.GameDetailDto
 import com.example.gamevault.data.remote.dto.GameDto
 import com.example.gamevault.data.remote.dto.GameScreenshotsResponse
+import com.example.gamevault.data.remote.dto.DeveloperDto
+import com.example.gamevault.data.remote.dto.GenreDto
+import com.example.gamevault.data.remote.dto.PlatformDto
+import com.example.gamevault.data.remote.dto.PlatformWrapperDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
@@ -73,6 +77,27 @@ class GameRepository(
     fun getNotPlayedGames(): Flow<List<GameEntity>> = gameDao.getNotPlayedGames()
     fun getPlayingGames(): Flow<List<GameEntity>> = gameDao.getPlayingGames()
     fun filterCollection(genre: String?): Flow<List<GameEntity>> = gameDao.filterCollection(genre)
+
+    fun GameEntity.toDetailDto(): GameDetailDto = GameDetailDto(
+        id = rawgId,
+        name = name,
+        descriptionRaw = description,
+        backgroundImage = backgroundImageUrl,
+        released = releaseDate,
+        rating = rating,
+        ratingsCount = 0,
+        playtime = null,
+        platforms = platforms?.split(",")?.map { platformName ->
+            PlatformWrapperDto(platform = PlatformDto(id = 0, name = platformName.trim()))
+        },
+        genres = genres?.split(",")?.map { genreName ->
+            GenreDto(id = 0, name = genreName.trim())
+        },
+        developers = developer?.let { listOf(DeveloperDto(id = 0, name = it)) },
+        publishers = null,
+        ratings = null,
+        esrbRating = null
+    )
 
     suspend fun addToCollection(game: GameEntity): AddToCollectionResult {
         val existing = gameDao.getGameById(game.rawgId)

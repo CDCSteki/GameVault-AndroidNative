@@ -32,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gamevault.data.repository.AuthRepository
 import com.example.gamevault.ui.components.PasswordStrengthIndicator
 import com.example.gamevault.ui.theme.*
+import com.example.gamevault.ui.components.GameVaultTextField
 
 @Composable
 fun RegisterScreen(
@@ -183,7 +184,6 @@ fun RegisterScreen(
                             )
                         )
 
-                        // LOGICA NOUĂ: Indicatorul de putere a parolei
                         if (uiState.password.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             PasswordStrengthIndicator(password = uiState.password)

@@ -30,9 +30,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.example.gamevault.data.repository.AuthRepository
+import com.example.gamevault.ui.components.GameVaultTextField
 import com.example.gamevault.ui.components.GameVaultTopBar
 import com.example.gamevault.ui.components.PasswordStrengthIndicator
-import com.example.gamevault.ui.screens.auth.GameVaultTextField
 import com.example.gamevault.ui.theme.*
 import com.example.gamevault.ui.util.createImageUri
 import kotlinx.coroutines.delay
