@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.gamevault.data.local.entity.GameEntity
 import com.example.gamevault.data.local.entity.PlayStatus
 import com.example.gamevault.data.remote.dto.GameDetailDto
-import com.example.gamevault.data.remote.dto.GameMovieDto
 import com.example.gamevault.data.remote.dto.GameScreenshotDto
 import com.example.gamevault.data.repository.GameRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +17,6 @@ data class GameDetailUiState(
     val gameDetail: GameDetailDto? = null,
     val localGame: GameEntity? = null,
     val screenshots: List<GameScreenshotDto> = emptyList(),
-    val trailers: List<GameMovieDto> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val snackbarMessage: String? = null,
@@ -49,12 +47,10 @@ class GameDetailViewModel(
 
             val detailResult = gameRepository.getGameDetails(gameId)
             val screenshotsResult = gameRepository.getGameScreenshots(gameId)
-            val moviesResult = gameRepository.getGameMovies(gameId)
 
             _uiState.value = _uiState.value.copy(
                 gameDetail = detailResult.getOrNull(),
                 screenshots = screenshotsResult.getOrNull()?.results ?: emptyList(),
-                trailers = moviesResult.getOrNull()?.results ?: emptyList(),
                 isLoading = false,
                 errorMessage = if (detailResult.isFailure) "Failed to load game details." else null
             )

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.gamevault.data.remote.dto.GameDto
 import com.example.gamevault.data.repository.GameRepository
 import com.example.gamevault.data.repository.AuthRepository
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +19,7 @@ data class HomeUiState(
     val allTimeLegends: List<GameDto> = emptyList(),
     val indieGems: List<GameDto> = emptyList(),
     val competitive: List<GameDto> = emptyList(),
-    val coOp: List<GameDto> = emptyList(),
+    val coop: List<GameDto> = emptyList(),
     val retro: List<GameDto> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null
@@ -58,19 +59,26 @@ class HomeViewModel(
             val currentYear = Calendar.getInstance().get(Calendar.YEAR)
             val dates = "$currentYear-01-01,$currentYear-12-31"
 
-            val thisYearResult = gameRepository.getGamesThisYear(dates)
-            val allTimeResult = gameRepository.getAllTimeTopGames()
-            val indieResult = gameRepository.getGamesByGenre("indie")
-            val competitiveResult = gameRepository.getGamesByGenre("shooter")
-            val coOpResult = gameRepository.getGamesByGenre("action")
-            val retroResult = gameRepository.getGamesByGenre("arcade")
+            val thisYearDef = async { gameRepository.getGamesThisYear(dates) }
+            val allTimeDef = async { gameRepository.getAllTimeTopGames() }
+            val indieDef = async { gameRepository.getGamesWithFilters(genres = "indie", pageSize = 10) }
+            val competitiveDef = async { gameRepository.getGamesWithFilters(tags = "multiplayer,competitive", pageSize = 10) }
+            val coopDef = async { gameRepository.getGamesWithFilters(tags = "co-op", pageSize = 10) }
+            val retroDef = async { gameRepository.getGamesWithFilters(dates = "1980-01-01,2005-12-31", pageSize = 10) }
+
+            val thisYearResult = thisYearDef.await()
+            val allTimeResult = allTimeDef.await()
+            val indieResult = indieDef.await()
+            val competitiveResult = competitiveDef.await()
+            val coopResult = coopDef.await()
+            val retroResult = retroDef.await()
 
             _uiState.value = _uiState.value.copy(
                 popularThisYear = thisYearResult.getOrElse { emptyList() },
                 allTimeLegends = allTimeResult.getOrElse { emptyList() },
                 indieGems = indieResult.getOrElse { emptyList() },
                 competitive = competitiveResult.getOrElse { emptyList() },
-                coOp = coOpResult.getOrElse { emptyList() },
+                coop = coopResult.getOrElse { emptyList() },
                 retro = retroResult.getOrElse { emptyList() },
                 isLoading = false,
                 errorMessage = if (thisYearResult.isFailure && allTimeResult.isFailure) {

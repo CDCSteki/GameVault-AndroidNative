@@ -96,8 +96,6 @@ fun GameDetailScreen(
                         onRemoveFromWishlist = viewModel::onRemoveFromWishlist,
                         onPlayStatusChange = viewModel::onPlayStatusChange,
                         onRatingChange = viewModel::onRatingChange,
-                        onNotesChange = viewModel::onNotesChange,
-                        onSaveNotes = viewModel::onSaveNotes,
                         onToggleNotesDialog = viewModel::onToggleNotesDialog
                     )
                 }
@@ -125,8 +123,6 @@ private fun GameDetailContent(
     onRemoveFromWishlist: () -> Unit,
     onPlayStatusChange: (PlayStatus) -> Unit,
     onRatingChange: (Float) -> Unit,
-    onNotesChange: (String) -> Unit,
-    onSaveNotes: () -> Unit,
     onToggleNotesDialog: () -> Unit
 ) {
     val detail = uiState.gameDetail!!
@@ -154,6 +150,9 @@ private fun GameDetailContent(
             )
         }
         InfoGridSection(detail = detail)
+
+        SystemRequirementsSection(detail = detail)
+
         PrivateNotesSection(
             notes = uiState.userNotes,
             userRating = uiState.userRating,
@@ -163,12 +162,6 @@ private fun GameDetailContent(
         AboutSection(description = detail.descriptionRaw)
         if (uiState.screenshots.isNotEmpty()) {
             ScreenshotsSection(screenshots = uiState.screenshots)
-        }
-        if (uiState.trailers.isNotEmpty()) {
-            TrailersSection(
-                trailersCount = uiState.trailers.size,
-                previewUrl = uiState.trailers.firstOrNull()?.preview
-            )
         }
         UserSentimentSection(detail = detail)
         Spacer(modifier = Modifier.height(100.dp))
@@ -670,18 +663,24 @@ private fun ScreenshotsSection(screenshots: List<GameScreenshotDto>) {
 }
 
 @Composable
-private fun TrailersSection(
-    trailersCount: Int,
-    previewUrl: String?
-) {
+private fun SystemRequirementsSection(detail: GameDetailDto) {
+    val pcPlatform = detail.platforms?.find { it.platform.name.contains("PC", ignoreCase = true) }
+    val requirements = pcPlatform?.requirements ?: pcPlatform?.requirementsEn
+
+    if (requirements?.minimum.isNullOrBlank() && requirements?.recommended.isNullOrBlank()) return
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(DarkCard)
+            .padding(16.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(bottom = 12.dp)
         ) {
             Box(
                 modifier = Modifier
@@ -690,75 +689,30 @@ private fun TrailersSection(
                     .background(NeonCyan, RoundedCornerShape(2.dp))
             )
             Text(
-                text = "Trailers",
+                text = "PC System Requirements",
                 style = MaterialTheme.typography.titleMedium,
                 color = TextPrimary,
                 fontWeight = FontWeight.Bold
             )
         }
-        Spacer(modifier = Modifier.height(8.dp))
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(160.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(DarkCard)
-        ) {
-            if (previewUrl != null) {
-                AsyncImage(
-                    model = previewUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                    alpha = 0.6f
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f))
+        requirements.minimum?.let { minReq ->
+            Text(
+                text = minReq.replace("\n", "\n• "),
+                style = MaterialTheme.typography.bodySmall,
+                color = TextSecondary,
+                lineHeight = 20.sp
             )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
-            Column(
-                modifier = Modifier.align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .background(
-                            color = NeonCyan.copy(alpha = 0.2f),
-                            shape = RoundedCornerShape(28.dp)
-                        )
-                        .border(
-                            width = 2.dp,
-                            color = NeonCyan,
-                            shape = RoundedCornerShape(28.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = "Play Trailer",
-                        tint = NeonCyan,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "WATCH OFFICIAL TRAILER",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = NeonCyan,
-                    letterSpacing = 1.sp
-                )
-                Text(
-                    text = "$trailersCount Videos Available",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = TextMuted
-                )
-            }
+        requirements.recommended?.let { recReq ->
+            Text(
+                text = recReq.replace("\n", "\n• "),
+                style = MaterialTheme.typography.bodySmall,
+                color = TextSecondary,
+                lineHeight = 20.sp
+            )
         }
     }
 }

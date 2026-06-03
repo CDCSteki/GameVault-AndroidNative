@@ -2,7 +2,6 @@ package com.example.gamevault.ui.screens.profile
 
 import android.Manifest
 import android.net.Uri
-import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -32,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.example.gamevault.data.repository.AuthRepository
 import com.example.gamevault.ui.components.GameVaultTopBar
+import com.example.gamevault.ui.components.PasswordStrengthIndicator
 import com.example.gamevault.ui.screens.auth.GameVaultTextField
 import com.example.gamevault.ui.theme.*
 import com.example.gamevault.ui.util.createImageUri
@@ -62,7 +62,7 @@ fun ProfileScreen(
 
     // Gallery launcher
     val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         uri?.let { viewModel.onImageSelected(context, it) }
     }
@@ -87,14 +87,6 @@ fun ProfileScreen(
         }
     }
 
-    // Gallery permission launcher
-    val galleryPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            galleryLauncher.launch("image/*")
-        }
-    }
 
     Box(
         modifier = Modifier
@@ -382,12 +374,11 @@ fun ProfileScreen(
                             .background(DarkNavySecondary)
                             .clickable {
                                 viewModel.onDismissImagePickerDialog()
-                                val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    Manifest.permission.READ_MEDIA_IMAGES
-                                } else {
-                                    Manifest.permission.READ_EXTERNAL_STORAGE
-                                }
-                                galleryPermissionLauncher.launch(permission)
+                                galleryLauncher.launch(
+                                    androidx.activity.result.PickVisualMediaRequest(
+                                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                                    )
+                                )
                             }
                             .padding(16.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -571,73 +562,6 @@ private fun ProfileSectionCard(
         }
         HorizontalDivider(color = BorderCyan.copy(alpha = 0.3f))
         content()
-    }
-}
-
-@Composable
-private fun PasswordStrengthIndicator(password: String) {
-    val strength = when {
-        password.length >= 12 &&
-                password.any { it.isUpperCase() } &&
-                password.any { it.isDigit() } &&
-                password.any { !it.isLetterOrDigit() } -> 3
-        password.length >= 8 &&
-                (password.any { it.isUpperCase() } || password.any { it.isDigit() }) -> 2
-        password.length >= 6 -> 1
-        else -> 0
-    }
-
-    val strengthLabel = when (strength) {
-        0 -> "Too weak"
-        1 -> "Weak"
-        2 -> "Good"
-        3 -> "Strong"
-        else -> ""
-    }
-
-    val strengthColor = when (strength) {
-        0 -> StatusRed
-        1 -> StatusOrange
-        2 -> StatusYellow
-        3 -> StatusGreen
-        else -> TextMuted
-    }
-
-    Column {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "Password strength",
-                style = MaterialTheme.typography.labelSmall,
-                color = TextMuted
-            )
-            Text(
-                text = strengthLabel,
-                style = MaterialTheme.typography.labelSmall,
-                color = strengthColor,
-                fontWeight = FontWeight.Bold
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            repeat(4) { index ->
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(4.dp)
-                        .clip(RoundedCornerShape(2.dp))
-                        .background(
-                            if (index < strength) strengthColor
-                            else DarkNavySecondary
-                        )
-                )
-            }
-        }
     }
 }
 

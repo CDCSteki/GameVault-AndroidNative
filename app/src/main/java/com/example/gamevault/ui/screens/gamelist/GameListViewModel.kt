@@ -40,32 +40,40 @@ class GameListViewModel(
                 pageSize = pageSize
             )
 
-            val title = when {
-                listType == NavRoutes.GameList.TYPE_THIS_YEAR -> "Popular This Year"
-                listType == NavRoutes.GameList.TYPE_ALL_TIME -> "All-Time Legends"
-                listType.startsWith("genre_") -> listType
-                    .removePrefix("genre_")
-                    .replaceFirstChar { it.uppercase() }
+            val cleanListType = listType.substringAfterLast("/")
+
+            val title = when (cleanListType) {
+                NavRoutes.GameList.TYPE_THIS_YEAR -> "Popular This Year"
+                NavRoutes.GameList.TYPE_ALL_TIME -> "All-Time Legends"
+                "discover_indie" -> "Indie Gems"
+                "discover_competitive" -> "Competitive Multiplayer"
+                "discover_coop" -> "Co-Op Adventures"
+                "discover_retro" -> "Retro Classics"
                 else -> "Games"
             }
 
-            val result = when {
-                listType == NavRoutes.GameList.TYPE_THIS_YEAR -> {
+            val result = when (cleanListType) {
+                NavRoutes.GameList.TYPE_THIS_YEAR -> {
                     val currentYear = Calendar.getInstance().get(Calendar.YEAR)
                     gameRepository.getGamesThisYear(
                         dates = "$currentYear-01-01,$currentYear-12-31",
                         pageSize = pageSize
                     )
                 }
-                listType == NavRoutes.GameList.TYPE_ALL_TIME -> {
+                NavRoutes.GameList.TYPE_ALL_TIME -> {
                     gameRepository.getAllTimeTopGames(pageSize = pageSize)
                 }
-                listType.startsWith("genre_") -> {
-                    val genre = listType.removePrefix("genre_")
-                    gameRepository.getGamesByGenre(
-                        genre = genre,
-                        pageSize = pageSize
-                    )
+                "discover_indie" -> {
+                    gameRepository.getGamesWithFilters(genres = "indie", pageSize = pageSize)
+                }
+                "discover_competitive" -> {
+                    gameRepository.getGamesWithFilters(tags = "multiplayer,competitive", pageSize = pageSize)
+                }
+                "discover_coop" -> {
+                    gameRepository.getGamesWithFilters(tags = "co-op", pageSize = pageSize)
+                }
+                "discover_retro" -> {
+                    gameRepository.getGamesWithFilters(dates = "1980-01-01,2005-12-31", pageSize = pageSize)
                 }
                 else -> gameRepository.getPopularGames(pageSize = pageSize)
             }

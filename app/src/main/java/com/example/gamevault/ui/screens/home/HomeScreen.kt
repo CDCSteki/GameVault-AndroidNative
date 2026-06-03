@@ -115,23 +115,25 @@ fun HomeScreen(
                 }
 
                 // Discover Section
-                item {
-                    SectionHeader(
-                        title = "Discover",
-                        icon = Icons.Default.Star,
-                        onViewAll = null
-                    )
-                }
-                item {
-                    DiscoverGrid(
-                        indieGames = uiState.indieGems,
-                        competitiveGames = uiState.competitive,
-                        coOpGames = uiState.coOp,
-                        retroGames = uiState.retro,
-                        onCategoryClick = { gameId -> onGameClick(gameId) },
-                        onViewAllGenre = { genre -> onViewAllClick("genre_$genre") }
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
+                if (uiState.errorMessage == null && (uiState.indieGems.isNotEmpty() || uiState.competitive.isNotEmpty() || uiState.coop.isNotEmpty() || uiState.retro.isNotEmpty())) {
+                    item {
+                        SectionHeader(
+                            title = "Discover",
+                            icon = Icons.Default.Star,
+                            onViewAll = null
+                        )
+                    }
+                    item {
+                        DiscoverGrid(
+                            indieGames = uiState.indieGems,
+                            competitiveGames = uiState.competitive,
+                            coOpGames = uiState.coop,
+                            retroGames = uiState.retro,
+                            onCategoryClick = { gameId -> onGameClick(gameId) },
+                            onViewAllGenre = { route -> onViewAllClick(route) }
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                    }
                 }
 
                 // Error
@@ -414,10 +416,10 @@ private fun DiscoverGrid(
     onViewAllGenre: (String) -> Unit
 ) {
     val categories = listOf(
-        DiscoverCategory("Indie Gems", NeonPurple, indieGames, "indie"),
-        DiscoverCategory("Competitive", NeonCyan, competitiveGames, "shooter"),
-        DiscoverCategory("Co-Op", StatusGreen, coOpGames, "action"),
-        DiscoverCategory("Retro", StatusOrange, retroGames, "arcade")
+        DiscoverCategory("Indie Gems", NeonPurple, indieGames, "discover_indie"),
+        DiscoverCategory("Competitive", NeonCyan, competitiveGames, "discover_competitive"),
+        DiscoverCategory("Co-op", StatusGreen, coOpGames, "discover_coop"),
+        DiscoverCategory("Retro", StatusOrange, retroGames, "discover_retro")
     )
 
     Column(

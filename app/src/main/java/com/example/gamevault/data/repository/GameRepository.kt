@@ -10,7 +10,6 @@ import com.example.gamevault.data.remote.api.Constants
 import com.example.gamevault.data.remote.api.RawgApiService
 import com.example.gamevault.data.remote.dto.GameDetailDto
 import com.example.gamevault.data.remote.dto.GameDto
-import com.example.gamevault.data.remote.dto.GameMoviesResponse
 import com.example.gamevault.data.remote.dto.GameScreenshotsResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -38,10 +37,17 @@ class GameRepository(
         ).results
     }
 
-    suspend fun getGamesByGenre(genre: String, pageSize: Int = 10): Result<List<GameDto>> = safeApiCall {
-        apiService.getGamesByGenre(
+    suspend fun getGamesWithFilters(
+        genres: String? = null,
+        tags: String? = null,
+        dates: String? = null,
+        pageSize: Int = 10
+    ): Result<List<GameDto>> = safeApiCall {
+        apiService.getGamesByFilters(
             apiKey = Constants.RAWG_API_KEY,
-            genres = genre,
+            genres = genres,
+            tags = tags,
+            dates = dates,
             pageSize = pageSize
         ).results
     }
@@ -55,10 +61,6 @@ class GameRepository(
 
     suspend fun getGameDetails(gameId: Int): Result<GameDetailDto> = safeApiCall {
         apiService.getGameDetails(gameId = gameId, apiKey = Constants.RAWG_API_KEY)
-    }
-
-    suspend fun getGameMovies(gameId: Int): Result<GameMoviesResponse> = safeApiCall {
-        apiService.getGameMovies(gameId = gameId, apiKey = Constants.RAWG_API_KEY)
     }
 
     suspend fun getGameScreenshots(gameId: Int): Result<GameScreenshotsResponse> = safeApiCall {

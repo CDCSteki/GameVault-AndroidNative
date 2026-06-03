@@ -74,28 +74,84 @@ fun SearchScreen(
                 onClick = viewModel::onToggleFilterSheet
             )
 
-            // Content
-            if (!uiState.hasSearched && uiState.query.isEmpty()) {
-                SearchHistorySection(
-                    history = uiState.searchHistory,
-                    onHistoryClick = { query ->
-                        viewModel.onHistoryItemClick(query)
-                    },
-                    onDeleteItem = viewModel::onDeleteHistoryItem,
-                    onClearAll = viewModel::onClearHistory
+            if (uiState.errorMessage != null) {
+                Text(
+                    text = uiState.errorMessage!!,
+                    color = StatusRed,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
-            } else if (uiState.isLoading) {
-                Box(
+            }
+            // Content Area Unificat
+            Box(modifier = Modifier.weight(1f)) {
+                LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
-                    CircularProgressIndicator(color = NeonPurple)
+                    // Starea implicită: Fără query + Fără filtre -> Afișăm Istoric
+                    val isDefaultState = uiState.query.isEmpty() && uiState.filters == SearchFilters()
+
+                    if (isDefaultState && uiState.searchHistory.isNotEmpty()) {
+                        item {
+                            SearchHistorySection(
+                                history = uiState.searchHistory,
+                                onHistoryClick = { query ->
+                                    viewModel.onHistoryItemClick(query)
+                                },
+                                onDeleteItem = viewModel::onDeleteHistoryItem,
+                                onClearAll = viewModel::onClearHistory
+                            )
+                        }
+                    }
+
+                    // Alegem ce listă afișăm: Sugestiile implicite sau Rezultatele de la search/filtre
+                    val displayList = if (isDefaultState) uiState.defaultGames else uiState.searchResults
+                    val listTitle = if (isDefaultState) "Trending Suggestions" else "Search Results"
+
+                    if (!isDefaultState && displayList.isEmpty() && !uiState.isLoading) {
+                        item {
+                            EmptySearchState()
+                        }
+                    } else if (displayList.isNotEmpty()) {
+                        item {
+                            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                                Text(
+                                    text = listTitle,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = TextPrimary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = "${displayList.size} TITLES FOUND",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = NeonPurple,
+                                    letterSpacing = 1.sp
+                                )
+                            }
+                        }
+
+                        items(displayList) { game ->
+                            Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
+                                SearchResultCard(
+                                    game = game,
+                                    onClick = { onGameClick(game.id) }
+                                )
+                            }
+                        }
+                    }
                 }
-            } else {
-                SearchResultsSection(
-                    results = uiState.searchResults,
-                    onGameClick = onGameClick
-                )
+
+                // Loading Overlay fluid
+                if (uiState.isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(DarkNavy.copy(alpha = 0.6f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = NeonPurple)
+                    }
+                }
             }
         }
 
@@ -222,8 +278,6 @@ private fun SearchHistorySection(
     onDeleteItem: (Int) -> Unit,
     onClearAll: () -> Unit
 ) {
-    if (history.isEmpty()) return
-
     Column(modifier = Modifier.padding(16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -290,56 +344,25 @@ private fun SearchHistorySection(
 }
 
 @Composable
-private fun SearchResultsSection(
-    results: List<GameDto>,
-    onGameClick: (Int) -> Unit
-) {
-    if (results.isEmpty()) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = Icons.Default.SearchOff,
-                    contentDescription = null,
-                    tint = TextMuted,
-                    modifier = Modifier.size(64.dp)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "No results found",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = TextMuted
-                )
-            }
-        }
-        return
-    }
-
-    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(
-            text = "Search Results",
-            style = MaterialTheme.typography.titleLarge,
-            color = TextPrimary,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = "${results.size} TITLES FOUND",
-            style = MaterialTheme.typography.labelSmall,
-            color = NeonPurple,
-            letterSpacing = 1.sp
-        )
-    }
-
-    LazyColumn(
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+private fun EmptySearchState() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 60.dp),
+        contentAlignment = Alignment.Center
     ) {
-        items(results) { game ->
-            SearchResultCard(
-                game = game,
-                onClick = { onGameClick(game.id) }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Default.SearchOff,
+                contentDescription = null,
+                tint = TextMuted,
+                modifier = Modifier.size(64.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "No results found",
+                style = MaterialTheme.typography.titleMedium,
+                color = TextMuted
             )
         }
     }
@@ -387,9 +410,16 @@ private fun SearchResultCard(
                         game.genres?.firstOrNull()?.let { genre ->
                             BadgeChip(text = genre.name.uppercase())
                         }
-                        game.platforms?.firstOrNull()?.platform?.let { platform ->
+                        if (!game.platforms.isNullOrEmpty()) {
+                            val platformCount = game.platforms.size
+                            val platformText = if (platformCount == 1) {
+                                game.platforms.first().platform.name
+                            } else {
+                                "${game.platforms.first().platform.name} +${platformCount - 1}"
+                            }
+
                             BadgeChip(
-                                text = platform.name,
+                                text = platformText,
                                 color = NeonCyan.copy(alpha = 0.15f),
                                 textColor = NeonCyan
                             )

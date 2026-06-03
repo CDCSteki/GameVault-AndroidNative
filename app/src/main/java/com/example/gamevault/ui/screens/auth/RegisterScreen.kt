@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gamevault.data.repository.AuthRepository
+import com.example.gamevault.ui.components.PasswordStrengthIndicator
 import com.example.gamevault.ui.theme.*
 
 @Composable
@@ -181,6 +182,12 @@ fun RegisterScreen(
                                 onNext = { focusManager.moveFocus(FocusDirection.Down) }
                             )
                         )
+
+                        // LOGICA NOUĂ: Indicatorul de putere a parolei
+                        if (uiState.password.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            PasswordStrengthIndicator(password = uiState.password)
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))

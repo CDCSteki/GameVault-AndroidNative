@@ -25,6 +25,7 @@ data class SearchFilters(
 data class SearchUiState(
     val query: String = "",
     val searchResults: List<GameDto> = emptyList(),
+    val defaultGames: List<GameDto> = emptyList(), // Nou: Jocurile afișate implicit
     val searchHistory: List<SearchHistoryEntity> = emptyList(),
     val filters: SearchFilters = SearchFilters(),
     val isLoading: Boolean = false,
@@ -46,6 +47,19 @@ class SearchViewModel(
 
     init {
         loadSearchHistory()
+        loadDefaultGames() // Încărcăm jocurile de bază la deschiderea ecranului
+    }
+
+    private fun loadDefaultGames() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            // Aducem 20 de jocuri populare ca sugestii
+            val result = gameRepository.getPopularGames(20)
+            _uiState.value = _uiState.value.copy(
+                defaultGames = result.getOrElse { emptyList() },
+                isLoading = false
+            )
+        }
     }
 
     private fun loadSearchHistory() {
@@ -63,22 +77,35 @@ class SearchViewModel(
         )
         // Debounce search
         searchJob?.cancel()
+
         if (query.length >= 2) {
             searchJob = viewModelScope.launch {
                 delay(500)
                 performSearch(query)
             }
         } else if (query.isEmpty()) {
-            _uiState.value = _uiState.value.copy(
-                searchResults = emptyList(),
-                hasSearched = false
-            )
+            val filters = _uiState.value.filters
+            if (filters != SearchFilters()) {
+                // Dacă ștergem textul, dar avem filtre active, facem search pe baza filtrelor
+                searchJob = viewModelScope.launch {
+                    delay(500)
+                    performSearch("")
+                }
+            } else {
+                // Fără text, fără filtre -> Afișăm înapoi starea implicită
+                _uiState.value = _uiState.value.copy(
+                    searchResults = emptyList(),
+                    hasSearched = false
+                )
+            }
         }
     }
 
     fun onSearchSubmit() {
         val query = _uiState.value.query
-        if (query.isBlank()) return
+        // Permitem submit și dacă e gol, cu condiția să existe filtre
+        if (query.isBlank() && _uiState.value.filters == SearchFilters()) return
+
         searchJob?.cancel()
         viewModelScope.launch {
             performSearch(query)
@@ -89,14 +116,27 @@ class SearchViewModel(
         val filters = _uiState.value.filters
         _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
 
-        searchRepository.saveSearch(query)
+        // Salvăm în istoric doar dacă s-a scris efectiv un text
+        if (query.isNotBlank()) {
+            searchRepository.saveSearch(query)
+        }
+
+        val currentDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+
+        val datesParam = filters.year?.let {
+            "$it-01-01,$it-12-31"
+        } ?: if (filters.ordering == "-released") {
+            "1950-01-01,$currentDate"
+        } else {
+            null
+        }
 
         val result = searchRepository.searchGames(
             query = query,
             genres = filters.genre,
             platforms = filters.platform,
             metacritic = filters.minRating,
-            dates = filters.year?.let { "$it-01-01,$it-12-31" },
+            dates = datesParam,
             ordering = filters.ordering
         )
 
@@ -138,16 +178,25 @@ class SearchViewModel(
             filters = filters,
             isFilterSheetVisible = false
         )
-        val query = _uiState.value.query
-        if (query.isNotBlank()) {
-            viewModelScope.launch {
-                performSearch(query)
-            }
+        // Declanșează automat căutarea cu noile filtre, chiar și cu query gol
+        viewModelScope.launch {
+            performSearch(_uiState.value.query)
         }
     }
 
     fun onClearFilters() {
         _uiState.value = _uiState.value.copy(filters = SearchFilters())
+        val query = _uiState.value.query
+        if (query.isNotBlank()) {
+            viewModelScope.launch {
+                performSearch(query)
+            }
+        } else {
+            _uiState.value = _uiState.value.copy(
+                searchResults = emptyList(),
+                hasSearched = false
+            )
+        }
     }
 
     class Factory(

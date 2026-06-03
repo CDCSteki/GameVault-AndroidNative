@@ -27,7 +27,14 @@ data class GenreDto(
 )
 
 data class PlatformWrapperDto(
-    @SerializedName("platform") val platform: PlatformDto
+    @SerializedName("platform") val platform: PlatformDto,
+    @SerializedName("requirements") val requirements: RequirementsDto? = null,
+    @SerializedName("requirements_en") val requirementsEn: RequirementsDto? = null
+)
+
+data class RequirementsDto(
+    @SerializedName("minimum") val minimum: String?,
+    @SerializedName("recommended") val recommended: String?
 )
 
 data class PlatformDto(

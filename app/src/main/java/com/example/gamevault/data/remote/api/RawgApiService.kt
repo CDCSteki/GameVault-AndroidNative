@@ -1,7 +1,6 @@
 package com.example.gamevault.data.remote.api
 
 import com.example.gamevault.data.remote.dto.GameDetailDto
-import com.example.gamevault.data.remote.dto.GameMoviesResponse
 import com.example.gamevault.data.remote.dto.GameScreenshotsResponse
 import com.example.gamevault.data.remote.dto.GamesListResponse
 import retrofit2.http.GET
@@ -28,11 +27,13 @@ interface RawgApiService {
         @Query("page_size") pageSize: Int = 10
     ): GamesListResponse
 
-    // Home - Discover by genre
+    // Home - Discover
     @GET("games")
-    suspend fun getGamesByGenre(
+    suspend fun getGamesByFilters(
         @Query("key") apiKey: String,
-        @Query("genres") genres: String,
+        @Query("genres") genres: String? = null,
+        @Query("tags") tags: String? = null,
+        @Query("dates") dates: String? = null,
         @Query("ordering") ordering: String = "-rating",
         @Query("page_size") pageSize: Int = 10
     ): GamesListResponse
@@ -57,13 +58,6 @@ interface RawgApiService {
         @Path("id") gameId: Int,
         @Query("key") apiKey: String
     ): GameDetailDto
-
-    // Trailers / Movies
-    @GET("games/{id}/movies")
-    suspend fun getGameMovies(
-        @Path("id") gameId: Int,
-        @Query("key") apiKey: String
-    ): GameMoviesResponse
 
     // Screenshots
     @GET("games/{id}/screenshots")
