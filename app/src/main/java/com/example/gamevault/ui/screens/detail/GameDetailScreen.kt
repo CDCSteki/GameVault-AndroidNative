@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.example.gamevault.data.local.entity.PlayStatus
 import com.example.gamevault.data.remote.dto.GameDetailDto
 import com.example.gamevault.data.remote.dto.GameScreenshotDto
 import com.example.gamevault.data.repository.GameRepository
@@ -43,45 +44,67 @@ fun GameDetailScreen(
         factory = GameDetailViewModel.Factory(gameRepository, gameId)
     )
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(DarkNavy)
-    ) {
-        when {
-            uiState.isLoading -> {
-                CircularProgressIndicator(
-                    color = NeonPurple,
-                    modifier = Modifier.align(Alignment.Center)
+    LaunchedEffect(uiState.snackbarMessage) {
+        uiState.snackbarMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.onSnackbarDismissed()
+        }
+    }
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = DarkCard,
+                    contentColor = TextPrimary,
+                    actionColor = NeonPurple
                 )
             }
-            uiState.errorMessage != null && uiState.gameDetail == null -> {
-                ErrorSection(
-                    message = uiState.errorMessage!!,
-                    onRetry = viewModel::retry,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-            uiState.gameDetail != null -> {
-                GameDetailContent(
-                    uiState = uiState,
-                    onBackClick = onBackClick,
-                    onAddToCollection = viewModel::onAddToCollection,
-                    onRemoveFromCollection = viewModel::onRemoveFromCollection,
-                    onAddToWishlist = viewModel::onAddToWishlist,
-                    onRemoveFromWishlist = viewModel::onRemoveFromWishlist,
-                    onTogglePlayed = viewModel::onTogglePlayedStatus,
-                    onRatingChange = viewModel::onRatingChange,
-                    onNotesChange = viewModel::onNotesChange,
-                    onSaveNotes = viewModel::onSaveNotes,
-                    onToggleNotesDialog = viewModel::onToggleNotesDialog
-                )
+        },
+        containerColor = DarkNavy
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(DarkNavy)
+        ) {
+            when {
+                uiState.isLoading -> {
+                    CircularProgressIndicator(
+                        color = NeonPurple,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                uiState.errorMessage != null && uiState.gameDetail == null -> {
+                    ErrorSection(
+                        message = uiState.errorMessage!!,
+                        onRetry = viewModel::retry,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                uiState.gameDetail != null -> {
+                    GameDetailContent(
+                        uiState = uiState,
+                        onBackClick = onBackClick,
+                        onAddToCollection = viewModel::onAddToCollection,
+                        onRemoveFromCollection = viewModel::onRemoveFromCollection,
+                        onAddToWishlist = viewModel::onAddToWishlist,
+                        onRemoveFromWishlist = viewModel::onRemoveFromWishlist,
+                        onPlayStatusChange = viewModel::onPlayStatusChange,
+                        onRatingChange = viewModel::onRatingChange,
+                        onNotesChange = viewModel::onNotesChange,
+                        onSaveNotes = viewModel::onSaveNotes,
+                        onToggleNotesDialog = viewModel::onToggleNotesDialog
+                    )
+                }
             }
         }
     }
 
-    // Notes Dialog
     if (uiState.showNotesDialog) {
         NotesDialog(
             notes = uiState.userNotes,
@@ -100,7 +123,7 @@ private fun GameDetailContent(
     onRemoveFromCollection: () -> Unit,
     onAddToWishlist: () -> Unit,
     onRemoveFromWishlist: () -> Unit,
-    onTogglePlayed: () -> Unit,
+    onPlayStatusChange: (PlayStatus) -> Unit,
     onRatingChange: (Float) -> Unit,
     onNotesChange: (String) -> Unit,
     onSaveNotes: () -> Unit,
@@ -114,16 +137,8 @@ private fun GameDetailContent(
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        // Hero Image
-        HeroSection(
-            detail = detail,
-            onBackClick = onBackClick
-        )
-
-        // Title + Badges
+        HeroSection(detail = detail, onBackClick = onBackClick)
         TitleSection(detail = detail)
-
-        // Action Buttons
         ActionButtonsSection(
             isInCollection = uiState.isInCollection,
             isInWishlist = uiState.isInWishlist,
@@ -132,37 +147,30 @@ private fun GameDetailContent(
             onAddToWishlist = onAddToWishlist,
             onRemoveFromWishlist = onRemoveFromWishlist
         )
-
-        // Info Grid
+        if (uiState.isInCollection) {
+            PlayStatusSection(
+                currentStatus = uiState.playStatus,
+                onStatusChange = onPlayStatusChange
+            )
+        }
         InfoGridSection(detail = detail)
-
-        // Private Notes
         PrivateNotesSection(
             notes = uiState.userNotes,
             userRating = uiState.userRating,
             onRatingChange = onRatingChange,
             onOpenNotes = onToggleNotesDialog
         )
-
-        // About
         AboutSection(description = detail.descriptionRaw)
-
-        // Screenshots
         if (uiState.screenshots.isNotEmpty()) {
             ScreenshotsSection(screenshots = uiState.screenshots)
         }
-
-        // Trailers
         if (uiState.trailers.isNotEmpty()) {
             TrailersSection(
                 trailersCount = uiState.trailers.size,
                 previewUrl = uiState.trailers.firstOrNull()?.preview
             )
         }
-
-        // User Sentiment
         UserSentimentSection(detail = detail)
-
         Spacer(modifier = Modifier.height(100.dp))
     }
 }
@@ -280,13 +288,9 @@ private fun ActionButtonsSection(
         // Collection Button
         Button(
             onClick = if (isInCollection) onRemoveFromCollection else onAddToCollection,
-            modifier = Modifier
-                .weight(1f)
-                .height(48.dp),
+            modifier = Modifier.weight(1f).height(48.dp),
             shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent
-            ),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             contentPadding = PaddingValues(0.dp)
         ) {
             Box(
@@ -322,35 +326,62 @@ private fun ActionButtonsSection(
             }
         }
 
-        // Wishlist Button
+        // Wishlist Button — dezactivat daca e in collection
         OutlinedButton(
-            onClick = if (isInWishlist) onRemoveFromWishlist else onAddToWishlist,
-            modifier = Modifier
-                .weight(1f)
-                .height(48.dp),
+            onClick = when {
+                isInCollection -> { {} }
+                isInWishlist -> onRemoveFromWishlist
+                else -> onAddToWishlist
+            },
+            modifier = Modifier.weight(1f).height(48.dp),
             shape = RoundedCornerShape(12.dp),
             border = androidx.compose.foundation.BorderStroke(
                 width = 1.dp,
-                color = if (isInWishlist) StatusYellow else BorderCyan
+                color = when {
+                    isInCollection -> TextMuted.copy(alpha = 0.3f)
+                    isInWishlist -> StatusYellow
+                    else -> BorderCyan
+                }
             ),
             colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = if (isInWishlist) StatusYellow.copy(alpha = 0.1f) else Color.Transparent
-            )
+                containerColor = when {
+                    isInCollection -> Color.Transparent
+                    isInWishlist -> StatusYellow.copy(alpha = 0.1f)
+                    else -> Color.Transparent
+                }
+            ),
+            enabled = !isInCollection
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Icon(
-                    imageVector = if (isInWishlist) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                    imageVector = when {
+                        isInCollection -> Icons.Default.Block
+                        isInWishlist -> Icons.Default.Bookmark
+                        else -> Icons.Default.BookmarkBorder
+                    },
                     contentDescription = null,
-                    tint = if (isInWishlist) StatusYellow else TextSecondary,
+                    tint = when {
+                        isInCollection -> TextMuted.copy(alpha = 0.3f)
+                        isInWishlist -> StatusYellow
+                        else -> TextSecondary
+                    },
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
-                    text = "WISHLIST",
+                    text = when {
+                        isInCollection -> "IN COLLECTION"
+                        isInWishlist -> "WISHLIST"
+                        else -> "WISHLIST"
+                    },
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (isInWishlist) StatusYellow else TextSecondary,
+                    color = when {
+                        isInCollection -> TextMuted.copy(alpha = 0.3f)
+                        isInWishlist -> StatusYellow
+                        else -> TextSecondary
+                    },
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -358,6 +389,81 @@ private fun ActionButtonsSection(
     }
 }
 
+@Composable
+private fun PlayStatusSection(
+    currentStatus: PlayStatus,
+    onStatusChange: (PlayStatus) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = "PLAY STATUS",
+            style = MaterialTheme.typography.labelSmall,
+            color = TextMuted,
+            letterSpacing = 1.sp,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            PlayStatus.entries.forEach { status ->
+                val isSelected = currentStatus == status
+                val statusColor = when (status) {
+                    PlayStatus.NOT_PLAYED -> TextMuted
+                    PlayStatus.PLAYING -> NeonCyan
+                    PlayStatus.PLAYED -> StatusGreen
+                }
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(
+                            if (isSelected) statusColor.copy(alpha = 0.15f)
+                            else DarkCard
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = if (isSelected) statusColor else BorderCyan,
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .clickable { onStatusChange(status) }
+                        .padding(vertical = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = when (status) {
+                                PlayStatus.NOT_PLAYED -> Icons.Default.RadioButtonUnchecked
+                                PlayStatus.PLAYING -> Icons.Default.PlayCircle
+                                PlayStatus.PLAYED -> Icons.Default.CheckCircle
+                            },
+                            contentDescription = null,
+                            tint = if (isSelected) statusColor else TextMuted,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Text(
+                            text = when (status) {
+                                PlayStatus.NOT_PLAYED -> "Not Played"
+                                PlayStatus.PLAYING -> "Playing"
+                                PlayStatus.PLAYED -> "Played"
+                            },
+                            style = MaterialTheme.typography.labelSmall,
+                            color = if (isSelected) statusColor else TextMuted,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
 @Composable
 private fun InfoGridSection(detail: GameDetailDto) {
     Column(

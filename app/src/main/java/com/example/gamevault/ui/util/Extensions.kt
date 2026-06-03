@@ -10,25 +10,13 @@ fun String?.formatReleaseDate(): String {
         val outputFormat = SimpleDateFormat("MMM yyyy", Locale.getDefault())
         val date = inputFormat.parse(this)
         date?.let { outputFormat.format(it) } ?: this
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         this
     }
 }
 
-fun Float.toStarRating(): String {
-    return "%.1f".format(this)
-}
-
 fun Int?.toPlaytimeString(): String {
     return if (this == null || this <= 0) "N/A" else "${this}h avg"
-}
-
-fun String?.toGenreList(): List<String> {
-    return this?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
-}
-
-fun String?.toPlatformList(): List<String> {
-    return this?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
 }
 
 fun String?.firstGenre(): String {

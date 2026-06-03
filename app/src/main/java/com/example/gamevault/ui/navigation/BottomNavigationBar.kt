@@ -1,6 +1,5 @@
 package com.example.gamevault.ui.navigation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,16 +15,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.gamevault.ui.theme.BorderCyan
 import com.example.gamevault.ui.theme.DarkNavySecondary
 import com.example.gamevault.ui.theme.NeonCyan
 import com.example.gamevault.ui.theme.NeonPurple
 import com.example.gamevault.ui.theme.TextMuted
-import com.example.gamevault.ui.theme.TextPrimary
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {

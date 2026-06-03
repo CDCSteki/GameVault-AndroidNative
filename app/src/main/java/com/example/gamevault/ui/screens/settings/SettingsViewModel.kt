@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.gamevault.data.local.preferences.AppPreferences
 import com.example.gamevault.data.repository.AuthRepository
 import com.example.gamevault.data.repository.SearchRepository
+import com.example.gamevault.ui.theme.AppTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.launch
 
 data class SettingsUiState(
     val isDarkTheme: Boolean = true,
+    val appTheme: AppTheme = AppTheme.CYBER_DARK,
     val language: String = "en",
     val showDeleteDialog: Boolean = false,
     val historyCleared: Boolean = false
@@ -34,22 +36,32 @@ class SettingsViewModel(
             }
         }
         viewModelScope.launch {
+            appPreferences.appTheme.collect { theme ->
+                _uiState.value = _uiState.value.copy(appTheme = theme)
+            }
+        }
+        viewModelScope.launch {
             appPreferences.language.collect { lang ->
                 _uiState.value = _uiState.value.copy(language = lang)
             }
         }
     }
 
-    fun onToggleTheme(isDark: Boolean) {
+    fun onSelectTheme(theme: AppTheme) {
         viewModelScope.launch {
-            appPreferences.setDarkTheme(isDark)
+            appPreferences.setAppTheme(theme)
+        }
+    }
+
+    fun onToggleLightMode(isLight: Boolean) {
+        viewModelScope.launch {
+            appPreferences.setDarkTheme(!isLight)
         }
     }
 
     fun onLanguageChange(lang: String) {
         viewModelScope.launch {
             appPreferences.setLanguage(lang)
-            _uiState.value = _uiState.value.copy(language = lang)
         }
     }
 

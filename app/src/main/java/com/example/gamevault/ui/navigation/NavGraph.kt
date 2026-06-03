@@ -13,6 +13,7 @@ import com.example.gamevault.di.AppContainer
 import com.example.gamevault.ui.screens.auth.LoginScreen
 import com.example.gamevault.ui.screens.auth.RegisterScreen
 import com.example.gamevault.ui.screens.detail.GameDetailScreen
+import com.example.gamevault.ui.screens.gamelist.GameListScreen
 import com.example.gamevault.ui.screens.home.HomeScreen
 import com.example.gamevault.ui.screens.library.LibraryScreen
 import com.example.gamevault.ui.screens.profile.ProfileScreen
@@ -85,6 +86,9 @@ fun NavGraph(
                 authRepository = appContainer.authRepository,
                 onGameClick = { gameId ->
                     navController.navigate(NavRoutes.GameDetail.createRoute(gameId))
+                },
+                onViewAllClick = { listType ->
+                    navController.navigate("game_list/$listType")
                 }
             )
         }
@@ -115,11 +119,6 @@ fun NavGraph(
                     navController.navigate(NavRoutes.Login.route) {
                         popUpTo(0) { inclusive = true }
                     }
-                },
-                onAccountDeleted = {
-                    navController.navigate(NavRoutes.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
                 }
             )
         }
@@ -145,6 +144,23 @@ fun NavGraph(
             GameDetailScreen(
                 gameId = gameId,
                 gameRepository = appContainer.gameRepository,
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "game_list/{listType}",
+            arguments = listOf(
+                navArgument("listType") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val listType = backStackEntry.arguments?.getString("listType") ?: return@composable
+            GameListScreen(
+                listType = listType,
+                gameRepository = appContainer.gameRepository,
+                onGameClick = { gameId ->
+                    navController.navigate(NavRoutes.GameDetail.createRoute(gameId))
+                },
                 onBackClick = { navController.popBackStack() }
             )
         }

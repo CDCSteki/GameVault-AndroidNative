@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.gamevault.data.local.entity.GameEntity
+import com.example.gamevault.data.local.entity.PlayStatus
 import com.example.gamevault.data.repository.GameRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,14 +12,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 enum class LibraryTab { COLLECTION, WISHLIST }
-enum class CollectionFilter { ALL, PLAYED, NOT_PLAYED }
+enum class CollectionFilter { ALL, PLAYING, PLAYED, NOT_PLAYED }
 
 data class LibraryUiState(
     val activeTab: LibraryTab = LibraryTab.COLLECTION,
     val collectionFilter: CollectionFilter = CollectionFilter.ALL,
     val collection: List<GameEntity> = emptyList(),
     val wishlist: List<GameEntity> = emptyList(),
-    val selectedGenre: String? = null,
     val isLoading: Boolean = false
 )
 
@@ -58,9 +58,9 @@ class LibraryViewModel(
         _uiState.value = _uiState.value.copy(collectionFilter = filter)
     }
 
-    fun onTogglePlayedStatus(gameId: Int, currentStatus: Boolean) {
+    fun onPlayStatusChange(gameId: Int, status: PlayStatus) {
         viewModelScope.launch {
-            gameRepository.updatePlayedStatus(gameId, !currentStatus)
+            gameRepository.updatePlayStatus(gameId, status)
         }
     }
 
@@ -86,8 +86,15 @@ class LibraryViewModel(
         val state = _uiState.value
         return when (state.collectionFilter) {
             CollectionFilter.ALL -> state.collection
-            CollectionFilter.PLAYED -> state.collection.filter { it.isPlayed }
-            CollectionFilter.NOT_PLAYED -> state.collection.filter { !it.isPlayed }
+            CollectionFilter.PLAYING -> state.collection.filter {
+                it.playStatus == PlayStatus.PLAYING.name
+            }
+            CollectionFilter.PLAYED -> state.collection.filter {
+                it.playStatus == PlayStatus.PLAYED.name
+            }
+            CollectionFilter.NOT_PLAYED -> state.collection.filter {
+                it.playStatus == PlayStatus.NOT_PLAYED.name
+            }
         }
     }
 

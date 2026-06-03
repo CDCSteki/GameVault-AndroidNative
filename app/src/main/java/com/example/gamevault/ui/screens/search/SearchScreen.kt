@@ -31,7 +31,9 @@ import coil3.compose.AsyncImage
 import com.example.gamevault.data.remote.dto.GameDto
 import com.example.gamevault.data.repository.GameRepository
 import com.example.gamevault.data.repository.SearchRepository
+import com.example.gamevault.ui.components.GameVaultTopBar
 import com.example.gamevault.ui.theme.*
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,7 +56,7 @@ fun SearchScreen(
         Column(modifier = Modifier.fillMaxSize()) {
 
             // Top Bar
-            SearchTopBar()
+            GameVaultTopBar()
 
             // Search Field
             SearchField(
@@ -106,31 +108,6 @@ fun SearchScreen(
                 onClear = viewModel::onClearFilters
             )
         }
-    }
-}
-
-@Composable
-private fun SearchTopBar() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(Color(0xFF1A0A3D), DarkNavy)
-                )
-            )
-            .padding(horizontal = 20.dp, vertical = 16.dp)
-    ) {
-        Text(
-            text = "≡ GAMEVAULT",
-            style = MaterialTheme.typography.titleMedium.copy(
-                brush = Brush.linearGradient(
-                    colors = listOf(NeonPurple, NeonCyan)
-                ),
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = 2.sp
-            )
-        )
     }
 }
 
@@ -444,7 +421,7 @@ private fun SearchResultCard(
                             modifier = Modifier.size(14.dp)
                         )
                         Text(
-                            text = String.format("%.1f", game.rating),
+                            text = String.format(Locale.US, "%.1f", game.rating),
                             style = MaterialTheme.typography.labelMedium,
                             color = TextSecondary
                         )
@@ -490,39 +467,6 @@ private fun BadgeChip(
             color = textColor,
             fontWeight = FontWeight.SemiBold
         )
-    }
-}
-
-@Composable
-private fun TrendingTagsRow() {
-    val tags = listOf("Action-RPG", "Sci-Fi", "Soulslike", "Competitive")
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text(
-            text = "TRENDING TAGS",
-            style = MaterialTheme.typography.labelSmall,
-            color = TextMuted,
-            letterSpacing = 1.sp
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(tags) { tag ->
-                Box(
-                    modifier = Modifier
-                        .border(
-                            width = 1.dp,
-                            color = BorderCyan,
-                            shape = RoundedCornerShape(20.dp)
-                        )
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text = tag,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = TextSecondary
-                    )
-                }
-            }
-        }
     }
 }
 

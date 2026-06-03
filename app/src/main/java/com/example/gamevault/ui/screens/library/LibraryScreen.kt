@@ -18,16 +18,18 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.example.gamevault.data.local.entity.GameEntity
+import com.example.gamevault.data.local.entity.PlayStatus
 import com.example.gamevault.data.repository.GameRepository
+import com.example.gamevault.ui.theme.*
 import com.example.gamevault.ui.util.firstGenre
 import com.example.gamevault.ui.util.firstPlatform
-import com.example.gamevault.ui.theme.*
 
 @Composable
 fun LibraryScreen(
@@ -47,16 +49,13 @@ fun LibraryScreen(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            // Top Bar
             LibraryTopBar()
 
-            // Tabs
             LibraryTabs(
                 activeTab = uiState.activeTab,
                 onTabChange = viewModel::onTabChange
             )
 
-            // Collection Filter (only for collection tab)
             if (uiState.activeTab == LibraryTab.COLLECTION) {
                 CollectionFilterRow(
                     activeFilter = uiState.collectionFilter,
@@ -64,11 +63,11 @@ fun LibraryScreen(
                 )
             }
 
-            // Content
             if (uiState.activeTab == LibraryTab.COLLECTION) {
                 if (filteredCollection.isEmpty()) {
                     EmptyLibraryMessage(
                         message = when (uiState.collectionFilter) {
+                            CollectionFilter.PLAYING -> "No games currently being played"
                             CollectionFilter.PLAYED -> "No played games yet"
                             CollectionFilter.NOT_PLAYED -> "No unplayed games"
                             CollectionFilter.ALL -> "Your collection is empty.\nSearch for games to add!"
@@ -78,15 +77,17 @@ fun LibraryScreen(
                     CollectionList(
                         games = filteredCollection,
                         onGameClick = onGameClick,
-                        onTogglePlayed = { game ->
-                            viewModel.onTogglePlayedStatus(game.rawgId, game.isPlayed)
+                        onPlayStatusChange = { game, status ->
+                            viewModel.onPlayStatusChange(game.rawgId, status)
                         },
                         onRemove = { viewModel.onRemoveFromCollection(it.rawgId) }
                     )
                 }
             } else {
                 if (uiState.wishlist.isEmpty()) {
-                    EmptyLibraryMessage(message = "Your wishlist is empty.\nAdd games you want to play!")
+                    EmptyLibraryMessage(
+                        message = "Your wishlist is empty.\nAdd games you want to play!"
+                    )
                 } else {
                     WishlistList(
                         games = uiState.wishlist,
@@ -112,16 +113,27 @@ private fun LibraryTopBar() {
             )
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-        Text(
-            text = "≡ GAMEVAULT",
-            style = MaterialTheme.typography.titleMedium.copy(
-                brush = Brush.linearGradient(
-                    colors = listOf(NeonPurple, NeonCyan)
-                ),
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = 2.sp
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.SportsEsports,
+                contentDescription = null,
+                tint = NeonPurple,
+                modifier = Modifier.size(28.dp)
             )
-        )
+            Text(
+                text = "GAMEVAULT",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    brush = Brush.linearGradient(
+                        colors = listOf(NeonPurple, NeonCyan)
+                    ),
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = 2.sp
+                )
+            )
+        }
     }
 }
 
@@ -143,10 +155,7 @@ private fun LibraryTabs(
                     .weight(1f)
                     .height(40.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        if (isSelected) NeonPurple
-                        else DarkCard
-                    )
+                    .background(if (isSelected) NeonPurple else DarkCard)
                     .border(
                         width = 1.dp,
                         color = if (isSelected) NeonPurple else BorderCyan,
@@ -182,28 +191,37 @@ private fun CollectionFilterRow(
     ) {
         CollectionFilter.entries.forEach { filter ->
             val isSelected = activeFilter == filter
+            val filterColor = when (filter) {
+                CollectionFilter.ALL -> NeonPurple
+                CollectionFilter.PLAYING -> NeonCyan
+                CollectionFilter.PLAYED -> StatusGreen
+                CollectionFilter.NOT_PLAYED -> StatusOrange
+            }
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
                     .background(
-                        if (isSelected) NeonPurple.copy(alpha = 0.2f) else Color.Transparent
+                        if (isSelected) filterColor.copy(alpha = 0.15f)
+                        else Color.Transparent
                     )
                     .border(
                         width = 1.dp,
-                        color = if (isSelected) NeonPurple else BorderCyan,
+                        color = if (isSelected) filterColor else BorderCyan,
                         shape = RoundedCornerShape(20.dp)
                     )
                     .clickable { onFilterChange(filter) }
-                    .padding(horizontal = 14.dp, vertical = 7.dp)
+                    .padding(horizontal = 12.dp, vertical = 7.dp)
             ) {
                 Text(
                     text = when (filter) {
                         CollectionFilter.ALL -> "All"
+                        CollectionFilter.PLAYING -> "Playing"
                         CollectionFilter.PLAYED -> "Played"
                         CollectionFilter.NOT_PLAYED -> "Not Played"
                     },
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (isSelected) NeonPurple else TextMuted
+                    color = if (isSelected) filterColor else TextMuted,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                 )
             }
         }
@@ -214,7 +232,7 @@ private fun CollectionFilterRow(
 private fun CollectionList(
     games: List<GameEntity>,
     onGameClick: (Int) -> Unit,
-    onTogglePlayed: (GameEntity) -> Unit,
+    onPlayStatusChange: (GameEntity, PlayStatus) -> Unit,
     onRemove: (GameEntity) -> Unit
 ) {
     Text(
@@ -232,7 +250,7 @@ private fun CollectionList(
             CollectionGameCard(
                 game = game,
                 onClick = { onGameClick(game.rawgId) },
-                onTogglePlayed = { onTogglePlayed(game) },
+                onPlayStatusChange = { status -> onPlayStatusChange(game, status) },
                 onRemove = { onRemove(game) }
             )
         }
@@ -243,34 +261,46 @@ private fun CollectionList(
 private fun CollectionGameCard(
     game: GameEntity,
     onClick: () -> Unit,
-    onTogglePlayed: () -> Unit,
+    onPlayStatusChange: (PlayStatus) -> Unit,
     onRemove: () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
+
+    val currentStatus = try {
+        PlayStatus.valueOf(game.playStatus)
+    } catch (_: Exception) {
+        PlayStatus.NOT_PLAYED
+    }
+
+    val statusColor = when (currentStatus) {
+        PlayStatus.NOT_PLAYED -> StatusOrange
+        PlayStatus.PLAYING -> NeonCyan
+        PlayStatus.PLAYED -> StatusGreen
+    }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(110.dp)
             .clip(RoundedCornerShape(12.dp))
-            .border(
-                width = 1.dp,
-                color = BorderCyan,
-                shape = RoundedCornerShape(12.dp)
-            )
+            .border(width = 1.dp, color = BorderCyan, shape = RoundedCornerShape(12.dp))
             .background(DarkCard)
             .clickable(onClick = onClick)
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
-            // Cover
-            Box(modifier = Modifier.width(90.dp).fillMaxHeight()) {
+
+            // Cover image
+            Box(
+                modifier = Modifier
+                    .width(90.dp)
+                    .fillMaxHeight()
+            ) {
                 AsyncImage(
                     model = game.coverImageUrl,
                     contentDescription = game.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
-                // Platform badge
                 game.platforms.firstPlatform().takeIf { it.isNotEmpty() }?.let { platform ->
                     Box(
                         modifier = Modifier
@@ -316,32 +346,47 @@ private fun CollectionGameCard(
                     )
                 }
 
-                // Played status
+                // Play status badge
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .background(
-                            if (game.isPlayed) StatusGreen.copy(alpha = 0.15f)
-                            else StatusOrange.copy(alpha = 0.15f)
-                        )
+                        .background(statusColor.copy(alpha = 0.15f))
                         .border(
                             width = 1.dp,
-                            color = if (game.isPlayed) StatusGreen else StatusOrange,
+                            color = statusColor,
                             shape = RoundedCornerShape(6.dp)
                         )
-                        .clickable(onClick = onTogglePlayed)
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
-                    Text(
-                        text = if (game.isPlayed) "✓ Played" else "Not Played",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (game.isPlayed) StatusGreen else StatusOrange,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = when (currentStatus) {
+                                PlayStatus.NOT_PLAYED -> Icons.Default.RadioButtonUnchecked
+                                PlayStatus.PLAYING -> Icons.Default.PlayCircle
+                                PlayStatus.PLAYED -> Icons.Default.CheckCircle
+                            },
+                            contentDescription = null,
+                            tint = statusColor,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Text(
+                            text = when (currentStatus) {
+                                PlayStatus.NOT_PLAYED -> "Not Played"
+                                PlayStatus.PLAYING -> "Playing"
+                                PlayStatus.PLAYED -> "Played"
+                            },
+                            style = MaterialTheme.typography.labelSmall,
+                            color = statusColor,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                 }
             }
 
-            // Menu
+            // Dropdown Menu
             Box {
                 IconButton(onClick = { showMenu = true }) {
                     Icon(
@@ -355,18 +400,27 @@ private fun CollectionGameCard(
                     onDismissRequest = { showMenu = false },
                     modifier = Modifier.background(DarkCard)
                 ) {
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = if (game.isPlayed) "Mark as Not Played" else "Mark as Played",
-                                color = TextPrimary
+                    PlayStatus.entries.forEach { status ->
+                        if (status != currentStatus) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = when (status) {
+                                            PlayStatus.NOT_PLAYED -> "Mark as Not Played"
+                                            PlayStatus.PLAYING -> "Mark as Playing"
+                                            PlayStatus.PLAYED -> "Mark as Played"
+                                        },
+                                        color = TextPrimary
+                                    )
+                                },
+                                onClick = {
+                                    showMenu = false
+                                    onPlayStatusChange(status)
+                                }
                             )
-                        },
-                        onClick = {
-                            showMenu = false
-                            onTogglePlayed()
                         }
-                    )
+                    }
+                    HorizontalDivider(color = BorderCyan.copy(alpha = 0.3f))
                     DropdownMenuItem(
                         text = { Text("Remove", color = StatusRed) },
                         onClick = {
@@ -416,11 +470,7 @@ private fun WishlistGameCard(
             .fillMaxWidth()
             .height(110.dp)
             .clip(RoundedCornerShape(12.dp))
-            .border(
-                width = 1.dp,
-                color = BorderCyan,
-                shape = RoundedCornerShape(12.dp)
-            )
+            .border(width = 1.dp, color = BorderCyan, shape = RoundedCornerShape(12.dp))
             .background(DarkCard)
             .clickable(onClick = onClick)
     ) {
@@ -451,13 +501,12 @@ private fun WishlistGameCard(
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = game.genres?.split(",")?.firstOrNull()?.trim()?.uppercase() ?: "",
+                        text = game.genres.firstGenre().uppercase(),
                         style = MaterialTheme.typography.labelSmall,
                         color = TextMuted
                     )
                 }
 
-                // Move to collection button
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
@@ -530,7 +579,7 @@ private fun EmptyLibraryMessage(message: String) {
                 text = message,
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextMuted,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = TextAlign.Center
             )
         }
     }

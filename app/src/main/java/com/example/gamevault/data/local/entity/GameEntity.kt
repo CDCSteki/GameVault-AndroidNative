@@ -3,6 +3,12 @@ package com.example.gamevault.data.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+
+enum class PlayStatus {
+    NOT_PLAYED,
+    PLAYING,
+    PLAYED
+}
 @Entity(tableName = "games")
 data class GameEntity(
     @PrimaryKey
@@ -13,14 +19,15 @@ data class GameEntity(
     val description: String?,
     val developer: String?,
     val releaseDate: String?,
-    val platforms: String?,        // salvat ca JSON string ex: "PC,PS5,Xbox"
-    val genres: String?,           // salvat ca JSON string ex: "RPG,Action"
+    val platforms: String?,
+    val genres: String?,
     val storageSize: String?,
     val rating: Float = 0f,
-    val userRating: Float = 0f,    // ratingul dat de utilizator
-    val userNotes: String? = null, // notele private ale utilizatorului
+    val userRating: Float = 0f,
+    val userNotes: String? = null,
     val isInCollection: Boolean = false,
     val isInWishlist: Boolean = false,
     val isPlayed: Boolean = false,
+    val playStatus: String = PlayStatus.NOT_PLAYED.name,
     val addedAt: Long = System.currentTimeMillis()
 )

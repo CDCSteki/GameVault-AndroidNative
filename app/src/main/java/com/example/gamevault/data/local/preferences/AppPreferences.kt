@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.gamevault.ui.theme.AppTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -20,6 +21,7 @@ class AppPreferences(private val context: Context) {
         private val KEY_IS_DARK_THEME = booleanPreferencesKey("is_dark_theme")
         private val KEY_LANGUAGE = stringPreferencesKey("language")
         private val KEY_IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
+        private val KEY_APP_THEME = stringPreferencesKey("app_theme")
     }
 
     // --- AUTH ---
@@ -45,10 +47,28 @@ class AppPreferences(private val context: Context) {
 
     // --- THEME ---
     val isDarkTheme: Flow<Boolean> = context.dataStore.data
-        .map { it[KEY_IS_DARK_THEME] ?: true } // default: dark
+        .map { it[KEY_IS_DARK_THEME] ?: true }
+
+    val appTheme: Flow<AppTheme> = context.dataStore.data
+        .map { prefs ->
+            when (prefs[KEY_APP_THEME]) {
+                AppTheme.OCEAN_BLUE.name -> AppTheme.OCEAN_BLUE
+                AppTheme.FOREST_GREEN.name -> AppTheme.FOREST_GREEN
+                AppTheme.SUNSET.name -> AppTheme.SUNSET
+                AppTheme.MIDNIGHT_RED.name -> AppTheme.MIDNIGHT_RED
+                else -> AppTheme.CYBER_DARK
+            }
+        }
 
     suspend fun setDarkTheme(isDark: Boolean) {
         context.dataStore.edit { it[KEY_IS_DARK_THEME] = isDark }
+    }
+
+    suspend fun setAppTheme(theme: AppTheme) {
+        context.dataStore.edit { prefs ->
+            prefs[KEY_APP_THEME] = theme.name
+            prefs[KEY_IS_DARK_THEME] = theme != AppTheme.CYBER_DARK
+        }
     }
 
     // --- LANGUAGE ---

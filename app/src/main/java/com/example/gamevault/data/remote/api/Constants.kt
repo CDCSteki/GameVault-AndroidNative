@@ -1,9 +1,9 @@
 package com.example.gamevault.data.remote.api
 
 object Constants {
-    const val RAWG_API_KEY = "YOUR_RAWG_API_KEY_HERE"
+    const val RAWG_API_KEY = "42b6f138fbbc4705baaea60eb4df642e"
 
-    // Genre slugs pentru RAWG API
+    // Genre slugs
     const val GENRE_INDIE = "indie"
     const val GENRE_ACTION = "action"
     const val GENRE_RPG = "rpg"
@@ -12,7 +12,7 @@ object Constants {
     const val GENRE_CO_OP = "cooperative"
     const val GENRE_RETRO = "arcade"
 
-    // Platform IDs RAWG
+    // Platform IDs
     const val PLATFORM_PC = "4"
     const val PLATFORM_PS5 = "187"
     const val PLATFORM_PS4 = "18"
@@ -20,4 +20,10 @@ object Constants {
     const val PLATFORM_NINTENDO = "7"
     const val PLATFORM_ANDROID = "21"
     const val PLATFORM_IOS = "3"
+
+    // Suppress unused — vor fi folosite in filtre
+    @Suppress("unused")
+    val ALL_GENRES = listOf(GENRE_INDIE, GENRE_ACTION, GENRE_RPG, GENRE_STRATEGY, GENRE_SHOOTER, GENRE_CO_OP, GENRE_RETRO)
+    @Suppress("unused")
+    val ALL_PLATFORMS = listOf(PLATFORM_PC, PLATFORM_PS5, PLATFORM_PS4, PLATFORM_XBOX, PLATFORM_NINTENDO, PLATFORM_ANDROID, PLATFORM_IOS)
 }

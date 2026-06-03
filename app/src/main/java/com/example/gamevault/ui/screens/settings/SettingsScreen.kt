@@ -4,7 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -24,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gamevault.data.local.preferences.AppPreferences
 import com.example.gamevault.data.repository.AuthRepository
 import com.example.gamevault.data.repository.SearchRepository
+import com.example.gamevault.ui.components.GameVaultTopBar
 import com.example.gamevault.ui.theme.*
 
 @Composable
@@ -49,42 +53,37 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            // Top Bar
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(Color(0xFF1A0A3D), DarkNavy)
-                        )
-                    )
-                    .padding(horizontal = 20.dp, vertical = 16.dp)
-            ) {
-                Text(
-                    text = "Settings",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = TextPrimary,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            // Top Bar cu icon controller
+            GameVaultTopBar()
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // System Preferences Section
+            // System Preferences
             SettingsSectionCard {
                 SettingsSectionHeader(
                     icon = Icons.Default.Settings,
                     title = "SYSTEM PREFERENCES"
                 )
 
-                // Dark Theme Toggle
+                // Theme selector
+                ThemeSelector(
+                    currentTheme = uiState.appTheme,
+                    onThemeSelect = viewModel::onSelectTheme
+                )
+
+                HorizontalDivider(
+                    color = BorderCyan.copy(alpha = 0.3f),
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+
+                // Light mode toggle
                 SettingsRow(
-                    label = "Display Theme",
-                    value = if (uiState.isDarkTheme) "Cyber Dark (Default)" else "Light Mode"
+                    label = "Light Mode",
+                    value = if (!uiState.isDarkTheme) "Enabled" else "Disabled"
                 ) {
                     Switch(
-                        checked = uiState.isDarkTheme,
-                        onCheckedChange = viewModel::onToggleTheme,
+                        checked = !uiState.isDarkTheme,
+                        onCheckedChange = { viewModel.onToggleLightMode(it) },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = TextPrimary,
                             checkedTrackColor = NeonPurple,
@@ -100,60 +99,20 @@ fun SettingsScreen(
                 )
 
                 // Language
-                SettingsRow(
-                    label = "System Language",
-                    value = when (uiState.language) {
-                        "en" -> "English (US)"
-                        "ro" -> "Romanian"
-                        else -> "English (US)"
-                    }
-                ) {
-                    var expanded by remember { mutableStateOf(false) }
-                    Box {
-                        TextButton(onClick = { expanded = true }) {
-                            Text(
-                                text = when (uiState.language) {
-                                    "en" -> "English (US)"
-                                    "ro" -> "Romanian"
-                                    else -> "English (US)"
-                                },
-                                color = TextSecondary,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = null,
-                                tint = TextMuted
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                            modifier = Modifier.background(DarkCard)
-                        ) {
-                            listOf("en" to "English (US)", "ro" to "Romanian").forEach { (code, name) ->
-                                DropdownMenuItem(
-                                    text = { Text(name, color = TextPrimary) },
-                                    onClick = {
-                                        viewModel.onLanguageChange(code)
-                                        expanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
+                LanguageSelector(
+                    currentLanguage = uiState.language,
+                    onLanguageSelect = viewModel::onLanguageChange
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Privacy & Data Section
+            // Privacy & Data
             SettingsSectionCard {
                 SettingsSectionHeader(
                     icon = Icons.Default.Lock,
                     title = "PRIVACY & DATA"
                 )
-
                 SettingsRow(
                     label = "Search History",
                     value = if (uiState.historyCleared) "Cleared!" else "Last cleared: Never"
@@ -170,14 +129,13 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Account Control Section
+            // Account Control
             SettingsSectionCard(borderColor = StatusRed.copy(alpha = 0.4f)) {
                 SettingsSectionHeader(
                     icon = Icons.Default.Warning,
                     title = "ACCOUNT CONTROL",
                     iconTint = StatusRed
                 )
-
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -193,17 +151,13 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = TextSecondary
                     )
-
                     Spacer(modifier = Modifier.height(4.dp))
-
                     OutlinedButton(
                         onClick = viewModel::onShowDeleteDialog,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(8.dp),
                         border = androidx.compose.foundation.BorderStroke(1.dp, StatusRed),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = StatusRed
-                        )
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = StatusRed)
                     ) {
                         Text(
                             text = "DELETE PROFILE",
@@ -236,9 +190,7 @@ fun SettingsScreen(
             },
             confirmButton = {
                 Button(
-                    onClick = {
-                        viewModel.onDeleteAccount(loggedInUserId, onAccountDeleted)
-                    },
+                    onClick = { viewModel.onDeleteAccount(loggedInUserId, onAccountDeleted) },
                     colors = ButtonDefaults.buttonColors(containerColor = StatusRed)
                 ) {
                     Text("DELETE", color = TextPrimary)
@@ -253,6 +205,124 @@ fun SettingsScreen(
     }
 }
 
+data class ThemeOption(
+    val theme: AppTheme,
+    val label: String,
+    val primaryColor: Color,
+    val secondaryColor: Color
+)
+
+@Composable
+private fun ThemeSelector(
+    currentTheme: AppTheme,
+    onThemeSelect: (AppTheme) -> Unit
+) {
+    val themes = listOf(
+        ThemeOption(AppTheme.CYBER_DARK, "Cyber Dark", NeonPurple, NeonCyan),
+        ThemeOption(AppTheme.OCEAN_BLUE, "Ocean Blue", OceanBlueLight, NeonCyan),
+        ThemeOption(AppTheme.FOREST_GREEN, "Forest", ForestGreenLight, StatusGreen),
+        ThemeOption(AppTheme.SUNSET, "Sunset", SunsetOrangeLight, StatusYellow),
+        ThemeOption(AppTheme.MIDNIGHT_RED, "Midnight Red", MidnightRedLight, StatusRed)
+    )
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(
+            text = "Display Theme",
+            style = MaterialTheme.typography.bodyMedium,
+            color = TextPrimary
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            items(themes) { option ->
+                val isSelected = currentTheme == option.theme
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.clickable { onThemeSelect(option.theme) }
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(CircleShape)
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(option.primaryColor, option.secondaryColor)
+                                )
+                            )
+                            .border(
+                                width = if (isSelected) 3.dp else 1.dp,
+                                color = if (isSelected) TextPrimary else Color.Transparent,
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isSelected) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                                tint = TextPrimary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = option.label,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (isSelected) TextPrimary else TextMuted
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LanguageSelector(
+    currentLanguage: String,
+    onLanguageSelect: (String) -> Unit
+) {
+    val languages = listOf(
+        "en" to "English (US)",
+        "ro" to "Română"
+    )
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(
+            text = "System Language",
+            style = MaterialTheme.typography.bodyMedium,
+            color = TextPrimary
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            languages.forEach { (code, name) ->
+                val isSelected = currentLanguage == code
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(
+                            if (isSelected) NeonPurple.copy(alpha = 0.2f)
+                            else DarkNavySecondary
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = if (isSelected) NeonPurple else BorderCyan,
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .clickable { onLanguageSelect(code) }
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                ) {
+                    Text(
+                        text = name,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (isSelected) NeonPurple else TextSecondary,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun SettingsSectionCard(
     borderColor: Color = BorderCyan,
@@ -263,11 +333,7 @@ private fun SettingsSectionCard(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(12.dp))
-            .border(
-                width = 1.dp,
-                color = borderColor,
-                shape = RoundedCornerShape(12.dp)
-            )
+            .border(width = 1.dp, color = borderColor, shape = RoundedCornerShape(12.dp))
             .background(DarkCard),
         content = content
     )
@@ -316,16 +382,8 @@ private fun SettingsRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyMedium,
-                color = TextPrimary
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodySmall,
-                color = TextMuted
-            )
+            Text(text = label, style = MaterialTheme.typography.bodyMedium, color = TextPrimary)
+            Text(text = value, style = MaterialTheme.typography.bodySmall, color = TextMuted)
         }
         action()
     }

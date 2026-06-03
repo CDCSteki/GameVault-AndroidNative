@@ -21,7 +21,9 @@ class AppContainer(context: Context) {
 
     val gameRepository = GameRepository(
         gameDao = database.gameDao(),
-        apiService = apiService
+        userDao = database.userDao(),
+        apiService = apiService,
+        appPreferences = appPreferences
     )
 
     val searchRepository = SearchRepository(

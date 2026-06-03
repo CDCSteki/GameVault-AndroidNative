@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,13 +31,15 @@ import coil3.compose.AsyncImage
 import com.example.gamevault.data.remote.dto.GameDto
 import com.example.gamevault.data.repository.AuthRepository
 import com.example.gamevault.data.repository.GameRepository
+import com.example.gamevault.ui.navigation.NavRoutes
 import com.example.gamevault.ui.theme.*
 
 @Composable
 fun HomeScreen(
     gameRepository: GameRepository,
     authRepository: AuthRepository,
-    onGameClick: (Int) -> Unit
+    onGameClick: (Int) -> Unit,
+    onViewAllClick: (String) -> Unit
 ) {
     val viewModel: HomeViewModel = viewModel(
         factory = HomeViewModel.Factory(gameRepository, authRepository)
@@ -69,7 +72,9 @@ fun HomeScreen(
                         SectionHeader(
                             title = "Popular This Year",
                             icon = Icons.AutoMirrored.Filled.TrendingUp,
-                            onViewAll = {}
+                            onViewAll = {
+                                onViewAllClick(NavRoutes.GameList.TYPE_THIS_YEAR)
+                            }
                         )
                     }
                     item {
@@ -95,7 +100,9 @@ fun HomeScreen(
                         SectionHeader(
                             title = "All-Time Legends",
                             icon = Icons.Default.EmojiEvents,
-                            onViewAll = {}
+                            onViewAll = {
+                                onViewAllClick(NavRoutes.GameList.TYPE_ALL_TIME)
+                            }
                         )
                     }
                     item {
@@ -121,7 +128,8 @@ fun HomeScreen(
                         competitiveGames = uiState.competitive,
                         coOpGames = uiState.coOp,
                         retroGames = uiState.retro,
-                        onCategoryClick = { gameId -> onGameClick(gameId) }
+                        onCategoryClick = { gameId -> onGameClick(gameId) },
+                        onViewAllGenre = { genre -> onViewAllClick("genre_$genre") }
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                 }
@@ -160,19 +168,30 @@ private fun HomeHeader(username: String) {
         contentAlignment = Alignment.CenterStart
     ) {
         Column {
-            Text(
-                text = "≡ GAMEVAULT",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    brush = Brush.linearGradient(
-                        colors = listOf(NeonPurple, NeonCyan)
-                    ),
-                    fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = 2.sp
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.SportsEsports,
+                    contentDescription = null,
+                    tint = NeonPurple,
+                    modifier = Modifier.size(28.dp)
                 )
-            )
+                Text(
+                    text = "GAMEVAULT",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        brush = Brush.linearGradient(
+                            colors = listOf(NeonPurple, NeonCyan)
+                        ),
+                        fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = 2.sp
+                    )
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Welcome Back,",
+                text = "Welcome,",
                 style = MaterialTheme.typography.headlineSmall,
                 color = TextSecondary
             )
@@ -391,13 +410,14 @@ private fun DiscoverGrid(
     competitiveGames: List<GameDto>,
     coOpGames: List<GameDto>,
     retroGames: List<GameDto>,
-    onCategoryClick: (Int) -> Unit
+    onCategoryClick: (Int) -> Unit,
+    onViewAllGenre: (String) -> Unit
 ) {
     val categories = listOf(
-        DiscoverCategory("Indie Gems", NeonPurple, indieGames),
-        DiscoverCategory("Competitive", NeonCyan, competitiveGames),
-        DiscoverCategory("Co-Op", StatusGreen, coOpGames),
-        DiscoverCategory("Retro", StatusOrange, retroGames)
+        DiscoverCategory("Indie Gems", NeonPurple, indieGames, "indie"),
+        DiscoverCategory("Competitive", NeonCyan, competitiveGames, "shooter"),
+        DiscoverCategory("Co-Op", StatusGreen, coOpGames, "action"),
+        DiscoverCategory("Retro", StatusOrange, retroGames, "arcade")
     )
 
     Column(
@@ -415,6 +435,7 @@ private fun DiscoverGrid(
                         onClick = {
                             category.games.firstOrNull()?.let { onCategoryClick(it.id) }
                         },
+                        onViewAll = { onViewAllGenre(category.genre) },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -426,13 +447,15 @@ private fun DiscoverGrid(
 data class DiscoverCategory(
     val name: String,
     val color: Color,
-    val games: List<GameDto>
+    val games: List<GameDto>,
+    val genre: String
 )
 
 @Composable
 private fun DiscoverCategoryCard(
     category: DiscoverCategory,
     onClick: () -> Unit,
+    onViewAll: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -445,10 +468,8 @@ private fun DiscoverCategoryCard(
                 shape = RoundedCornerShape(12.dp)
             )
             .background(DarkCard)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
+            .clickable(onClick = onViewAll)
     ) {
-        // Background image dari games
         if (category.games.isNotEmpty()) {
             AsyncImage(
                 model = category.games.firstOrNull()?.backgroundImage,
@@ -464,15 +485,13 @@ private fun DiscoverCategoryCard(
                 .fillMaxSize()
                 .background(
                     brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            DarkCard.copy(alpha = 0.7f)
-                        )
+                        colors = listOf(Color.Transparent, DarkCard.copy(alpha = 0.7f))
                     )
                 )
         )
 
         Column(
+            modifier = Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(

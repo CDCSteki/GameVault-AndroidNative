@@ -28,8 +28,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             val isDarkTheme by appContainer.preferences.isDarkTheme
                 .collectAsState(initial = true)
+            val appTheme by appContainer.preferences.appTheme
+                .collectAsState(initial = com.example.gamevault.ui.theme.AppTheme.CYBER_DARK)
 
-            GameVaultTheme(darkTheme = isDarkTheme) {
+            GameVaultTheme(darkTheme = isDarkTheme, appTheme = appTheme) {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
@@ -39,6 +41,7 @@ class MainActivity : ComponentActivity() {
                     NavRoutes.Register.route,
                     NavRoutes.Splash.route
                 ) && !currentRoute.orEmpty().startsWith("game_detail")
+                        && !currentRoute.orEmpty().startsWith("game_list")
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),

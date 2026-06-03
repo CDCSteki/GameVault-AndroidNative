@@ -12,4 +12,10 @@ sealed class NavRoutes(val route: String) {
     object GameDetail : NavRoutes("game_detail/{gameId}") {
         fun createRoute(gameId: Int) = "game_detail/$gameId"
     }
+    object GameList : NavRoutes("game_list/{listType}") {
+        fun createRoute(listType: String) = "game_list/$listType"
+        const val TYPE_THIS_YEAR = "this_year"
+        const val TYPE_ALL_TIME = "all_time"
+        fun createGenreRoute(genre: String) = "game_list/genre_$genre"
+    }
 }

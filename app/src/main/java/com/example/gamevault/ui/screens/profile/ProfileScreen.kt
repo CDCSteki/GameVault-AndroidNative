@@ -1,14 +1,19 @@
 package com.example.gamevault.ui.screens.profile
 
+import android.Manifest
+import android.net.Uri
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -18,26 +23,78 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
 import com.example.gamevault.data.repository.AuthRepository
+import com.example.gamevault.ui.components.GameVaultTopBar
 import com.example.gamevault.ui.screens.auth.GameVaultTextField
 import com.example.gamevault.ui.theme.*
+import com.example.gamevault.ui.util.createImageUri
+import kotlinx.coroutines.delay
+import java.io.File
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     authRepository: AuthRepository,
-    onLogout: () -> Unit,
-    onAccountDeleted: () -> Unit
+    onLogout: () -> Unit
 ) {
     val viewModel: ProfileViewModel = viewModel(
         factory = ProfileViewModel.Factory(authRepository)
     )
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(uiState.successMessage, uiState.errorMessage) {
+        if (uiState.successMessage != null || uiState.errorMessage != null) {
+            delay(5000)
+            viewModel.clearMessages()
+        }
+    }
+
+    // Camera URI
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
+
+    // Gallery launcher
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { viewModel.onImageSelected(context, it) }
+    }
+
+    // Camera launcher
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            cameraUri?.let { viewModel.onImageSelected(context, it) }
+        }
+    }
+
+    // Camera permission launcher
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            val uri = createImageUri(context)
+            cameraUri = uri
+            cameraLauncher.launch(uri)
+        }
+    }
+
+    // Gallery permission launcher
+    val galleryPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            galleryLauncher.launch("image/*")
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -49,210 +106,193 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            // Top bar
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(Color(0xFF1A0A3D), DarkNavy)
-                        )
-                    )
-                    .padding(horizontal = 20.dp, vertical = 16.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = TextSecondary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        text = "← PROFILE",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = TextPrimary,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
+            // Top Bar
+            GameVaultTopBar()
 
-            // Avatar + Info
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Avatar
-                Box(contentAlignment = Alignment.BottomEnd) {
-                    Box(
-                        modifier = Modifier
-                            .size(90.dp)
-                            .clip(CircleShape)
-                            .background(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(NeonPurple, NeonCyan)
-                                )
-                            )
-                            .border(3.dp, NeonPurple, CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = null,
-                            tint = TextPrimary,
-                            modifier = Modifier.size(48.dp)
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .size(28.dp)
-                            .background(NeonPurple, CircleShape)
-                            .border(2.dp, DarkNavy, CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit",
-                            tint = TextPrimary,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
-                }
+            // Avatar Section
+            AvatarSection(
+                profilePictureUri = uiState.profilePictureUri,
+                username = uiState.user?.username ?: "",
+                level = uiState.user?.level ?: 1,
+                tier = uiState.user?.tier ?: "ROOKIE",
+                onEditClick = viewModel::onShowImagePickerDialog
+            )
 
-                Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = uiState.user?.username ?: "Loading...",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = TextPrimary,
-                    fontWeight = FontWeight.Bold
-                )
-
-                // Level badge
+            // Messages
+            uiState.successMessage?.let {
                 Box(
                     modifier = Modifier
-                        .background(
-                            color = NeonPurple.copy(alpha = 0.2f),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .border(
-                            1.dp,
-                            NeonPurple.copy(alpha = 0.5f),
-                            RoundedCornerShape(12.dp)
-                        )
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(StatusGreen.copy(alpha = 0.15f))
+                        .border(1.dp, StatusGreen, RoundedCornerShape(8.dp))
+                        .padding(12.dp)
                 ) {
-                    Text(
-                        text = "LVL ${uiState.user?.level ?: 1}  ${uiState.user?.tier ?: "ROOKIE"}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = NeonPurple,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = StatusGreen,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = it,
+                            color = StatusGreen,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // Edit Form
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // Username field
-                Column {
-                    Text(
-                        text = "Username",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = TextSecondary
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
+            uiState.errorMessage?.let {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(StatusRed.copy(alpha = 0.15f))
+                        .border(1.dp, StatusRed, RoundedCornerShape(8.dp))
+                        .padding(12.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Error,
+                            contentDescription = null,
+                            tint = StatusRed,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = it,
+                            color = StatusRed,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            // Username Section
+            ProfileSectionCard(title = "USERNAME") {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     GameVaultTextField(
                         value = uiState.username,
                         onValueChange = viewModel::onUsernameChange,
                         placeholder = "Enter username",
                         leadingIcon = Icons.Default.Person
                     )
+                    GradientButton(
+                        text = "UPDATE USERNAME",
+                        onClick = viewModel::onSaveUsername,
+                        isLoading = uiState.isLoading
+                    )
                 }
+            }
 
-                // Password field
-                Column {
-                    Text(
-                        text = "Password",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = TextSecondary
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    GameVaultTextField(
-                        value = uiState.password,
-                        onValueChange = viewModel::onPasswordChange,
-                        placeholder = "••••••••••",
-                        leadingIcon = Icons.Default.Lock,
-                        isPassword = true,
-                        isPasswordVisible = uiState.isPasswordVisible,
-                        onTogglePasswordVisibility = viewModel::onTogglePasswordVisibility
-                    )
-                }
+            Spacer(modifier = Modifier.height(12.dp))
 
-                // Messages
-                uiState.successMessage?.let {
-                    Text(
-                        text = it,
-                        color = StatusGreen,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-                uiState.errorMessage?.let {
-                    Text(
-                        text = it,
-                        color = StatusRed,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-
-                // Save Button
-                Button(
-                    onClick = viewModel::onSaveChanges,
+            // Password Section
+            ProfileSectionCard(title = "CHANGE PASSWORD") {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(52.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                    contentPadding = PaddingValues(0.dp),
-                    enabled = !uiState.isLoading
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(NeonPurple, Color(0xFF6A0DAD))
-                                ),
-                                shape = RoundedCornerShape(12.dp)
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (uiState.isLoading) {
-                            CircularProgressIndicator(
-                                color = TextPrimary,
-                                modifier = Modifier.size(24.dp),
-                                strokeWidth = 2.dp
-                            )
-                        } else {
-                            Text(
-                                text = "SAVE CHANGES",
-                                style = MaterialTheme.typography.labelLarge,
-                                color = TextPrimary,
-                                letterSpacing = 1.sp
-                            )
-                        }
+                    // Current password
+                    Column {
+                        Text(
+                            text = "Current Password",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = TextSecondary
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        GameVaultTextField(
+                            value = uiState.currentPassword,
+                            onValueChange = viewModel::onCurrentPasswordChange,
+                            placeholder = "Enter current password",
+                            leadingIcon = Icons.Default.Lock,
+                            isPassword = true,
+                            isPasswordVisible = uiState.isCurrentPasswordVisible,
+                            onTogglePasswordVisibility = viewModel::onToggleCurrentPasswordVisibility
+                        )
                     }
-                }
 
-                // Logout Button
+                    // New password
+                    Column {
+                        Text(
+                            text = "New Password",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = TextSecondary
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        GameVaultTextField(
+                            value = uiState.newPassword,
+                            onValueChange = viewModel::onNewPasswordChange,
+                            placeholder = "Min. 6 characters",
+                            leadingIcon = Icons.Default.Lock,
+                            isPassword = true,
+                            isPasswordVisible = uiState.isNewPasswordVisible,
+                            onTogglePasswordVisibility = viewModel::onToggleNewPasswordVisibility
+                        )
+                    }
+
+                    // Confirm new password
+                    Column {
+                        Text(
+                            text = "Confirm New Password",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = TextSecondary
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        GameVaultTextField(
+                            value = uiState.confirmNewPassword,
+                            onValueChange = viewModel::onConfirmNewPasswordChange,
+                            placeholder = "Repeat new password",
+                            leadingIcon = Icons.Default.Lock,
+                            isPassword = true,
+                            isPasswordVisible = uiState.isConfirmPasswordVisible,
+                            onTogglePasswordVisibility = viewModel::onToggleConfirmPasswordVisibility
+                        )
+                    }
+
+                    // Password strength indicator
+                    if (uiState.newPassword.isNotEmpty()) {
+                        PasswordStrengthIndicator(password = uiState.newPassword)
+                    }
+
+                    GradientButton(
+                        text = "UPDATE PASSWORD",
+                        onClick = viewModel::onSavePassword,
+                        isLoading = uiState.isLoading
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Actions Section
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Logout
                 OutlinedButton(
                     onClick = { viewModel.onLogout(onLogout) },
                     modifier = Modifier
@@ -279,105 +319,369 @@ fun ProfileScreen(
                         )
                     }
                 }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Delete Account section
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .border(
-                            width = 1.dp,
-                            color = StatusRed.copy(alpha = 0.4f),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .background(StatusRed.copy(alpha = 0.05f))
-                        .padding(16.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Warning,
-                            contentDescription = null,
-                            tint = StatusRed,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Text(
-                            text = "ACCOUNT CONTROL",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = StatusRed,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = "Deactivate Account",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = TextPrimary,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Permanently deletes your profile, game library, and all associated data. This action is irreversible.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    OutlinedButton(
-                        onClick = viewModel::onShowDeleteDialog,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, StatusRed),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = StatusRed)
-                    ) {
-                        Text(
-                            text = "DELETE PROFILE",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = StatusRed,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp
-                        )
-                    }
-                }
             }
-            Spacer(modifier = Modifier.height(80.dp))
+
+            Spacer(modifier = Modifier.height(100.dp))
         }
     }
 
-    // Delete Account Dialog
-    if (uiState.showDeleteDialog) {
+    // Image Picker Dialog
+    if (uiState.showImagePickerDialog) {
         AlertDialog(
-            onDismissRequest = viewModel::onDismissDeleteDialog,
+            onDismissRequest = viewModel::onDismissImagePickerDialog,
             containerColor = DarkCard,
             title = {
-                Text("Delete Account", color = StatusRed, fontWeight = FontWeight.Bold)
-            },
-            text = {
                 Text(
-                    "Are you sure? This will permanently delete your profile and all data. This action is irreversible.",
-                    color = TextSecondary
+                    "Change Profile Picture",
+                    color = TextPrimary,
+                    fontWeight = FontWeight.Bold
                 )
             },
-            confirmButton = {
-                Button(
-                    onClick = { viewModel.onDeleteAccount(onAccountDeleted) },
-                    colors = ButtonDefaults.buttonColors(containerColor = StatusRed)
-                ) {
-                    Text("DELETE", color = TextPrimary)
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    // Camera option
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(DarkNavySecondary)
+                            .clickable {
+                                viewModel.onDismissImagePickerDialog()
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CameraAlt,
+                            contentDescription = null,
+                            tint = NeonCyan,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Column {
+                            Text(
+                                text = "Take Photo",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = TextPrimary,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Use your camera",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = TextMuted
+                            )
+                        }
+                    }
+
+                    // Gallery option
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(DarkNavySecondary)
+                            .clickable {
+                                viewModel.onDismissImagePickerDialog()
+                                val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    Manifest.permission.READ_MEDIA_IMAGES
+                                } else {
+                                    Manifest.permission.READ_EXTERNAL_STORAGE
+                                }
+                                galleryPermissionLauncher.launch(permission)
+                            }
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PhotoLibrary,
+                            contentDescription = null,
+                            tint = NeonPurple,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Column {
+                            Text(
+                                text = "Choose from Gallery",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = TextPrimary,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Pick from your photos",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = TextMuted
+                            )
+                        }
+                    }
                 }
             },
+            confirmButton = {},
             dismissButton = {
-                TextButton(onClick = viewModel::onDismissDeleteDialog) {
+                TextButton(onClick = viewModel::onDismissImagePickerDialog) {
                     Text("Cancel", color = TextSecondary)
                 }
             }
         )
+    }
+}
+@Composable
+private fun AvatarSection(
+    profilePictureUri: String?,
+    username: String,
+    level: Int,
+    tier: String,
+    onEditClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(contentAlignment = Alignment.BottomEnd) {
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .border(
+                        width = 3.dp,
+                        brush = Brush.linearGradient(
+                            colors = listOf(NeonPurple, NeonCyan)
+                        ),
+                        shape = CircleShape
+                    )
+                    .background(DarkCard),
+                contentAlignment = Alignment.Center
+            ) {
+                if (profilePictureUri != null) {
+                    val imageModel = if (profilePictureUri.startsWith("/")) {
+                        // Local file path — functioneaza offline
+                        File(profilePictureUri)
+                    } else {
+                        profilePictureUri
+                    }
+                    AsyncImage(
+                        model = imageModel,
+                        contentDescription = "Profile Picture",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        tint = TextSecondary,
+                        modifier = Modifier.size(52.dp)
+                    )
+                }
+            }
+
+            // Edit button
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(NeonPurple, NeonCyan)
+                        ),
+                        shape = CircleShape
+                    )
+                    .border(2.dp, DarkNavy, CircleShape)
+                    .clickable(onClick = onEditClick),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CameraAlt,
+                    contentDescription = "Change Photo",
+                    tint = TextPrimary,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = username,
+            style = MaterialTheme.typography.headlineSmall,
+            color = TextPrimary,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Box(
+            modifier = Modifier
+                .background(
+                    color = NeonPurple.copy(alpha = 0.2f),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .border(
+                    1.dp,
+                    NeonPurple.copy(alpha = 0.5f),
+                    RoundedCornerShape(12.dp)
+                )
+                .padding(horizontal = 12.dp, vertical = 4.dp)
+        ) {
+            Text(
+                text = "LVL $level  •  $tier",
+                style = MaterialTheme.typography.labelSmall,
+                color = NeonPurple,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProfileSectionCard(
+    title: String,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .border(1.dp, BorderCyan, RoundedCornerShape(12.dp))
+            .background(DarkCard)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(3.dp)
+                    .height(16.dp)
+                    .background(NeonPurple, RoundedCornerShape(2.dp))
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelSmall,
+                color = NeonPurple,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
+        }
+        HorizontalDivider(color = BorderCyan.copy(alpha = 0.3f))
+        content()
+    }
+}
+
+@Composable
+private fun PasswordStrengthIndicator(password: String) {
+    val strength = when {
+        password.length >= 12 &&
+                password.any { it.isUpperCase() } &&
+                password.any { it.isDigit() } &&
+                password.any { !it.isLetterOrDigit() } -> 3
+        password.length >= 8 &&
+                (password.any { it.isUpperCase() } || password.any { it.isDigit() }) -> 2
+        password.length >= 6 -> 1
+        else -> 0
+    }
+
+    val strengthLabel = when (strength) {
+        0 -> "Too weak"
+        1 -> "Weak"
+        2 -> "Good"
+        3 -> "Strong"
+        else -> ""
+    }
+
+    val strengthColor = when (strength) {
+        0 -> StatusRed
+        1 -> StatusOrange
+        2 -> StatusYellow
+        3 -> StatusGreen
+        else -> TextMuted
+    }
+
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Password strength",
+                style = MaterialTheme.typography.labelSmall,
+                color = TextMuted
+            )
+            Text(
+                text = strengthLabel,
+                style = MaterialTheme.typography.labelSmall,
+                color = strengthColor,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            repeat(4) { index ->
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(
+                            if (index < strength) strengthColor
+                            else DarkNavySecondary
+                        )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GradientButton(
+    text: String,
+    onClick: () -> Unit,
+    isLoading: Boolean = false
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+        contentPadding = PaddingValues(0.dp),
+        enabled = !isLoading
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(NeonPurple, Color(0xFF6A0DAD))
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = TextPrimary,
+                    modifier = Modifier.size(22.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = TextPrimary,
+                    letterSpacing = 1.sp
+                )
+            }
+        }
     }
 }

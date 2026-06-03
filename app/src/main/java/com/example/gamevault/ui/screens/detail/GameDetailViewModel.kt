@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.gamevault.data.local.entity.GameEntity
+import com.example.gamevault.data.local.entity.PlayStatus
 import com.example.gamevault.data.remote.dto.GameDetailDto
 import com.example.gamevault.data.remote.dto.GameMovieDto
 import com.example.gamevault.data.remote.dto.GameScreenshotDto
@@ -20,9 +21,10 @@ data class GameDetailUiState(
     val trailers: List<GameMovieDto> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val snackbarMessage: String? = null,
     val isInCollection: Boolean = false,
     val isInWishlist: Boolean = false,
-    val isPlayed: Boolean = false,
+    val playStatus: PlayStatus = PlayStatus.NOT_PLAYED,
     val userRating: Float = 0f,
     val userNotes: String = "",
     val showNotesDialog: Boolean = false
@@ -45,7 +47,6 @@ class GameDetailViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
 
-            // Load detail, screenshots, trailers in parallel
             val detailResult = gameRepository.getGameDetails(gameId)
             val screenshotsResult = gameRepository.getGameScreenshots(gameId)
             val moviesResult = gameRepository.getGameMovies(gameId)
@@ -67,7 +68,11 @@ class GameDetailViewModel(
                     localGame = localGame,
                     isInCollection = localGame?.isInCollection ?: false,
                     isInWishlist = localGame?.isInWishlist ?: false,
-                    isPlayed = localGame?.isPlayed ?: false,
+                    playStatus = try {
+                        PlayStatus.valueOf(localGame?.playStatus ?: PlayStatus.NOT_PLAYED.name)
+                    } catch (e: Exception) {
+                        PlayStatus.NOT_PLAYED
+                    },
                     userRating = localGame?.userRating ?: 0f,
                     userNotes = localGame?.userNotes ?: ""
                 )
@@ -79,13 +84,26 @@ class GameDetailViewModel(
         viewModelScope.launch {
             val detail = _uiState.value.gameDetail ?: return@launch
             val entity = with(gameRepository) { detail.toEntity() }
-            gameRepository.addToCollection(entity)
+            val result = gameRepository.addToCollection(entity)
+            when (result) {
+                is GameRepository.AddToCollectionResult.Success ->
+                    _uiState.value = _uiState.value.copy(
+                        snackbarMessage = "Added to collection!"
+                    )
+                is GameRepository.AddToCollectionResult.AlreadyInCollection ->
+                    _uiState.value = _uiState.value.copy(
+                        snackbarMessage = "Already in your collection!"
+                    )
+            }
         }
     }
 
     fun onRemoveFromCollection() {
         viewModelScope.launch {
             gameRepository.removeFromCollection(gameId)
+            _uiState.value = _uiState.value.copy(
+                snackbarMessage = "Removed from collection"
+            )
         }
     }
 
@@ -93,27 +111,42 @@ class GameDetailViewModel(
         viewModelScope.launch {
             val detail = _uiState.value.gameDetail ?: return@launch
             val entity = with(gameRepository) { detail.toEntity() }
-            gameRepository.addToWishlist(entity)
+            val result = gameRepository.addToWishlist(entity)
+            when (result) {
+                is GameRepository.AddToWishlistResult.Success ->
+                    _uiState.value = _uiState.value.copy(
+                        snackbarMessage = "Added to wishlist!"
+                    )
+                is GameRepository.AddToWishlistResult.AlreadyInWishlist ->
+                    _uiState.value = _uiState.value.copy(
+                        snackbarMessage = "Already in your wishlist!"
+                    )
+                is GameRepository.AddToWishlistResult.AlreadyInCollection ->
+                    _uiState.value = _uiState.value.copy(
+                        snackbarMessage = "This game is already in your collection!"
+                    )
+            }
         }
     }
 
     fun onRemoveFromWishlist() {
         viewModelScope.launch {
             gameRepository.removeFromWishlist(gameId)
+            _uiState.value = _uiState.value.copy(
+                snackbarMessage = "Removed from wishlist"
+            )
         }
     }
 
-    fun onTogglePlayedStatus() {
+    fun onPlayStatusChange(status: PlayStatus) {
         viewModelScope.launch {
-            val newStatus = !_uiState.value.isPlayed
-            gameRepository.updatePlayedStatus(gameId, newStatus)
+            gameRepository.updatePlayStatus(gameId, status)
         }
     }
 
     fun onRatingChange(rating: Float) {
         _uiState.value = _uiState.value.copy(userRating = rating)
         viewModelScope.launch {
-            // Daca jocul nu e salvat local, il salvam intai
             if (_uiState.value.localGame == null) {
                 val detail = _uiState.value.gameDetail ?: return@launch
                 val entity = with(gameRepository) { detail.toEntity() }
@@ -138,6 +171,10 @@ class GameDetailViewModel(
         _uiState.value = _uiState.value.copy(
             showNotesDialog = !_uiState.value.showNotesDialog
         )
+    }
+
+    fun onSnackbarDismissed() {
+        _uiState.value = _uiState.value.copy(snackbarMessage = null)
     }
 
     fun retry() {

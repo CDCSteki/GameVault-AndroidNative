@@ -21,11 +21,14 @@ interface GameDao {
     @Query("SELECT * FROM games WHERE isInCollection = 1 ORDER BY addedAt DESC")
     fun getCollection(): Flow<List<GameEntity>>
 
-    @Query("SELECT * FROM games WHERE isInCollection = 1 AND isPlayed = 1 ORDER BY addedAt DESC")
+    @Query("SELECT * FROM games WHERE isInCollection = 1 AND playStatus = 'PLAYED' ORDER BY addedAt DESC")
     fun getPlayedGames(): Flow<List<GameEntity>>
 
-    @Query("SELECT * FROM games WHERE isInCollection = 1 AND isPlayed = 0 ORDER BY addedAt DESC")
+    @Query("SELECT * FROM games WHERE isInCollection = 1 AND playStatus = 'NOT_PLAYED' ORDER BY addedAt DESC")
     fun getNotPlayedGames(): Flow<List<GameEntity>>
+
+    @Query("SELECT * FROM games WHERE isInCollection = 1 AND playStatus = 'PLAYING' ORDER BY addedAt DESC")
+    fun getPlayingGames(): Flow<List<GameEntity>>
 
     // --- WISHLIST ---
     @Query("SELECT * FROM games WHERE isInWishlist = 1 ORDER BY addedAt DESC")
@@ -45,8 +48,11 @@ interface GameDao {
     @Query("UPDATE games SET isInWishlist = :inWishlist WHERE rawgId = :rawgId")
     suspend fun updateWishlistStatus(rawgId: Int, inWishlist: Boolean)
 
-    @Query("UPDATE games SET isPlayed = :isPlayed WHERE rawgId = :rawgId")
-    suspend fun updatePlayedStatus(rawgId: Int, isPlayed: Boolean)
+    @Query("UPDATE games SET isPlayed = :isPlayed, playStatus = :playStatus WHERE rawgId = :rawgId")
+    suspend fun updatePlayedStatus(rawgId: Int, isPlayed: Boolean, playStatus: String)
+
+    @Query("UPDATE games SET playStatus = :playStatus WHERE rawgId = :rawgId")
+    suspend fun updatePlayStatus(rawgId: Int, playStatus: String)
 
     @Query("UPDATE games SET userRating = :rating WHERE rawgId = :rawgId")
     suspend fun updateUserRating(rawgId: Int, rating: Float)
@@ -58,7 +64,11 @@ interface GameDao {
     @Query("DELETE FROM games WHERE rawgId = :rawgId")
     suspend fun deleteGame(rawgId: Int)
 
-    // --- FILTER / SEARCH in local ---
+    // --- COUNTS ---
+    @Query("SELECT COUNT(*) FROM games WHERE isInCollection = 1 AND playStatus = 'PLAYED'")
+    suspend fun getPlayedGamesCount(): Int
+
+    // --- FILTER ---
     @Query("""
         SELECT * FROM games 
         WHERE isInCollection = 1 
