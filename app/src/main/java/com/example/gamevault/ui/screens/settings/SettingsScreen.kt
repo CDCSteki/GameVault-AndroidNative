@@ -43,84 +43,69 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val loggedInUserId by authRepository.loggedInUserId.collectAsState(initial = -1)
 
+    // Accesăm culorile temei curente
+    val colors = GVTheme.colors
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkNavy)
+            .background(colors.background)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            // Top Bar cu icon controller
             GameVaultTopBar()
 
             Spacer(modifier = Modifier.height(8.dp))
 
             // System Preferences
-            SettingsSectionCard {
+            SettingsSectionCard(borderColor = colors.border) {
                 SettingsSectionHeader(
                     icon = Icons.Default.Settings,
-                    title = "SYSTEM PREFERENCES"
+                    title = "SYSTEM PREFERENCES",
+                    iconTint = colors.accent
                 )
 
                 // Theme selector
                 ThemeSelector(
                     currentTheme = uiState.appTheme,
-                    onThemeSelect = viewModel::onSelectTheme
+                    onThemeSelect = viewModel::onSelectTheme,
+                    colors = colors
                 )
 
                 HorizontalDivider(
-                    color = BorderCyan.copy(alpha = 0.3f),
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-
-                // Light mode toggle
-                SettingsRow(
-                    label = "Light Mode",
-                    value = if (!uiState.isDarkTheme) "Enabled" else "Disabled"
-                ) {
-                    Switch(
-                        checked = !uiState.isDarkTheme,
-                        onCheckedChange = { viewModel.onToggleLightMode(it) },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = TextPrimary,
-                            checkedTrackColor = NeonPurple,
-                            uncheckedThumbColor = TextMuted,
-                            uncheckedTrackColor = DarkCard
-                        )
-                    )
-                }
-
-                HorizontalDivider(
-                    color = BorderCyan.copy(alpha = 0.3f),
+                    color = colors.border.copy(alpha = 0.3f),
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
                 // Language
                 LanguageSelector(
                     currentLanguage = uiState.language,
-                    onLanguageSelect = viewModel::onLanguageChange
+                    onLanguageSelect = viewModel::onLanguageChange,
+                    colors = colors
                 )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             // Privacy & Data
-            SettingsSectionCard {
+            SettingsSectionCard(borderColor = colors.border) {
                 SettingsSectionHeader(
                     icon = Icons.Default.Lock,
-                    title = "PRIVACY & DATA"
+                    title = "PRIVACY & DATA",
+                    iconTint = colors.accent
                 )
                 SettingsRow(
                     label = "Search History",
-                    value = if (uiState.historyCleared) "Cleared!" else "Last cleared: Never"
+                    value = if (uiState.historyCleared) "Cleared!" else "Last cleared: Never",
+                    colors = colors
                 ) {
                     TextButton(onClick = viewModel::onClearSearchHistory) {
                         Text(
                             text = "Clear Now",
-                            color = NeonCyan,
+                            color = colors.accentSecondary,
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
@@ -143,13 +128,13 @@ fun SettingsScreen(
                     Text(
                         text = "Deactivate Account",
                         style = MaterialTheme.typography.titleSmall,
-                        color = TextPrimary,
+                        color = colors.textPrimary,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = "Permanently deletes your profile, game library, and all associated data. This action is irreversible.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary
+                        color = colors.textSecondary
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     OutlinedButton(
@@ -178,14 +163,14 @@ fun SettingsScreen(
     if (uiState.showDeleteDialog) {
         AlertDialog(
             onDismissRequest = viewModel::onDismissDeleteDialog,
-            containerColor = DarkCard,
+            containerColor = colors.card,
             title = {
                 Text("Delete Account", color = StatusRed, fontWeight = FontWeight.Bold)
             },
             text = {
                 Text(
                     "Are you sure? All your data will be permanently deleted.",
-                    color = TextSecondary
+                    color = colors.textSecondary
                 )
             },
             confirmButton = {
@@ -193,47 +178,52 @@ fun SettingsScreen(
                     onClick = { viewModel.onDeleteAccount(loggedInUserId, onAccountDeleted) },
                     colors = ButtonDefaults.buttonColors(containerColor = StatusRed)
                 ) {
-                    Text("DELETE", color = TextPrimary)
+                    Text("DELETE", color = colors.textPrimary)
                 }
             },
             dismissButton = {
                 TextButton(onClick = viewModel::onDismissDeleteDialog) {
-                    Text("Cancel", color = TextSecondary)
+                    Text("Cancel", color = colors.textSecondary)
                 }
             }
         )
     }
 }
 
+// ---- Datele pentru fiecare temă afișată în selector ----
 data class ThemeOption(
     val theme: AppTheme,
     val label: String,
     val primaryColor: Color,
-    val secondaryColor: Color
+    val secondaryColor: Color,
+    val emoji: String
+)
+
+private val allThemeOptions = listOf(
+    ThemeOption(AppTheme.CYBER_DARK,    "Cyber",    NeonPurple,          NeonCyan,            "🌌"),
+    ThemeOption(AppTheme.OCEAN_BLUE,    "Ocean",    Color(0xFF48CAE4),   Color(0xFF90E0EF),   "🌊"),
+    ThemeOption(AppTheme.FOREST_GREEN,  "Forest",   Color(0xFF52B788),   Color(0xFFB7E4C7),   "🌿"),
+    ThemeOption(AppTheme.SUNSET,        "Sunset",   Color(0xFFFF6B35),   Color(0xFFFFD166),   "🌅"),
+    ThemeOption(AppTheme.MIDNIGHT_RED,  "Blood",    Color(0xFFE63946),   Color(0xFFFF6B6B),   "🔴"),
+    ThemeOption(AppTheme.NEON_GREEN,    "Matrix",   Color(0xFF39FF14),   Color(0xFF00FFFF),   "💚"),
+    ThemeOption(AppTheme.ROSE_GOLD,     "Rose",     Color(0xFFE8A598),   Color(0xFFF7D6CB),   "🌸"),
 )
 
 @Composable
 private fun ThemeSelector(
     currentTheme: AppTheme,
-    onThemeSelect: (AppTheme) -> Unit
+    onThemeSelect: (AppTheme) -> Unit,
+    colors: GameVaultColors
 ) {
-    val themes = listOf(
-        ThemeOption(AppTheme.CYBER_DARK, "Cyber Dark", NeonPurple, NeonCyan),
-        ThemeOption(AppTheme.OCEAN_BLUE, "Ocean Blue", OceanBlueLight, NeonCyan),
-        ThemeOption(AppTheme.FOREST_GREEN, "Forest", ForestGreenLight, StatusGreen),
-        ThemeOption(AppTheme.SUNSET, "Sunset", SunsetOrangeLight, StatusYellow),
-        ThemeOption(AppTheme.MIDNIGHT_RED, "Midnight Red", MidnightRedLight, StatusRed)
-    )
-
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
             text = "Display Theme",
             style = MaterialTheme.typography.bodyMedium,
-            color = TextPrimary
+            color = colors.textPrimary
         )
         Spacer(modifier = Modifier.height(12.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(themes) { option ->
+            items(allThemeOptions) { option ->
                 val isSelected = currentTheme == option.theme
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -241,7 +231,7 @@ private fun ThemeSelector(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(52.dp)
+                            .size(56.dp)
                             .clip(CircleShape)
                             .background(
                                 brush = Brush.linearGradient(
@@ -250,7 +240,8 @@ private fun ThemeSelector(
                             )
                             .border(
                                 width = if (isSelected) 3.dp else 1.dp,
-                                color = if (isSelected) TextPrimary else Color.Transparent,
+                                color = if (isSelected) colors.textPrimary
+                                else Color.Transparent,
                                 shape = CircleShape
                             ),
                         contentAlignment = Alignment.Center
@@ -259,8 +250,13 @@ private fun ThemeSelector(
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = null,
-                                tint = TextPrimary,
-                                modifier = Modifier.size(20.dp)
+                                tint = Color.White,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        } else {
+                            Text(
+                                text = option.emoji,
+                                fontSize = 22.sp
                             )
                         }
                     }
@@ -268,7 +264,8 @@ private fun ThemeSelector(
                     Text(
                         text = option.label,
                         style = MaterialTheme.typography.labelSmall,
-                        color = if (isSelected) TextPrimary else TextMuted
+                        color = if (isSelected) colors.accent else colors.textMuted,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                     )
                 }
             }
@@ -279,42 +276,48 @@ private fun ThemeSelector(
 @Composable
 private fun LanguageSelector(
     currentLanguage: String,
-    onLanguageSelect: (String) -> Unit
+    onLanguageSelect: (String) -> Unit,
+    colors: GameVaultColors
 ) {
+    // Perechi: cod ISO -> (numeFlagEmoji, numeAfisat)
     val languages = listOf(
-        "en" to "English (US)",
-        "ro" to "Română"
+        "en" to ("🇬🇧" to "English"),
+        "ro" to ("🇷🇴" to "Română"),
     )
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
             text = "System Language",
             style = MaterialTheme.typography.bodyMedium,
-            color = TextPrimary
+            color = colors.textPrimary
         )
         Spacer(modifier = Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            languages.forEach { (code, name) ->
+            languages.forEach { (code, meta) ->
+                val (flag, name) = meta
                 val isSelected = currentLanguage == code
-                Box(
+                Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(10.dp))
                         .background(
-                            if (isSelected) NeonPurple.copy(alpha = 0.2f)
-                            else DarkNavySecondary
+                            if (isSelected) colors.accent.copy(alpha = 0.2f)
+                            else colors.backgroundSecondary
                         )
                         .border(
                             width = 1.dp,
-                            color = if (isSelected) NeonPurple else BorderCyan,
+                            color = if (isSelected) colors.accent else colors.border,
                             shape = RoundedCornerShape(10.dp)
                         )
                         .clickable { onLanguageSelect(code) }
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    Text(text = flag, fontSize = 18.sp)
                     Text(
                         text = name,
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (isSelected) NeonPurple else TextSecondary,
+                        color = if (isSelected) colors.accent else colors.textSecondary,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                     )
                 }
@@ -325,16 +328,17 @@ private fun LanguageSelector(
 
 @Composable
 private fun SettingsSectionCard(
-    borderColor: Color = BorderCyan,
+    borderColor: Color,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val colors = GVTheme.colors
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(12.dp))
             .border(width = 1.dp, color = borderColor, shape = RoundedCornerShape(12.dp))
-            .background(DarkCard),
+            .background(colors.card),
         content = content
     )
 }
@@ -343,7 +347,7 @@ private fun SettingsSectionCard(
 private fun SettingsSectionHeader(
     icon: ImageVector,
     title: String,
-    iconTint: Color = NeonPurple
+    iconTint: Color
 ) {
     Row(
         modifier = Modifier
@@ -352,12 +356,7 @@ private fun SettingsSectionHeader(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = iconTint,
-            modifier = Modifier.size(16.dp)
-        )
+        Icon(imageVector = icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(16.dp))
         Text(
             text = title,
             style = MaterialTheme.typography.labelSmall,
@@ -372,6 +371,7 @@ private fun SettingsSectionHeader(
 private fun SettingsRow(
     label: String,
     value: String,
+    colors: GameVaultColors,
     action: @Composable () -> Unit
 ) {
     Row(
@@ -382,8 +382,8 @@ private fun SettingsRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = label, style = MaterialTheme.typography.bodyMedium, color = TextPrimary)
-            Text(text = value, style = MaterialTheme.typography.bodySmall, color = TextMuted)
+            Text(text = label, style = MaterialTheme.typography.bodyMedium, color = colors.textPrimary)
+            Text(text = value, style = MaterialTheme.typography.bodySmall, color = colors.textMuted)
         }
         action()
     }

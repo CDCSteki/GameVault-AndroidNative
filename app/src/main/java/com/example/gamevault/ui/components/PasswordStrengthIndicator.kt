@@ -38,7 +38,7 @@ fun PasswordStrengthIndicator(password: String) {
         1 -> StatusOrange
         2 -> StatusYellow
         3 -> StatusGreen
-        else -> TextMuted
+        else -> GVTheme.colors.textMuted
     }
 
     Column {
@@ -49,7 +49,7 @@ fun PasswordStrengthIndicator(password: String) {
             Text(
                 text = "Password strength",
                 style = MaterialTheme.typography.labelSmall,
-                color = TextMuted
+                color = GVTheme.colors.textMuted
             )
             Text(
                 text = strengthLabel,
@@ -71,7 +71,7 @@ fun PasswordStrengthIndicator(password: String) {
                         .clip(RoundedCornerShape(2.dp))
                         .background(
                             if (index < strength) strengthColor
-                            else DarkNavySecondary
+                            else GVTheme.colors.backgroundSecondary
                         )
                 )
             }

@@ -45,29 +45,25 @@ class AppPreferences(private val context: Context) {
         }
     }
 
-    // --- THEME ---
-    val isDarkTheme: Flow<Boolean> = context.dataStore.data
-        .map { it[KEY_IS_DARK_THEME] ?: true }
-
     val appTheme: Flow<AppTheme> = context.dataStore.data
         .map { prefs ->
             when (prefs[KEY_APP_THEME]) {
-                AppTheme.OCEAN_BLUE.name -> AppTheme.OCEAN_BLUE
-                AppTheme.FOREST_GREEN.name -> AppTheme.FOREST_GREEN
-                AppTheme.SUNSET.name -> AppTheme.SUNSET
-                AppTheme.MIDNIGHT_RED.name -> AppTheme.MIDNIGHT_RED
-                else -> AppTheme.CYBER_DARK
+                AppTheme.OCEAN_BLUE.name    -> AppTheme.OCEAN_BLUE
+                AppTheme.FOREST_GREEN.name  -> AppTheme.FOREST_GREEN
+                AppTheme.SUNSET.name        -> AppTheme.SUNSET
+                AppTheme.MIDNIGHT_RED.name  -> AppTheme.MIDNIGHT_RED
+                AppTheme.NEON_GREEN.name    -> AppTheme.NEON_GREEN
+                AppTheme.ROSE_GOLD.name     -> AppTheme.ROSE_GOLD
+                else                        -> AppTheme.CYBER_DARK
             }
         }
 
-    suspend fun setDarkTheme(isDark: Boolean) {
-        context.dataStore.edit { it[KEY_IS_DARK_THEME] = isDark }
-    }
 
     suspend fun setAppTheme(theme: AppTheme) {
         context.dataStore.edit { prefs ->
             prefs[KEY_APP_THEME] = theme.name
-            prefs[KEY_IS_DARK_THEME] = theme != AppTheme.CYBER_DARK
+            // Toate temele sunt "dark" — light mode rămâne un toggle separat
+            prefs[KEY_IS_DARK_THEME] = true
         }
     }
 

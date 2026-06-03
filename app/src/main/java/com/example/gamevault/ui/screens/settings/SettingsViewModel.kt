@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 data class SettingsUiState(
-    val isDarkTheme: Boolean = true,
     val appTheme: AppTheme = AppTheme.CYBER_DARK,
     val language: String = "en",
     val showDeleteDialog: Boolean = false,
@@ -31,11 +30,6 @@ class SettingsViewModel(
 
     init {
         viewModelScope.launch {
-            appPreferences.isDarkTheme.collect { isDark ->
-                _uiState.value = _uiState.value.copy(isDarkTheme = isDark)
-            }
-        }
-        viewModelScope.launch {
             appPreferences.appTheme.collect { theme ->
                 _uiState.value = _uiState.value.copy(appTheme = theme)
             }
@@ -50,12 +44,6 @@ class SettingsViewModel(
     fun onSelectTheme(theme: AppTheme) {
         viewModelScope.launch {
             appPreferences.setAppTheme(theme)
-        }
-    }
-
-    fun onToggleLightMode(isLight: Boolean) {
-        viewModelScope.launch {
-            appPreferences.setDarkTheme(!isLight)
         }
     }
 

@@ -11,22 +11,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.gamevault.ui.theme.DarkNavy
-import com.example.gamevault.ui.theme.NeonCyan
-import com.example.gamevault.ui.theme.NeonPurple
+import com.example.gamevault.ui.theme.GVTheme
 
 @Composable
 fun GameVaultTopBar(modifier: Modifier = Modifier) {
+    val colors = GVTheme.colors
     Box(
         modifier = modifier
             .fillMaxWidth()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(Color(0xFF1A0A3D), DarkNavy)
+                    colors = listOf(
+                        colors.accent.copy(alpha = 0.25f),
+                        colors.background
+                    )
                 )
             )
             .padding(horizontal = 20.dp, vertical = 16.dp)
@@ -38,14 +39,14 @@ fun GameVaultTopBar(modifier: Modifier = Modifier) {
             Icon(
                 imageVector = Icons.Default.SportsEsports,
                 contentDescription = null,
-                tint = NeonPurple,
+                tint = colors.accent,
                 modifier = Modifier.size(28.dp)
             )
             Text(
                 text = "GAMEVAULT",
                 style = MaterialTheme.typography.titleMedium.copy(
                     brush = Brush.linearGradient(
-                        colors = listOf(NeonPurple, NeonCyan)
+                        colors = listOf(colors.accent, colors.accentSecondary)
                     ),
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = 2.sp

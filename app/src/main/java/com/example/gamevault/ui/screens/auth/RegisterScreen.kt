@@ -30,9 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gamevault.data.repository.AuthRepository
+import com.example.gamevault.ui.components.GameVaultTextField
 import com.example.gamevault.ui.components.PasswordStrengthIndicator
 import com.example.gamevault.ui.theme.*
-import com.example.gamevault.ui.components.GameVaultTextField
 
 @Composable
 fun RegisterScreen(
@@ -52,8 +52,8 @@ fun RegisterScreen(
             .background(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        Color(0xFF1A1040),
-                        DarkNavy
+                        GVTheme.colors.backgroundSecondary,
+                        GVTheme.colors.background
                     ),
                     center = Offset(0.5f, 0.3f),
                     radius = 1000f
@@ -77,7 +77,7 @@ fun RegisterScreen(
                     .border(
                         width = 1.5.dp,
                         brush = Brush.linearGradient(
-                            colors = listOf(NeonCyan, NeonPurple)
+                            colors = listOf(GVTheme.colors.accentSecondary, GVTheme.colors.accent)
                         ),
                         shape = RoundedCornerShape(16.dp)
                     )
@@ -93,7 +93,7 @@ fun RegisterScreen(
                         text = "GAMEVAULT",
                         style = MaterialTheme.typography.displayMedium.copy(
                             brush = Brush.linearGradient(
-                                colors = listOf(NeonPurple, NeonCyan)
+                                colors = listOf(GVTheme.colors.accent, GVTheme.colors.accentSecondary)
                             ),
                             fontWeight = FontWeight.ExtraBold,
                             letterSpacing = 3.sp
@@ -105,7 +105,7 @@ fun RegisterScreen(
                     Text(
                         text = "Create your account",
                         style = MaterialTheme.typography.titleMedium,
-                        color = TextSecondary
+                        color = GVTheme.colors.textSecondary
                     )
 
                     Spacer(modifier = Modifier.height(32.dp))
@@ -115,7 +115,7 @@ fun RegisterScreen(
                         Text(
                             text = "Username",
                             style = MaterialTheme.typography.labelMedium,
-                            color = TextSecondary
+                            color = GVTheme.colors.textSecondary
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         GameVaultTextField(
@@ -139,7 +139,7 @@ fun RegisterScreen(
                         Text(
                             text = "Email",
                             style = MaterialTheme.typography.labelMedium,
-                            color = TextSecondary
+                            color = GVTheme.colors.textSecondary
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         GameVaultTextField(
@@ -164,7 +164,7 @@ fun RegisterScreen(
                         Text(
                             text = "Password",
                             style = MaterialTheme.typography.labelMedium,
-                            color = TextSecondary
+                            color = GVTheme.colors.textSecondary
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         GameVaultTextField(
@@ -197,7 +197,7 @@ fun RegisterScreen(
                         Text(
                             text = "Confirm Password",
                             style = MaterialTheme.typography.labelMedium,
-                            color = TextSecondary
+                            color = GVTheme.colors.textSecondary
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         GameVaultTextField(
@@ -256,7 +256,7 @@ fun RegisterScreen(
                                 .fillMaxSize()
                                 .background(
                                     brush = Brush.linearGradient(
-                                        colors = listOf(NeonPurple, Color(0xFF6A0DAD))
+                                        colors = listOf(GVTheme.colors.accent, GVTheme.colors.accentSecondary)
                                     ),
                                     shape = RoundedCornerShape(12.dp)
                                 ),
@@ -264,7 +264,7 @@ fun RegisterScreen(
                         ) {
                             if (uiState.isLoading) {
                                 CircularProgressIndicator(
-                                    color = TextPrimary,
+                                    color = GVTheme.colors.textPrimary,
                                     modifier = Modifier.size(24.dp),
                                     strokeWidth = 2.dp
                                 )
@@ -272,7 +272,7 @@ fun RegisterScreen(
                                 Text(
                                     text = "CREATE ACCOUNT",
                                     style = MaterialTheme.typography.labelLarge,
-                                    color = TextPrimary,
+                                    color = GVTheme.colors.textPrimary,
                                     letterSpacing = 2.sp
                                 )
                             }
@@ -289,7 +289,7 @@ fun RegisterScreen(
                         Text(
                             text = "Already have an account? ",
                             style = MaterialTheme.typography.bodySmall,
-                            color = TextSecondary
+                            color = GVTheme.colors.textSecondary
                         )
                         TextButton(
                             onClick = onNavigateToLogin,
@@ -300,7 +300,7 @@ fun RegisterScreen(
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     fontWeight = FontWeight.Bold
                                 ),
-                                color = NeonPurple
+                                color = GVTheme.colors.accent
                             )
                         }
                     }

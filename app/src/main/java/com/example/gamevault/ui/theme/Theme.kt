@@ -6,31 +6,36 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val GameVaultDarkColorScheme = darkColorScheme(
-    primary = NeonPurple,
-    onPrimary = TextPrimary,
-    primaryContainer = DarkCard,
-    onPrimaryContainer = TextPrimary,
-    secondary = NeonCyan,
-    onSecondary = DarkNavy,
-    secondaryContainer = DarkCardSecondary,
-    onSecondaryContainer = TextPrimary,
-    tertiary = NeonPurpleLight,
-    onTertiary = DarkNavy,
-    background = DarkNavy,
-    onBackground = TextPrimary,
-    surface = DarkNavySecondary,
-    onSurface = TextPrimary,
-    surfaceVariant = DarkCard,
-    onSurfaceVariant = TextSecondary,
-    outline = BorderCyan,
-    error = StatusRed,
-    onError = TextPrimary
-)
+// ---- Material3 color schemes (folosite de componente M3 standard) ----
+
+private fun darkM3Scheme(accent: Color, accentSec: Color, bg: Color, bgSec: Color, card: Color, border: Color) =
+    darkColorScheme(
+        primary = accent,
+        onPrimary = TextPrimary,
+        primaryContainer = card,
+        onPrimaryContainer = TextPrimary,
+        secondary = accentSec,
+        onSecondary = bg,
+        secondaryContainer = card,
+        onSecondaryContainer = TextPrimary,
+        tertiary = accent.copy(alpha = 0.7f),
+        onTertiary = bg,
+        background = bg,
+        onBackground = TextPrimary,
+        surface = bgSec,
+        onSurface = TextPrimary,
+        surfaceVariant = card,
+        onSurfaceVariant = TextSecondary,
+        outline = border,
+        error = StatusRed,
+        onError = TextPrimary
+    )
 
 private val GameVaultLightColorScheme = lightColorScheme(
     primary = LightPrimary,
@@ -45,93 +50,19 @@ private val GameVaultLightColorScheme = lightColorScheme(
     onError = TextPrimary
 )
 
-private val OceanBlueColorScheme = darkColorScheme(
-    primary = OceanBlueLight,
-    onPrimary = TextPrimary,
-    primaryContainer = DarkCard,
-    onPrimaryContainer = TextPrimary,
-    secondary = NeonCyan,
-    onSecondary = DarkNavy,
-    background = DarkNavy,
-    onBackground = TextPrimary,
-    surface = DarkNavySecondary,
-    onSurface = TextPrimary,
-    surfaceVariant = DarkCard,
-    onSurfaceVariant = TextSecondary,
-    outline = OceanBlue,
-    error = StatusRed,
-    onError = TextPrimary
-)
-
-private val ForestGreenColorScheme = darkColorScheme(
-    primary = ForestGreenLight,
-    onPrimary = TextPrimary,
-    primaryContainer = DarkCard,
-    onPrimaryContainer = TextPrimary,
-    secondary = StatusGreen,
-    onSecondary = DarkNavy,
-    background = DarkNavy,
-    onBackground = TextPrimary,
-    surface = DarkNavySecondary,
-    onSurface = TextPrimary,
-    surfaceVariant = DarkCard,
-    onSurfaceVariant = TextSecondary,
-    outline = ForestGreen,
-    error = StatusRed,
-    onError = TextPrimary
-)
-
-private val SunsetColorScheme = darkColorScheme(
-    primary = SunsetOrangeLight,
-    onPrimary = TextPrimary,
-    primaryContainer = DarkCard,
-    onPrimaryContainer = TextPrimary,
-    secondary = StatusYellow,
-    onSecondary = DarkNavy,
-    background = DarkNavy,
-    onBackground = TextPrimary,
-    surface = DarkNavySecondary,
-    onSurface = TextPrimary,
-    surfaceVariant = DarkCard,
-    onSurfaceVariant = TextSecondary,
-    outline = SunsetOrange,
-    error = StatusRed,
-    onError = TextPrimary
-)
-
-private val MidnightRedColorScheme = darkColorScheme(
-    primary = MidnightRedLight,
-    onPrimary = TextPrimary,
-    primaryContainer = DarkCard,
-    onPrimaryContainer = TextPrimary,
-    secondary = StatusRed,
-    onSecondary = DarkNavy,
-    background = DarkNavy,
-    onBackground = TextPrimary,
-    surface = DarkNavySecondary,
-    onSurface = TextPrimary,
-    surfaceVariant = DarkCard,
-    onSurfaceVariant = TextSecondary,
-    outline = MidnightRed,
-    error = StatusRed,
-    onError = TextPrimary
-)
-
 @Composable
 fun GameVaultTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     appTheme: AppTheme = AppTheme.CYBER_DARK,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        !darkTheme -> GameVaultLightColorScheme
-        else -> when (appTheme) {
-            AppTheme.CYBER_DARK -> GameVaultDarkColorScheme
-            AppTheme.OCEAN_BLUE -> OceanBlueColorScheme
-            AppTheme.FOREST_GREEN -> ForestGreenColorScheme
-            AppTheme.SUNSET -> SunsetColorScheme
-            AppTheme.MIDNIGHT_RED -> MidnightRedColorScheme
-        }
+    val gvColors = if (!darkTheme) CyberDarkColors else appThemeColors(appTheme)
+
+    val colorScheme = if (!darkTheme) {
+        GameVaultLightColorScheme
+    } else {
+        val c = gvColors
+        darkM3Scheme(c.accent, c.accentSecondary, c.background, c.backgroundSecondary, c.card, c.border)
     }
 
     val view = LocalView.current
@@ -144,9 +75,16 @@ fun GameVaultTheme(
         }
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    CompositionLocalProvider(LocalGameVaultColors provides gvColors) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content
+        )
+    }
+}
+
+object GVTheme {
+    val colors: GameVaultColors
+        @Composable get() = LocalGameVaultColors.current
 }

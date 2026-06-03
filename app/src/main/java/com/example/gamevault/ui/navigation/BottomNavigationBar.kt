@@ -18,13 +18,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.gamevault.ui.theme.DarkNavySecondary
-import com.example.gamevault.ui.theme.NeonCyan
-import com.example.gamevault.ui.theme.NeonPurple
-import com.example.gamevault.ui.theme.TextMuted
+import com.example.gamevault.ui.theme.GVTheme
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
+    val colors = GVTheme.colors
+
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.Search,
@@ -44,11 +43,14 @@ fun BottomNavigationBar(navController: NavController) {
             .border(
                 width = 1.dp,
                 brush = Brush.horizontalGradient(
-                    colors = listOf(NeonPurple.copy(alpha = 0.5f), NeonCyan.copy(alpha = 0.5f))
+                    listOf(
+                        colors.accent.copy(alpha = 0.5f),
+                        colors.accentSecondary.copy(alpha = 0.5f)
+                    )
                 ),
                 shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
             ),
-        containerColor = DarkNavySecondary,
+        containerColor = colors.backgroundSecondary,
         tonalElevation = 0.dp
     ) {
         items.forEach { item ->
@@ -58,9 +60,7 @@ fun BottomNavigationBar(navController: NavController) {
                 onClick = {
                     if (currentRoute != item.route) {
                         navController.navigate(item.route) {
-                            popUpTo(NavRoutes.Home.route) {
-                                saveState = true
-                            }
+                            popUpTo(NavRoutes.Home.route) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
                         }
@@ -71,22 +71,22 @@ fun BottomNavigationBar(navController: NavController) {
                         imageVector = item.icon,
                         contentDescription = item.title,
                         modifier = Modifier.size(22.dp),
-                        tint = if (isSelected) NeonPurple else TextMuted
+                        tint = if (isSelected) colors.accent else colors.textMuted
                     )
                 },
                 label = {
                     Text(
                         text = item.title,
                         style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
-                        color = if (isSelected) NeonPurple else TextMuted
+                        color = if (isSelected) colors.accent else colors.textMuted
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = NeonPurple,
-                    unselectedIconColor = TextMuted,
-                    selectedTextColor = NeonPurple,
-                    unselectedTextColor = TextMuted,
-                    indicatorColor = NeonPurple.copy(alpha = 0.15f)
+                    selectedIconColor = colors.accent,
+                    unselectedIconColor = colors.textMuted,
+                    selectedTextColor = colors.accent,
+                    unselectedTextColor = colors.textMuted,
+                    indicatorColor = colors.accent.copy(alpha = 0.15f)
                 )
             )
         }

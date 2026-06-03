@@ -19,11 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.gamevault.ui.theme.BorderCyan
-import com.example.gamevault.ui.theme.DarkCard
-import com.example.gamevault.ui.theme.NeonCyan
 import com.example.gamevault.ui.theme.TextMuted
-import com.example.gamevault.ui.theme.TextPrimary
+import com.example.gamevault.ui.theme.GVTheme
+
 
 @Composable
 fun GameVaultTextField(
@@ -87,14 +85,14 @@ fun GameVaultTextField(
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = TextPrimary,
-            unfocusedTextColor = TextPrimary,
-            focusedBorderColor = NeonCyan,
-            unfocusedBorderColor = BorderCyan,
-            focusedContainerColor = DarkCard,
-            unfocusedContainerColor = DarkCard,
-            cursorColor = NeonCyan,
-            focusedLeadingIconColor = NeonCyan,
+            focusedTextColor = GVTheme.colors.textPrimary,
+            unfocusedTextColor = GVTheme.colors.textPrimary,
+            focusedBorderColor = GVTheme.colors.accentSecondary,
+            unfocusedBorderColor = GVTheme.colors.border,
+            focusedContainerColor = GVTheme.colors.card,
+            unfocusedContainerColor = GVTheme.colors.card,
+            cursorColor = GVTheme.colors.accentSecondary,
+            focusedLeadingIconColor = GVTheme.colors.accentSecondary,
             unfocusedLeadingIconColor = TextMuted
         )
     )

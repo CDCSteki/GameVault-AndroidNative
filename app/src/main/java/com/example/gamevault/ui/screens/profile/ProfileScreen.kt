@@ -91,7 +91,7 @@ fun ProfileScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkNavy)
+            .background(GVTheme.colors.background)
     ) {
         Column(
             modifier = Modifier
@@ -210,7 +210,7 @@ fun ProfileScreen(
                         Text(
                             text = "Current Password",
                             style = MaterialTheme.typography.labelMedium,
-                            color = TextSecondary
+                            color = GVTheme.colors.textSecondary
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         GameVaultTextField(
@@ -229,7 +229,7 @@ fun ProfileScreen(
                         Text(
                             text = "New Password",
                             style = MaterialTheme.typography.labelMedium,
-                            color = TextSecondary
+                            color = GVTheme.colors.textSecondary
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         GameVaultTextField(
@@ -248,7 +248,7 @@ fun ProfileScreen(
                         Text(
                             text = "Confirm New Password",
                             style = MaterialTheme.typography.labelMedium,
-                            color = TextSecondary
+                            color = GVTheme.colors.textSecondary
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         GameVaultTextField(
@@ -291,7 +291,7 @@ fun ProfileScreen(
                         .fillMaxWidth()
                         .height(52.dp),
                     shape = RoundedCornerShape(12.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, BorderCyan)
+                    border = androidx.compose.foundation.BorderStroke(1.dp, GVTheme.colors.border)
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -300,13 +300,13 @@ fun ProfileScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Logout,
                             contentDescription = null,
-                            tint = TextSecondary,
+                            tint = GVTheme.colors.textSecondary,
                             modifier = Modifier.size(18.dp)
                         )
                         Text(
                             text = "LOGOUT",
                             style = MaterialTheme.typography.labelLarge,
-                            color = TextSecondary,
+                            color = GVTheme.colors.textSecondary,
                             letterSpacing = 1.sp
                         )
                     }
@@ -321,11 +321,11 @@ fun ProfileScreen(
     if (uiState.showImagePickerDialog) {
         AlertDialog(
             onDismissRequest = viewModel::onDismissImagePickerDialog,
-            containerColor = DarkCard,
+            containerColor = GVTheme.colors.card,
             title = {
                 Text(
                     "Change Profile Picture",
-                    color = TextPrimary,
+                    color = GVTheme.colors.textPrimary,
                     fontWeight = FontWeight.Bold
                 )
             },
@@ -336,7 +336,7 @@ fun ProfileScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(10.dp))
-                            .background(DarkNavySecondary)
+                            .background(GVTheme.colors.backgroundSecondary)
                             .clickable {
                                 viewModel.onDismissImagePickerDialog()
                                 cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
@@ -348,20 +348,20 @@ fun ProfileScreen(
                         Icon(
                             imageVector = Icons.Default.CameraAlt,
                             contentDescription = null,
-                            tint = NeonCyan,
+                            tint = GVTheme.colors.accentSecondary,
                             modifier = Modifier.size(24.dp)
                         )
                         Column {
                             Text(
                                 text = "Take Photo",
                                 style = MaterialTheme.typography.titleSmall,
-                                color = TextPrimary,
+                                color = GVTheme.colors.textPrimary,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = "Use your camera",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = TextMuted
+                                color = GVTheme.colors.textMuted
                             )
                         }
                     }
@@ -371,7 +371,7 @@ fun ProfileScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(10.dp))
-                            .background(DarkNavySecondary)
+                            .background(GVTheme.colors.backgroundSecondary)
                             .clickable {
                                 viewModel.onDismissImagePickerDialog()
                                 galleryLauncher.launch(
@@ -387,20 +387,20 @@ fun ProfileScreen(
                         Icon(
                             imageVector = Icons.Default.PhotoLibrary,
                             contentDescription = null,
-                            tint = NeonPurple,
+                            tint = GVTheme.colors.accent,
                             modifier = Modifier.size(24.dp)
                         )
                         Column {
                             Text(
                                 text = "Choose from Gallery",
                                 style = MaterialTheme.typography.titleSmall,
-                                color = TextPrimary,
+                                color = GVTheme.colors.textPrimary,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = "Pick from your photos",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = TextMuted
+                                color = GVTheme.colors.textMuted
                             )
                         }
                     }
@@ -409,7 +409,7 @@ fun ProfileScreen(
             confirmButton = {},
             dismissButton = {
                 TextButton(onClick = viewModel::onDismissImagePickerDialog) {
-                    Text("Cancel", color = TextSecondary)
+                    Text("Cancel", color = GVTheme.colors.textSecondary)
                 }
             }
         )
@@ -437,16 +437,15 @@ private fun AvatarSection(
                     .border(
                         width = 3.dp,
                         brush = Brush.linearGradient(
-                            colors = listOf(NeonPurple, NeonCyan)
+                            colors = listOf(GVTheme.colors.accent, GVTheme.colors.accentSecondary)
                         ),
                         shape = CircleShape
                     )
-                    .background(DarkCard),
+                    .background(GVTheme.colors.card),
                 contentAlignment = Alignment.Center
             ) {
                 if (profilePictureUri != null) {
                     val imageModel = if (profilePictureUri.startsWith("/")) {
-                        // Local file path — functioneaza offline
                         File(profilePictureUri)
                     } else {
                         profilePictureUri
@@ -463,7 +462,7 @@ private fun AvatarSection(
                     Icon(
                         imageVector = Icons.Default.Person,
                         contentDescription = null,
-                        tint = TextSecondary,
+                        tint = GVTheme.colors.textSecondary,
                         modifier = Modifier.size(52.dp)
                     )
                 }
@@ -475,18 +474,18 @@ private fun AvatarSection(
                     .size(32.dp)
                     .background(
                         brush = Brush.linearGradient(
-                            colors = listOf(NeonPurple, NeonCyan)
+                            colors = listOf(GVTheme.colors.accent, GVTheme.colors.accentSecondary)
                         ),
                         shape = CircleShape
                     )
-                    .border(2.dp, DarkNavy, CircleShape)
+                    .border(2.dp, GVTheme.colors.background, CircleShape)
                     .clickable(onClick = onEditClick),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.CameraAlt,
                     contentDescription = "Change Photo",
-                    tint = TextPrimary,
+                    tint = GVTheme.colors.textPrimary,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -497,7 +496,7 @@ private fun AvatarSection(
         Text(
             text = username,
             style = MaterialTheme.typography.headlineSmall,
-            color = TextPrimary,
+            color = GVTheme.colors.textPrimary,
             fontWeight = FontWeight.Bold
         )
 
@@ -506,12 +505,12 @@ private fun AvatarSection(
         Box(
             modifier = Modifier
                 .background(
-                    color = NeonPurple.copy(alpha = 0.2f),
+                    color = GVTheme.colors.accent.copy(alpha = 0.2f),
                     shape = RoundedCornerShape(12.dp)
                 )
                 .border(
                     1.dp,
-                    NeonPurple.copy(alpha = 0.5f),
+                    GVTheme.colors.accent.copy(alpha = 0.5f),
                     RoundedCornerShape(12.dp)
                 )
                 .padding(horizontal = 12.dp, vertical = 4.dp)
@@ -519,7 +518,7 @@ private fun AvatarSection(
             Text(
                 text = "LVL $level  •  $tier",
                 style = MaterialTheme.typography.labelSmall,
-                color = NeonPurple,
+                color = GVTheme.colors.accent,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -536,8 +535,8 @@ private fun ProfileSectionCard(
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .clip(RoundedCornerShape(12.dp))
-            .border(1.dp, BorderCyan, RoundedCornerShape(12.dp))
-            .background(DarkCard)
+            .border(1.dp, GVTheme.colors.border, RoundedCornerShape(12.dp))
+            .background(GVTheme.colors.card)
     ) {
         Row(
             modifier = Modifier
@@ -550,17 +549,17 @@ private fun ProfileSectionCard(
                 modifier = Modifier
                     .width(3.dp)
                     .height(16.dp)
-                    .background(NeonPurple, RoundedCornerShape(2.dp))
+                    .background(GVTheme.colors.accent, RoundedCornerShape(2.dp))
             )
             Text(
                 text = title,
                 style = MaterialTheme.typography.labelSmall,
-                color = NeonPurple,
+                color = GVTheme.colors.accent,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.sp
             )
         }
-        HorizontalDivider(color = BorderCyan.copy(alpha = 0.3f))
+        HorizontalDivider(color = GVTheme.colors.border.copy(alpha = 0.3f))
         content()
     }
 }
@@ -586,7 +585,7 @@ private fun GradientButton(
                 .fillMaxSize()
                 .background(
                     brush = Brush.linearGradient(
-                        colors = listOf(NeonPurple, Color(0xFF6A0DAD))
+                        colors = listOf(GVTheme.colors.accent, GVTheme.colors.accentSecondary)
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ),
@@ -594,7 +593,7 @@ private fun GradientButton(
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    color = TextPrimary,
+                    color = GVTheme.colors.textPrimary,
                     modifier = Modifier.size(22.dp),
                     strokeWidth = 2.dp
                 )
@@ -602,7 +601,7 @@ private fun GradientButton(
                 Text(
                     text = text,
                     style = MaterialTheme.typography.labelLarge,
-                    color = TextPrimary,
+                    color = GVTheme.colors.textPrimary,
                     letterSpacing = 1.sp
                 )
             }

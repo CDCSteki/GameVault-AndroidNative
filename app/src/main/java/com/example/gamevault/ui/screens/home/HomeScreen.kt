@@ -49,11 +49,11 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkNavy)
+            .background(GVTheme.colors.background)
     ) {
         if (uiState.isLoading && uiState.popularThisYear.isEmpty()) {
             CircularProgressIndicator(
-                color = NeonPurple,
+                color = GVTheme.colors.accent,
                 modifier = Modifier.align(Alignment.Center)
             )
         } else {
@@ -129,7 +129,6 @@ fun HomeScreen(
                             competitiveGames = uiState.competitive,
                             coOpGames = uiState.coop,
                             retroGames = uiState.retro,
-                            onCategoryClick = { gameId -> onGameClick(gameId) },
                             onViewAllGenre = { route -> onViewAllClick(route) }
                         )
                         Spacer(modifier = Modifier.height(24.dp))
@@ -154,6 +153,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeHeader(username: String) {
+    val colors = GVTheme.colors
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -161,8 +161,8 @@ private fun HomeHeader(username: String) {
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF1A0A3D),
-                        DarkNavy
+                        colors.accent.copy(alpha = 0.25f),
+                        GVTheme.colors.background
                     )
                 )
             )
@@ -177,14 +177,14 @@ private fun HomeHeader(username: String) {
                 Icon(
                     imageVector = Icons.Default.SportsEsports,
                     contentDescription = null,
-                    tint = NeonPurple,
+                    tint = GVTheme.colors.accent,
                     modifier = Modifier.size(28.dp)
                 )
                 Text(
                     text = "GAMEVAULT",
                     style = MaterialTheme.typography.titleMedium.copy(
                         brush = Brush.linearGradient(
-                            colors = listOf(NeonPurple, NeonCyan)
+                            colors = listOf(GVTheme.colors.accent, GVTheme.colors.accentSecondary)
                         ),
                         fontWeight = FontWeight.ExtraBold,
                         letterSpacing = 2.sp
@@ -195,13 +195,13 @@ private fun HomeHeader(username: String) {
             Text(
                 text = "Welcome,",
                 style = MaterialTheme.typography.headlineSmall,
-                color = TextSecondary
+                color = GVTheme.colors.textSecondary
             )
             Text(
                 text = username,
                 style = MaterialTheme.typography.headlineLarge.copy(
                     brush = Brush.linearGradient(
-                        colors = listOf(NeonPurple, NeonCyan)
+                        colors = listOf(GVTheme.colors.accent, GVTheme.colors.accentSecondary)
                     ),
                     fontWeight = FontWeight.Bold
                 )
@@ -210,7 +210,7 @@ private fun HomeHeader(username: String) {
             Text(
                 text = "Your next legendary adventure is just a click away.",
                 style = MaterialTheme.typography.bodySmall,
-                color = TextMuted
+                color = GVTheme.colors.textMuted
             )
         }
     }
@@ -236,13 +236,13 @@ private fun SectionHeader(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = NeonPurple,
+                tint = GVTheme.colors.accent,
                 modifier = Modifier.size(18.dp)
             )
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
-                color = TextPrimary,
+                color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -251,7 +251,7 @@ private fun SectionHeader(
                 Text(
                     text = "VIEW ALL",
                     style = MaterialTheme.typography.labelSmall,
-                    color = NeonPurple,
+                    color = GVTheme.colors.accent,
                     letterSpacing = 1.sp
                 )
             }
@@ -300,7 +300,7 @@ private fun GameCardMedium(
                     .align(Alignment.TopEnd)
                     .padding(8.dp)
                     .background(
-                        color = if (badge == "ONLINE") NeonCyan else NeonPurple,
+                        color = if (badge == "ONLINE") GVTheme.colors.accentSecondary else GVTheme.colors.accent,
                         shape = RoundedCornerShape(4.dp)
                     )
                     .padding(horizontal = 6.dp, vertical = 2.dp)
@@ -308,7 +308,7 @@ private fun GameCardMedium(
                 Text(
                     text = badge,
                     style = MaterialTheme.typography.labelSmall,
-                    color = DarkNavy,
+                    color = GVTheme.colors.background,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -323,14 +323,14 @@ private fun GameCardMedium(
             Text(
                 text = game.name,
                 style = MaterialTheme.typography.labelLarge,
-                color = TextPrimary,
+                color = GVTheme.colors.textPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = game.genres?.firstOrNull()?.name?.uppercase() ?: "",
                 style = MaterialTheme.typography.labelSmall,
-                color = TextMuted
+                color = GVTheme.colors.textMuted
             )
         }
     }
@@ -386,7 +386,7 @@ private fun AllTimeLegendCard(
                 Text(
                     text = "HALL OF FAME",
                     style = MaterialTheme.typography.labelSmall,
-                    color = DarkNavy,
+                    color = GVTheme.colors.background,
                     fontWeight = FontWeight.ExtraBold
                 )
             }
@@ -394,13 +394,13 @@ private fun AllTimeLegendCard(
             Text(
                 text = game.name,
                 style = MaterialTheme.typography.headlineSmall,
-                color = TextPrimary,
+                color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = game.genres?.firstOrNull()?.name ?: "",
                 style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary
+                color = GVTheme.colors.textSecondary
             )
         }
     }
@@ -412,12 +412,11 @@ private fun DiscoverGrid(
     competitiveGames: List<GameDto>,
     coOpGames: List<GameDto>,
     retroGames: List<GameDto>,
-    onCategoryClick: (Int) -> Unit,
     onViewAllGenre: (String) -> Unit
 ) {
     val categories = listOf(
-        DiscoverCategory("Indie Gems", NeonPurple, indieGames, "discover_indie"),
-        DiscoverCategory("Competitive", NeonCyan, competitiveGames, "discover_competitive"),
+        DiscoverCategory("Indie Gems", GVTheme.colors.accent, indieGames, "discover_indie"),
+        DiscoverCategory("Competitive", GVTheme.colors.accentSecondary, competitiveGames, "discover_competitive"),
         DiscoverCategory("Co-op", StatusGreen, coOpGames, "discover_coop"),
         DiscoverCategory("Retro", StatusOrange, retroGames, "discover_retro")
     )
@@ -434,9 +433,6 @@ private fun DiscoverGrid(
                 rowCategories.forEach { category ->
                     DiscoverCategoryCard(
                         category = category,
-                        onClick = {
-                            category.games.firstOrNull()?.let { onCategoryClick(it.id) }
-                        },
                         onViewAll = { onViewAllGenre(category.genre) },
                         modifier = Modifier.weight(1f)
                     )
@@ -456,7 +452,6 @@ data class DiscoverCategory(
 @Composable
 private fun DiscoverCategoryCard(
     category: DiscoverCategory,
-    onClick: () -> Unit,
     onViewAll: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -469,7 +464,7 @@ private fun DiscoverCategoryCard(
                 color = category.color.copy(alpha = 0.4f),
                 shape = RoundedCornerShape(12.dp)
             )
-            .background(DarkCard)
+            .background(GVTheme.colors.card)
             .clickable(onClick = onViewAll)
     ) {
         if (category.games.isNotEmpty()) {
@@ -487,7 +482,7 @@ private fun DiscoverCategoryCard(
                 .fillMaxSize()
                 .background(
                     brush = Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, DarkCard.copy(alpha = 0.7f))
+                        colors = listOf(Color.Transparent, GVTheme.colors.card.copy(alpha = 0.7f))
                     )
                 )
         )
@@ -525,7 +520,7 @@ private fun DiscoverCategoryCard(
             Text(
                 text = category.name,
                 style = MaterialTheme.typography.labelMedium,
-                color = TextPrimary,
+                color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.SemiBold
             )
         }

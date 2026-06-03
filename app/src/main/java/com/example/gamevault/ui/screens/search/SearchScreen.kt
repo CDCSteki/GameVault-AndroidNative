@@ -51,7 +51,7 @@ fun SearchScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkNavy)
+            .background(GVTheme.colors.background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
@@ -116,13 +116,13 @@ fun SearchScreen(
                                 Text(
                                     text = listTitle,
                                     style = MaterialTheme.typography.titleLarge,
-                                    color = TextPrimary,
+                                    color = GVTheme.colors.textPrimary,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = "${displayList.size} TITLES FOUND",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = NeonPurple,
+                                    color = GVTheme.colors.accent,
                                     letterSpacing = 1.sp
                                 )
                             }
@@ -144,10 +144,10 @@ fun SearchScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(DarkNavy.copy(alpha = 0.6f)),
+                            .background(GVTheme.colors.background.copy(alpha = 0.6f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = NeonPurple)
+                        CircularProgressIndicator(color = GVTheme.colors.accent)
                     }
                 }
             }
@@ -180,7 +180,7 @@ private fun SearchField(
         placeholder = {
             Text(
                 text = "Search titles, genres...",
-                color = TextMuted,
+                color = GVTheme.colors.textMuted,
                 style = MaterialTheme.typography.bodyMedium
             )
         },
@@ -188,7 +188,7 @@ private fun SearchField(
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = null,
-                tint = TextMuted,
+                tint = GVTheme.colors.textMuted,
                 modifier = Modifier.size(20.dp)
             )
         },
@@ -198,7 +198,7 @@ private fun SearchField(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Clear",
-                        tint = TextMuted,
+                        tint = GVTheme.colors.textMuted,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -209,13 +209,13 @@ private fun SearchField(
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(onSearch = { onSearchSubmit() }),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = TextPrimary,
-            unfocusedTextColor = TextPrimary,
-            focusedBorderColor = NeonCyan,
-            unfocusedBorderColor = BorderCyan,
-            focusedContainerColor = DarkCard,
-            unfocusedContainerColor = DarkCard,
-            cursorColor = NeonCyan
+            focusedTextColor = GVTheme.colors.textPrimary,
+            unfocusedTextColor = GVTheme.colors.textPrimary,
+            focusedBorderColor = GVTheme.colors.accentSecondary,
+            unfocusedBorderColor = GVTheme.colors.border,
+            focusedContainerColor = GVTheme.colors.card,
+            unfocusedContainerColor = GVTheme.colors.card,
+            cursorColor = GVTheme.colors.accentSecondary
         )
     )
 }
@@ -242,7 +242,7 @@ private fun FilterButton(
                 .fillMaxSize()
                 .background(
                     brush = Brush.linearGradient(
-                        colors = listOf(NeonPurple, Color(0xFF6A0DAD))
+                        colors = listOf(GVTheme.colors.accent, GVTheme.colors.accentSecondary)
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ),
@@ -255,13 +255,13 @@ private fun FilterButton(
                 Icon(
                     imageVector = Icons.Default.FilterList,
                     contentDescription = null,
-                    tint = TextPrimary,
+                    tint = GVTheme.colors.textPrimary,
                     modifier = Modifier.size(18.dp)
                 )
                 Text(
                     text = if (hasActiveFilters) "FILTER (ACTIVE)" else "FILTER",
                     style = MaterialTheme.typography.labelLarge,
-                    color = TextPrimary,
+                    color = GVTheme.colors.textPrimary,
                     letterSpacing = 1.sp
                 )
             }
@@ -285,14 +285,14 @@ private fun SearchHistorySection(
             Text(
                 text = "Recent Searches",
                 style = MaterialTheme.typography.titleMedium,
-                color = TextPrimary,
+                color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.Bold
             )
             TextButton(onClick = onClearAll) {
                 Text(
                     text = "CLEAR ALL",
                     style = MaterialTheme.typography.labelSmall,
-                    color = NeonPurple
+                    color = GVTheme.colors.accent
                 )
             }
         }
@@ -315,13 +315,13 @@ private fun SearchHistorySection(
                     Icon(
                         imageVector = Icons.Default.History,
                         contentDescription = null,
-                        tint = TextMuted,
+                        tint = GVTheme.colors.textMuted,
                         modifier = Modifier.size(18.dp)
                     )
                     Text(
                         text = item.query,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondary
+                        color = GVTheme.colors.textSecondary
                     )
                 }
                 IconButton(
@@ -331,12 +331,12 @@ private fun SearchHistorySection(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Delete",
-                        tint = TextMuted,
+                        tint = GVTheme.colors.textMuted,
                         modifier = Modifier.size(16.dp)
                     )
                 }
             }
-            HorizontalDivider(color = BorderCyan.copy(alpha = 0.3f))
+            HorizontalDivider(color = GVTheme.colors.border.copy(alpha = 0.3f))
         }
     }
 }
@@ -353,14 +353,14 @@ private fun EmptySearchState() {
             Icon(
                 imageVector = Icons.Default.SearchOff,
                 contentDescription = null,
-                tint = TextMuted,
+                tint = GVTheme.colors.textMuted,
                 modifier = Modifier.size(64.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "No results found",
                 style = MaterialTheme.typography.titleMedium,
-                color = TextMuted
+                color = GVTheme.colors.textMuted
             )
         }
     }
@@ -378,10 +378,10 @@ private fun SearchResultCard(
             .clip(RoundedCornerShape(12.dp))
             .border(
                 width = 1.dp,
-                color = BorderCyan,
+                color = GVTheme.colors.border,
                 shape = RoundedCornerShape(12.dp)
             )
-            .background(DarkCard)
+            .background(GVTheme.colors.card)
             .clickable(onClick = onClick)
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
@@ -418,8 +418,8 @@ private fun SearchResultCard(
 
                             BadgeChip(
                                 text = platformText,
-                                color = NeonCyan.copy(alpha = 0.15f),
-                                textColor = NeonCyan
+                                color = GVTheme.colors.accentSecondary.copy(alpha = 0.15f),
+                                textColor = GVTheme.colors.accentSecondary
                             )
                         }
                     }
@@ -427,7 +427,7 @@ private fun SearchResultCard(
                     Text(
                         text = game.name,
                         style = MaterialTheme.typography.titleMedium,
-                        color = TextPrimary,
+                        color = GVTheme.colors.textPrimary,
                         fontWeight = FontWeight.Bold,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
@@ -451,7 +451,7 @@ private fun SearchResultCard(
                         Text(
                             text = String.format(Locale.US, "%.1f", game.rating),
                             style = MaterialTheme.typography.labelMedium,
-                            color = TextSecondary
+                            color = GVTheme.colors.textSecondary
                         )
                     }
                     game.playtime?.let { playtime ->
@@ -462,13 +462,13 @@ private fun SearchResultCard(
                             Icon(
                                 imageVector = Icons.Default.Timer,
                                 contentDescription = null,
-                                tint = TextMuted,
+                                tint = GVTheme.colors.textMuted,
                                 modifier = Modifier.size(14.dp)
                             )
                             Text(
                                 text = "${playtime}h Playtime",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = TextMuted
+                                color = GVTheme.colors.textMuted
                             )
                         }
                     }
@@ -481,8 +481,8 @@ private fun SearchResultCard(
 @Composable
 private fun BadgeChip(
     text: String,
-    color: Color = NeonPurple.copy(alpha = 0.15f),
-    textColor: Color = NeonPurple
+    color: Color = GVTheme.colors.accent.copy(alpha = 0.15f),
+    textColor: Color = GVTheme.colors.accent
 ) {
     Box(
         modifier = Modifier
@@ -517,7 +517,7 @@ private fun FilterBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = DarkNavySecondary,
+        containerColor = GVTheme.colors.backgroundSecondary,
         dragHandle = {
             Box(
                 modifier = Modifier
@@ -525,7 +525,7 @@ private fun FilterBottomSheet(
                     .width(40.dp)
                     .height(4.dp)
                     .background(
-                        color = BorderCyan,
+                        color = GVTheme.colors.border,
                         shape = RoundedCornerShape(2.dp)
                     )
             )
@@ -540,7 +540,7 @@ private fun FilterBottomSheet(
             Text(
                 text = "Filter Games",
                 style = MaterialTheme.typography.headlineSmall,
-                color = TextPrimary,
+                color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.Bold
             )
 
@@ -609,8 +609,8 @@ private fun FilterBottomSheet(
                     },
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, BorderCyan)
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = GVTheme.colors.textSecondary),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, GVTheme.colors.border)
                 ) {
                     Text("CLEAR")
                 }
@@ -629,10 +629,10 @@ private fun FilterBottomSheet(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = NeonPurple
+                        containerColor = GVTheme.colors.accent
                     )
                 ) {
-                    Text("APPLY", color = TextPrimary)
+                    Text("APPLY", color = GVTheme.colors.textPrimary)
                 }
             }
         }
@@ -644,7 +644,7 @@ private fun FilterSectionTitle(title: String) {
     Text(
         text = title,
         style = MaterialTheme.typography.labelMedium,
-        color = TextSecondary,
+        color = GVTheme.colors.textSecondary,
         modifier = Modifier.padding(bottom = 8.dp)
     )
 }
@@ -659,11 +659,11 @@ private fun FilterChipItem(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
             .background(
-                color = if (isSelected) NeonPurple else DarkCard
+                color = if (isSelected) GVTheme.colors.accent else GVTheme.colors.card
             )
             .border(
                 width = 1.dp,
-                color = if (isSelected) NeonPurple else BorderCyan,
+                color = if (isSelected) GVTheme.colors.accent else GVTheme.colors.border,
                 shape = RoundedCornerShape(20.dp)
             )
             .clickable(onClick = onClick)
@@ -672,7 +672,7 @@ private fun FilterChipItem(
         Text(
             text = text,
             style = MaterialTheme.typography.labelMedium,
-            color = if (isSelected) TextPrimary else TextSecondary
+            color = if (isSelected) GVTheme.colors.textPrimary else GVTheme.colors.textSecondary
         )
     }
 }

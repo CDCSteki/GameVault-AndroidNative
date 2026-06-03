@@ -5,5 +5,7 @@ enum class AppTheme {
     OCEAN_BLUE,
     FOREST_GREEN,
     SUNSET,
-    MIDNIGHT_RED
+    MIDNIGHT_RED,
+    NEON_GREEN,
+    ROSE_GOLD
 }

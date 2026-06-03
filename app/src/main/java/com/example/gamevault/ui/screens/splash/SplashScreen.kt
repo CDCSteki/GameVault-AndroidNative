@@ -8,7 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,8 +36,8 @@ fun SplashScreen(
             .background(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        Color(0xFF1A0A3D),
-                        DarkNavy
+                        GVTheme.colors.backgroundSecondary,
+                        GVTheme.colors.accent
                     )
                 )
             ),
@@ -51,7 +50,7 @@ fun SplashScreen(
                 text = "GAMEVAULT",
                 style = MaterialTheme.typography.displayLarge.copy(
                     brush = Brush.linearGradient(
-                        colors = listOf(NeonPurple, NeonCyan)
+                        colors = listOf(GVTheme.colors.accent, GVTheme.colors.accent)
                     ),
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = 4.sp
@@ -61,11 +60,11 @@ fun SplashScreen(
             Text(
                 text = "Your Gaming Universe",
                 style = MaterialTheme.typography.titleMedium,
-                color = TextMuted
+                color = GVTheme.colors.textMuted
             )
             Spacer(modifier = Modifier.height(48.dp))
             androidx.compose.material3.CircularProgressIndicator(
-                color = NeonPurple,
+                color = GVTheme.colors.accent,
                 modifier = Modifier.size(32.dp),
                 strokeWidth = 2.dp
             )

@@ -73,10 +73,6 @@ class GameRepository(
 
     // --- LOCAL - COLLECTION ---
     fun getCollection(): Flow<List<GameEntity>> = gameDao.getCollection()
-    fun getPlayedGames(): Flow<List<GameEntity>> = gameDao.getPlayedGames()
-    fun getNotPlayedGames(): Flow<List<GameEntity>> = gameDao.getNotPlayedGames()
-    fun getPlayingGames(): Flow<List<GameEntity>> = gameDao.getPlayingGames()
-    fun filterCollection(genre: String?): Flow<List<GameEntity>> = gameDao.filterCollection(genre)
 
     fun GameEntity.toDetailDto(): GameDetailDto = GameDetailDto(
         id = rawgId,
@@ -134,7 +130,6 @@ class GameRepository(
 
     // --- LOCAL - WISHLIST ---
     fun getWishlist(): Flow<List<GameEntity>> = gameDao.getWishlist()
-    fun filterWishlist(genre: String?): Flow<List<GameEntity>> = gameDao.filterWishlist(genre)
 
     suspend fun addToWishlist(game: GameEntity): AddToWishlistResult {
         val existing = gameDao.getGameById(game.rawgId)
@@ -196,20 +191,6 @@ class GameRepository(
         backgroundImageUrl = backgroundImage,
         description = descriptionRaw,
         developer = developers?.firstOrNull()?.name,
-        releaseDate = released,
-        platforms = platforms?.joinToString(",") { it.platform.name },
-        genres = genres?.joinToString(",") { it.name },
-        storageSize = null,
-        rating = rating
-    )
-
-    fun GameDto.toEntity(): GameEntity = GameEntity(
-        rawgId = id,
-        name = name,
-        coverImageUrl = backgroundImage,
-        backgroundImageUrl = backgroundImage,
-        description = null,
-        developer = null,
         releaseDate = released,
         platforms = platforms?.joinToString(",") { it.platform.name },
         genres = genres?.joinToString(",") { it.name },

@@ -51,8 +51,8 @@ fun LoginScreen(
             .background(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        Color(0xFF1A1040),
-                        DarkNavy
+                        GVTheme.colors.backgroundSecondary,
+                        GVTheme.colors.background
                     ),
                     center = Offset(0.5f, 0.3f),
                     radius = 1000f
@@ -77,7 +77,7 @@ fun LoginScreen(
                     .border(
                         width = 1.5.dp,
                         brush = Brush.linearGradient(
-                            colors = listOf(NeonCyan, NeonPurple)
+                            colors = listOf(GVTheme.colors.accentSecondary, GVTheme.colors.accent)
                         ),
                         shape = RoundedCornerShape(16.dp)
                     )
@@ -95,7 +95,7 @@ fun LoginScreen(
                         text = "GAMEVAULT",
                         style = MaterialTheme.typography.displayMedium.copy(
                             brush = Brush.linearGradient(
-                                colors = listOf(NeonPurple, NeonCyan)
+                                colors = listOf(GVTheme.colors.accent, GVTheme.colors.accentSecondary)
                             ),
                             fontWeight = FontWeight.ExtraBold,
                             letterSpacing = 3.sp
@@ -107,7 +107,7 @@ fun LoginScreen(
                     Text(
                         text = "Welcome back, Hunter",
                         style = MaterialTheme.typography.titleMedium,
-                        color = TextSecondary
+                        color = GVTheme.colors.textSecondary
                     )
 
                     Spacer(modifier = Modifier.height(36.dp))
@@ -119,7 +119,7 @@ fun LoginScreen(
                         Text(
                             text = "Email or Username",
                             style = MaterialTheme.typography.labelMedium,
-                            color = TextSecondary
+                            color = GVTheme.colors.textSecondary
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         GameVaultTextField(
@@ -151,7 +151,7 @@ fun LoginScreen(
                             Text(
                                 text = "Password",
                                 style = MaterialTheme.typography.labelMedium,
-                                color = TextSecondary
+                                color = GVTheme.colors.textSecondary
                             )
                             TextButton(
                                 onClick = { /* TODO: Forgot password */ },
@@ -160,7 +160,7 @@ fun LoginScreen(
                                 Text(
                                     text = "Forgot Password?",
                                     style = MaterialTheme.typography.labelMedium,
-                                    color = NeonPurple
+                                    color = GVTheme.colors.accent
                                 )
                             }
                         }
@@ -221,7 +221,7 @@ fun LoginScreen(
                                 .fillMaxSize()
                                 .background(
                                     brush = Brush.linearGradient(
-                                        colors = listOf(NeonPurple, Color(0xFF6A0DAD))
+                                        colors = listOf(GVTheme.colors.accent, GVTheme.colors.accentSecondary)
                                     ),
                                     shape = RoundedCornerShape(12.dp)
                                 ),
@@ -229,7 +229,7 @@ fun LoginScreen(
                         ) {
                             if (uiState.isLoading) {
                                 CircularProgressIndicator(
-                                    color = TextPrimary,
+                                    color = GVTheme.colors.textPrimary,
                                     modifier = Modifier.size(24.dp),
                                     strokeWidth = 2.dp
                                 )
@@ -237,7 +237,7 @@ fun LoginScreen(
                                 Text(
                                     text = "LOGIN",
                                     style = MaterialTheme.typography.labelLarge,
-                                    color = TextPrimary,
+                                    color = GVTheme.colors.textPrimary,
                                     letterSpacing = 2.sp
                                 )
                             }
@@ -254,7 +254,7 @@ fun LoginScreen(
                         Text(
                             text = "Don't have an account? ",
                             style = MaterialTheme.typography.bodySmall,
-                            color = TextSecondary
+                            color = GVTheme.colors.textSecondary
                         )
                         TextButton(
                             onClick = onNavigateToRegister,
@@ -265,7 +265,7 @@ fun LoginScreen(
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     fontWeight = FontWeight.Bold
                                 ),
-                                color = NeonPurple
+                                color = GVTheme.colors.accent
                             )
                         }
                     }

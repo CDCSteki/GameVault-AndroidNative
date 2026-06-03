@@ -44,7 +44,7 @@ fun GameListScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkNavy)
+            .background(GVTheme.colors.background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
@@ -59,7 +59,7 @@ fun GameListScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = NeonPurple)
+                        CircularProgressIndicator(color = GVTheme.colors.accent)
                     }
                 }
 
@@ -78,17 +78,17 @@ fun GameListScreen(
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = uiState.errorMessage!!,
-                                color = TextSecondary,
+                                color = GVTheme.colors.textSecondary,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Button(
                                 onClick = viewModel::retry,
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = NeonPurple
+                                    containerColor = GVTheme.colors.accent
                                 )
                             ) {
-                                Text("Retry", color = TextPrimary)
+                                Text("Retry", color = GVTheme.colors.textPrimary)
                             }
                         }
                     }
@@ -101,7 +101,7 @@ fun GameListScreen(
                     ) {
                         Text(
                             text = "No games found",
-                            color = TextMuted,
+                            color = GVTheme.colors.textMuted,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -158,7 +158,7 @@ private fun PageSizeSelector(
             Text(
                 text = "Showing $totalShown titles",
                 style = MaterialTheme.typography.labelSmall,
-                color = NeonPurple,
+                color = GVTheme.colors.accent,
                 letterSpacing = 1.sp
             )
 
@@ -169,7 +169,7 @@ private fun PageSizeSelector(
                 Text(
                     text = "Show:",
                     style = MaterialTheme.typography.labelSmall,
-                    color = TextMuted
+                    color = GVTheme.colors.textMuted
                 )
                 options.forEach { size ->
                     val isSelected = currentSize == size
@@ -177,12 +177,12 @@ private fun PageSizeSelector(
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
                             .background(
-                                if (isSelected) NeonPurple
-                                else DarkCard
+                                if (isSelected) GVTheme.colors.accent
+                                else GVTheme.colors.card
                             )
                             .border(
                                 width = 1.dp,
-                                color = if (isSelected) NeonPurple else BorderCyan,
+                                color = if (isSelected) GVTheme.colors.accent else GVTheme.colors.border,
                                 shape = RoundedCornerShape(6.dp)
                             )
                             .clickable { if (!isSelected) onSizeChange(size) }
@@ -191,7 +191,7 @@ private fun PageSizeSelector(
                         Text(
                             text = "$size",
                             style = MaterialTheme.typography.labelSmall,
-                            color = if (isSelected) TextPrimary else TextMuted,
+                            color = if (isSelected) GVTheme.colors.textPrimary else GVTheme.colors.textMuted,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                         )
                     }
@@ -200,7 +200,7 @@ private fun PageSizeSelector(
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        HorizontalDivider(color = BorderCyan.copy(alpha = 0.3f))
+        HorizontalDivider(color = GVTheme.colors.border.copy(alpha = 0.3f))
     }
 }
 
@@ -209,12 +209,13 @@ private fun GameListTopBar(
     title: String,
     onBackClick: () -> Unit
 ) {
+    val colors = GVTheme.colors
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(Color(0xFF1A0A3D), DarkNavy)
+                    colors = listOf(colors.accent.copy(alpha = 0.25f), GVTheme.colors.background)
                 )
             )
             .padding(horizontal = 16.dp, vertical = 16.dp)
@@ -228,14 +229,14 @@ private fun GameListTopBar(
                 modifier = Modifier
                     .size(36.dp)
                     .background(
-                        color = DarkCard,
+                        color = GVTheme.colors.card,
                         shape = RoundedCornerShape(8.dp)
                     )
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = TextPrimary,
+                    tint = GVTheme.colors.textPrimary,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -243,7 +244,7 @@ private fun GameListTopBar(
                 text = title,
                 style = MaterialTheme.typography.headlineSmall.copy(
                     brush = Brush.linearGradient(
-                        colors = listOf(NeonPurple, NeonCyan)
+                        colors = listOf(GVTheme.colors.accent, GVTheme.colors.accentSecondary)
                     )
                 ),
                 fontWeight = FontWeight.ExtraBold
@@ -262,8 +263,8 @@ private fun GameListCard(
             .fillMaxWidth()
             .height(120.dp)
             .clip(RoundedCornerShape(12.dp))
-            .border(width = 1.dp, color = BorderCyan, shape = RoundedCornerShape(12.dp))
-            .background(DarkCard)
+            .border(width = 1.dp, color = GVTheme.colors.border, shape = RoundedCornerShape(12.dp))
+            .background(GVTheme.colors.card)
             .clickable(onClick = onClick)
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
@@ -291,8 +292,8 @@ private fun GameListCard(
                         game.platforms?.firstOrNull()?.platform?.let { platform ->
                             BadgeChip(
                                 text = platform.name,
-                                color = NeonCyan.copy(alpha = 0.15f),
-                                textColor = NeonCyan
+                                color = GVTheme.colors.accentSecondary.copy(alpha = 0.15f),
+                                textColor = GVTheme.colors.accentSecondary
                             )
                         }
                     }
@@ -300,7 +301,7 @@ private fun GameListCard(
                     Text(
                         text = game.name,
                         style = MaterialTheme.typography.titleMedium,
-                        color = TextPrimary,
+                        color = GVTheme.colors.textPrimary,
                         fontWeight = FontWeight.Bold,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
@@ -324,7 +325,7 @@ private fun GameListCard(
                         Text(
                             text = String.format(Locale.US, "%.1f", game.rating),
                             style = MaterialTheme.typography.labelMedium,
-                            color = TextSecondary
+                            color = GVTheme.colors.textSecondary
                         )
                     }
 
@@ -337,13 +338,13 @@ private fun GameListCard(
                                 Icon(
                                     imageVector = Icons.Default.Timer,
                                     contentDescription = null,
-                                    tint = TextMuted,
+                                    tint = GVTheme.colors.textMuted,
                                     modifier = Modifier.size(14.dp)
                                 )
                                 Text(
                                     text = "${playtime}h",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = TextMuted
+                                    color = GVTheme.colors.textMuted
                                 )
                             }
                         }
@@ -353,7 +354,7 @@ private fun GameListCard(
                         Text(
                             text = year,
                             style = MaterialTheme.typography.labelSmall,
-                            color = TextMuted
+                            color = GVTheme.colors.textMuted
                         )
                     }
                 }
@@ -365,8 +366,8 @@ private fun GameListCard(
 @Composable
 private fun BadgeChip(
     text: String,
-    color: Color = NeonPurple.copy(alpha = 0.15f),
-    textColor: Color = NeonPurple
+    color: Color = GVTheme.colors.accent.copy(alpha = 0.15f),
+    textColor: Color = GVTheme.colors.accent
 ) {
     Box(
         modifier = Modifier

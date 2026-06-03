@@ -58,24 +58,24 @@ fun GameDetailScreen(
             SnackbarHost(snackbarHostState) { data ->
                 Snackbar(
                     snackbarData = data,
-                    containerColor = DarkCard,
-                    contentColor = TextPrimary,
-                    actionColor = NeonPurple
+                    containerColor = GVTheme.colors.card,
+                    contentColor = GVTheme.colors.textPrimary,
+                    actionColor = GVTheme.colors.accent
                 )
             }
         },
-        containerColor = DarkNavy
+        containerColor = GVTheme.colors.background
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(DarkNavy)
+                .background(GVTheme.colors.background)
         ) {
             when {
                 uiState.isLoading -> {
                     CircularProgressIndicator(
-                        color = NeonPurple,
+                        color = GVTheme.colors.accent,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -193,7 +193,7 @@ private fun HeroSection(
                     brush = Brush.verticalGradient(
                         colors = listOf(
                             Color.Transparent,
-                            DarkNavy
+                            GVTheme.colors.background
                         )
                     )
                 )
@@ -213,7 +213,7 @@ private fun HeroSection(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
-                tint = TextPrimary
+                tint = GVTheme.colors.textPrimary
             )
         }
     }
@@ -233,12 +233,12 @@ private fun TitleSection(detail: GameDetailDto) {
                 Box(
                     modifier = Modifier
                         .background(
-                            color = NeonPurple.copy(alpha = 0.2f),
+                            color = GVTheme.colors.accent.copy(alpha = 0.2f),
                             shape = RoundedCornerShape(4.dp)
                         )
                         .border(
                             width = 1.dp,
-                            color = NeonPurple.copy(alpha = 0.5f),
+                            color = GVTheme.colors.accent.copy(alpha = 0.5f),
                             shape = RoundedCornerShape(4.dp)
                         )
                         .padding(horizontal = 8.dp, vertical = 3.dp)
@@ -246,7 +246,7 @@ private fun TitleSection(detail: GameDetailDto) {
                     Text(
                         text = genre.name.uppercase(),
                         style = MaterialTheme.typography.labelSmall,
-                        color = NeonPurple
+                        color = GVTheme.colors.accent
                     )
                 }
             }
@@ -257,7 +257,7 @@ private fun TitleSection(detail: GameDetailDto) {
         Text(
             text = detail.name,
             style = MaterialTheme.typography.displayMedium,
-            color = TextPrimary,
+            color = GVTheme.colors.textPrimary,
             fontWeight = FontWeight.ExtraBold
         )
     }
@@ -293,7 +293,7 @@ private fun ActionButtonsSection(
                         brush = if (isInCollection) {
                             Brush.linearGradient(listOf(StatusGreen, StatusGreen.copy(alpha = 0.7f)))
                         } else {
-                            Brush.linearGradient(listOf(NeonPurple, Color(0xFF6A0DAD)))
+                            Brush.linearGradient(listOf(GVTheme.colors.accent, GVTheme.colors.accent.copy(alpha = 0.7f)))
                         },
                         shape = RoundedCornerShape(12.dp)
                     ),
@@ -306,13 +306,13 @@ private fun ActionButtonsSection(
                     Icon(
                         imageVector = if (isInCollection) Icons.Default.CheckCircle else Icons.Default.Add,
                         contentDescription = null,
-                        tint = TextPrimary,
+                        tint = GVTheme.colors.textPrimary,
                         modifier = Modifier.size(16.dp)
                     )
                     Text(
                         text = if (isInCollection) "IN COLLECTION" else "ADD TO COLLECTION",
                         style = MaterialTheme.typography.labelSmall,
-                        color = TextPrimary,
+                        color = GVTheme.colors.textPrimary,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -331,9 +331,9 @@ private fun ActionButtonsSection(
             border = androidx.compose.foundation.BorderStroke(
                 width = 1.dp,
                 color = when {
-                    isInCollection -> TextMuted.copy(alpha = 0.3f)
+                    isInCollection -> GVTheme.colors.textMuted.copy(alpha = 0.3f)
                     isInWishlist -> StatusYellow
-                    else -> BorderCyan
+                    else -> GVTheme.colors.border
                 }
             ),
             colors = ButtonDefaults.outlinedButtonColors(
@@ -357,9 +357,9 @@ private fun ActionButtonsSection(
                     },
                     contentDescription = null,
                     tint = when {
-                        isInCollection -> TextMuted.copy(alpha = 0.3f)
+                        isInCollection -> GVTheme.colors.textMuted.copy(alpha = 0.3f)
                         isInWishlist -> StatusYellow
-                        else -> TextSecondary
+                        else -> GVTheme.colors.textSecondary
                     },
                     modifier = Modifier.size(16.dp)
                 )
@@ -371,9 +371,9 @@ private fun ActionButtonsSection(
                     },
                     style = MaterialTheme.typography.labelSmall,
                     color = when {
-                        isInCollection -> TextMuted.copy(alpha = 0.3f)
+                        isInCollection -> GVTheme.colors.textMuted.copy(alpha = 0.3f)
                         isInWishlist -> StatusYellow
-                        else -> TextSecondary
+                        else -> GVTheme.colors.textSecondary
                     },
                     fontWeight = FontWeight.Bold
                 )
@@ -395,7 +395,7 @@ private fun PlayStatusSection(
         Text(
             text = "PLAY STATUS",
             style = MaterialTheme.typography.labelSmall,
-            color = TextMuted,
+            color = GVTheme.colors.textMuted,
             letterSpacing = 1.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -406,8 +406,8 @@ private fun PlayStatusSection(
             PlayStatus.entries.forEach { status ->
                 val isSelected = currentStatus == status
                 val statusColor = when (status) {
-                    PlayStatus.NOT_PLAYED -> TextMuted
-                    PlayStatus.PLAYING -> NeonCyan
+                    PlayStatus.NOT_PLAYED -> GVTheme.colors.textMuted
+                    PlayStatus.PLAYING -> GVTheme.colors.accentSecondary
                     PlayStatus.PLAYED -> StatusGreen
                 }
                 Box(
@@ -416,11 +416,11 @@ private fun PlayStatusSection(
                         .clip(RoundedCornerShape(10.dp))
                         .background(
                             if (isSelected) statusColor.copy(alpha = 0.15f)
-                            else DarkCard
+                            else GVTheme.colors.card
                         )
                         .border(
                             width = 1.dp,
-                            color = if (isSelected) statusColor else BorderCyan,
+                            color = if (isSelected) statusColor else GVTheme.colors.border,
                             shape = RoundedCornerShape(10.dp)
                         )
                         .clickable { onStatusChange(status) }
@@ -438,7 +438,7 @@ private fun PlayStatusSection(
                                 PlayStatus.PLAYED -> Icons.Default.CheckCircle
                             },
                             contentDescription = null,
-                            tint = if (isSelected) statusColor else TextMuted,
+                            tint = if (isSelected) statusColor else GVTheme.colors.textMuted,
                             modifier = Modifier.size(14.dp)
                         )
                         Text(
@@ -448,7 +448,7 @@ private fun PlayStatusSection(
                                 PlayStatus.PLAYED -> "Played"
                             },
                             style = MaterialTheme.typography.labelSmall,
-                            color = if (isSelected) statusColor else TextMuted,
+                            color = if (isSelected) statusColor else GVTheme.colors.textMuted,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                         )
                     }
@@ -464,7 +464,7 @@ private fun InfoGridSection(detail: GameDetailDto) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(DarkCard)
+            .background(GVTheme.colors.card)
             .padding(16.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -508,14 +508,14 @@ private fun InfoItem(
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
-            color = TextMuted,
+            color = GVTheme.colors.textMuted,
             letterSpacing = 1.sp
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            color = TextPrimary,
+            color = GVTheme.colors.textPrimary,
             fontWeight = FontWeight.SemiBold,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
@@ -537,10 +537,10 @@ private fun PrivateNotesSection(
             .clip(RoundedCornerShape(12.dp))
             .border(
                 width = 1.dp,
-                color = NeonPurple.copy(alpha = 0.3f),
+                color = GVTheme.colors.accent.copy(alpha = 0.3f),
                 shape = RoundedCornerShape(12.dp)
             )
-            .background(DarkCard)
+            .background(GVTheme.colors.card)
             .padding(16.dp)
     ) {
         Row(
@@ -551,7 +551,7 @@ private fun PrivateNotesSection(
             Text(
                 text = "Private Notes",
                 style = MaterialTheme.typography.titleMedium,
-                color = TextPrimary,
+                color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.Bold
             )
             // Star Rating
@@ -561,7 +561,7 @@ private fun PrivateNotesSection(
                     Icon(
                         imageVector = if (userRating >= starRating) Icons.Default.Star else Icons.Default.StarBorder,
                         contentDescription = null,
-                        tint = if (userRating >= starRating) StatusYellow else TextMuted,
+                        tint = if (userRating >= starRating) StatusYellow else GVTheme.colors.textMuted,
                         modifier = Modifier
                             .size(24.dp)
                             .clickable { onRatingChange(starRating) }
@@ -576,14 +576,14 @@ private fun PrivateNotesSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
-                .background(DarkNavySecondary)
+                .background(GVTheme.colors.backgroundSecondary)
                 .clickable(onClick = onOpenNotes)
                 .padding(12.dp)
         ) {
             Text(
                 text = if (notes.isBlank()) "Your private notes on this game..." else notes,
                 style = MaterialTheme.typography.bodySmall,
-                color = if (notes.isBlank()) TextMuted else TextSecondary,
+                color = if (notes.isBlank()) GVTheme.colors.textMuted else GVTheme.colors.textSecondary,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
@@ -608,12 +608,12 @@ private fun AboutSection(description: String?) {
                 modifier = Modifier
                     .width(3.dp)
                     .height(20.dp)
-                    .background(NeonPurple, RoundedCornerShape(2.dp))
+                    .background(GVTheme.colors.accent, RoundedCornerShape(2.dp))
             )
             Text(
                 text = "About the Game",
                 style = MaterialTheme.typography.titleMedium,
-                color = TextPrimary,
+                color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -621,7 +621,7 @@ private fun AboutSection(description: String?) {
         Text(
             text = description,
             style = MaterialTheme.typography.bodyMedium,
-            color = TextSecondary,
+            color = GVTheme.colors.textSecondary,
             maxLines = 6,
             overflow = TextOverflow.Ellipsis
         )
@@ -638,7 +638,7 @@ private fun ScreenshotsSection(screenshots: List<GameScreenshotDto>) {
         Text(
             text = "Screenshots",
             style = MaterialTheme.typography.titleMedium,
-            color = TextPrimary,
+            color = GVTheme.colors.textPrimary,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
@@ -674,7 +674,7 @@ private fun SystemRequirementsSection(detail: GameDetailDto) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(DarkCard)
+            .background(GVTheme.colors.card)
             .padding(16.dp)
     ) {
         Row(
@@ -686,12 +686,12 @@ private fun SystemRequirementsSection(detail: GameDetailDto) {
                 modifier = Modifier
                     .width(3.dp)
                     .height(20.dp)
-                    .background(NeonCyan, RoundedCornerShape(2.dp))
+                    .background(GVTheme.colors.accentSecondary, RoundedCornerShape(2.dp))
             )
             Text(
                 text = "PC System Requirements",
                 style = MaterialTheme.typography.titleMedium,
-                color = TextPrimary,
+                color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -700,7 +700,7 @@ private fun SystemRequirementsSection(detail: GameDetailDto) {
             Text(
                 text = minReq.replace("\n", "\n• "),
                 style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
+                color = GVTheme.colors.textSecondary,
                 lineHeight = 20.sp
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -710,7 +710,7 @@ private fun SystemRequirementsSection(detail: GameDetailDto) {
             Text(
                 text = recReq.replace("\n", "\n• "),
                 style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
+                color = GVTheme.colors.textSecondary,
                 lineHeight = 20.sp
             )
         }
@@ -726,13 +726,13 @@ private fun UserSentimentSection(detail: GameDetailDto) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(DarkCard)
+            .background(GVTheme.colors.card)
             .padding(16.dp)
     ) {
         Text(
             text = "USER SENTIMENT",
             style = MaterialTheme.typography.labelSmall,
-            color = TextMuted,
+            color = GVTheme.colors.textMuted,
             letterSpacing = 1.sp
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -744,7 +744,7 @@ private fun UserSentimentSection(detail: GameDetailDto) {
             Text(
                 text = "$sentimentPercent%",
                 style = MaterialTheme.typography.headlineLarge,
-                color = NeonCyan,
+                color = GVTheme.colors.accentSecondary,
                 fontWeight = FontWeight.ExtraBold
             )
             LinearProgressIndicator(
@@ -753,8 +753,8 @@ private fun UserSentimentSection(detail: GameDetailDto) {
                     .weight(1f)
                     .height(8.dp)
                     .clip(RoundedCornerShape(4.dp)),
-                color = NeonCyan,
-                trackColor = DarkNavySecondary
+                color = GVTheme.colors.accentSecondary,
+                trackColor = GVTheme.colors.backgroundSecondary
             )
         }
 
@@ -772,7 +772,7 @@ private fun UserSentimentSection(detail: GameDetailDto) {
                 Text(
                     text = rating.title.replaceFirstChar { it.uppercase() },
                     style = MaterialTheme.typography.labelMedium,
-                    color = TextSecondary,
+                    color = GVTheme.colors.textSecondary,
                     modifier = Modifier.width(100.dp)
                 )
                 LinearProgressIndicator(
@@ -781,13 +781,13 @@ private fun UserSentimentSection(detail: GameDetailDto) {
                         .weight(1f)
                         .height(6.dp)
                         .clip(RoundedCornerShape(3.dp)),
-                    color = NeonPurple,
-                    trackColor = DarkNavySecondary
+                    color = GVTheme.colors.accent,
+                    trackColor = GVTheme.colors.backgroundSecondary
                 )
                 Text(
                     text = "${rating.percent.toInt()}%",
                     style = MaterialTheme.typography.labelSmall,
-                    color = TextMuted,
+                    color = GVTheme.colors.textMuted,
                     modifier = Modifier.width(40.dp),
                     textAlign = androidx.compose.ui.text.style.TextAlign.End
                 )
@@ -816,14 +816,14 @@ private fun ErrorSection(
         Text(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
-            color = TextSecondary
+            color = GVTheme.colors.textSecondary
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = onRetry,
-            colors = ButtonDefaults.buttonColors(containerColor = NeonPurple)
+            colors = ButtonDefaults.buttonColors(containerColor = GVTheme.colors.accent)
         ) {
-            Text("Retry", color = TextPrimary)
+            Text("Retry", color = GVTheme.colors.textPrimary)
         }
     }
 }
@@ -837,11 +837,11 @@ private fun NotesDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = DarkCard,
+        containerColor = GVTheme.colors.card,
         title = {
             Text(
                 text = "Private Notes",
-                color = TextPrimary,
+                color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.Bold
             )
         },
@@ -855,17 +855,17 @@ private fun NotesDialog(
                 placeholder = {
                     Text(
                         text = "Write your notes here...",
-                        color = TextMuted
+                        color = GVTheme.colors.textMuted
                     )
                 },
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = TextPrimary,
-                    unfocusedTextColor = TextPrimary,
-                    focusedBorderColor = NeonCyan,
-                    unfocusedBorderColor = BorderCyan,
-                    focusedContainerColor = DarkNavySecondary,
-                    unfocusedContainerColor = DarkNavySecondary,
-                    cursorColor = NeonCyan
+                    focusedTextColor = GVTheme.colors.textPrimary,
+                    unfocusedTextColor = GVTheme.colors.textPrimary,
+                    focusedBorderColor = GVTheme.colors.accentSecondary,
+                    unfocusedBorderColor = GVTheme.colors.border,
+                    focusedContainerColor = GVTheme.colors.backgroundSecondary,
+                    unfocusedContainerColor = GVTheme.colors.backgroundSecondary,
+                    cursorColor = GVTheme.colors.accentSecondary
                 ),
                 shape = RoundedCornerShape(12.dp)
             )
@@ -873,14 +873,14 @@ private fun NotesDialog(
         confirmButton = {
             Button(
                 onClick = onSave,
-                colors = ButtonDefaults.buttonColors(containerColor = NeonPurple)
+                colors = ButtonDefaults.buttonColors(containerColor = GVTheme.colors.accent)
             ) {
-                Text("Save", color = TextPrimary)
+                Text("Save", color = GVTheme.colors.textPrimary)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel", color = TextSecondary)
+                Text("Cancel", color = GVTheme.colors.textSecondary)
             }
         }
     )

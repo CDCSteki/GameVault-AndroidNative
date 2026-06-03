@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -27,6 +26,7 @@ import coil3.compose.AsyncImage
 import com.example.gamevault.data.local.entity.GameEntity
 import com.example.gamevault.data.local.entity.PlayStatus
 import com.example.gamevault.data.repository.GameRepository
+import com.example.gamevault.ui.components.GameVaultTopBar
 import com.example.gamevault.ui.theme.*
 import com.example.gamevault.ui.util.firstGenre
 import com.example.gamevault.ui.util.firstPlatform
@@ -45,11 +45,11 @@ fun LibraryScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkNavy)
+            .background(GVTheme.colors.background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            LibraryTopBar()
+            GameVaultTopBar()
 
             LibraryTabs(
                 activeTab = uiState.activeTab,
@@ -102,42 +102,6 @@ fun LibraryScreen(
 }
 
 @Composable
-private fun LibraryTopBar() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(Color(0xFF1A0A3D), DarkNavy)
-                )
-            )
-            .padding(horizontal = 20.dp, vertical = 16.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.SportsEsports,
-                contentDescription = null,
-                tint = NeonPurple,
-                modifier = Modifier.size(28.dp)
-            )
-            Text(
-                text = "GAMEVAULT",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    brush = Brush.linearGradient(
-                        colors = listOf(NeonPurple, NeonCyan)
-                    ),
-                    fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = 2.sp
-                )
-            )
-        }
-    }
-}
-
-@Composable
 private fun LibraryTabs(
     activeTab: LibraryTab,
     onTabChange: (LibraryTab) -> Unit
@@ -155,10 +119,10 @@ private fun LibraryTabs(
                     .weight(1f)
                     .height(40.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(if (isSelected) NeonPurple else DarkCard)
+                    .background(if (isSelected) GVTheme.colors.accent else GVTheme.colors.card)
                     .border(
                         width = 1.dp,
-                        color = if (isSelected) NeonPurple else BorderCyan,
+                        color = if (isSelected) GVTheme.colors.accent else GVTheme.colors.border,
                         shape = RoundedCornerShape(10.dp)
                     )
                     .clickable { onTabChange(tab) },
@@ -170,7 +134,7 @@ private fun LibraryTabs(
                         LibraryTab.WISHLIST -> "WISHLIST"
                     },
                     style = MaterialTheme.typography.labelMedium,
-                    color = if (isSelected) TextPrimary else TextMuted,
+                    color = if (isSelected) GVTheme.colors.textPrimary else GVTheme.colors.textMuted,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -192,8 +156,8 @@ private fun CollectionFilterRow(
         CollectionFilter.entries.forEach { filter ->
             val isSelected = activeFilter == filter
             val filterColor = when (filter) {
-                CollectionFilter.ALL -> NeonPurple
-                CollectionFilter.PLAYING -> NeonCyan
+                CollectionFilter.ALL -> GVTheme.colors.accent
+                CollectionFilter.PLAYING -> GVTheme.colors.accentSecondary
                 CollectionFilter.PLAYED -> StatusGreen
                 CollectionFilter.NOT_PLAYED -> StatusOrange
             }
@@ -206,7 +170,7 @@ private fun CollectionFilterRow(
                     )
                     .border(
                         width = 1.dp,
-                        color = if (isSelected) filterColor else BorderCyan,
+                        color = if (isSelected) filterColor else GVTheme.colors.border,
                         shape = RoundedCornerShape(20.dp)
                     )
                     .clickable { onFilterChange(filter) }
@@ -220,7 +184,7 @@ private fun CollectionFilterRow(
                         CollectionFilter.NOT_PLAYED -> "Not Played"
                     },
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (isSelected) filterColor else TextMuted,
+                    color = if (isSelected) filterColor else GVTheme.colors.textMuted,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                 )
             }
@@ -238,7 +202,7 @@ private fun CollectionList(
     Text(
         text = "${games.size} Games in library",
         style = MaterialTheme.typography.bodySmall,
-        color = TextMuted,
+        color = GVTheme.colors.textMuted,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
     )
 
@@ -274,7 +238,7 @@ private fun CollectionGameCard(
 
     val statusColor = when (currentStatus) {
         PlayStatus.NOT_PLAYED -> StatusOrange
-        PlayStatus.PLAYING -> NeonCyan
+        PlayStatus.PLAYING -> GVTheme.colors.accentSecondary
         PlayStatus.PLAYED -> StatusGreen
     }
 
@@ -283,8 +247,8 @@ private fun CollectionGameCard(
             .fillMaxWidth()
             .height(110.dp)
             .clip(RoundedCornerShape(12.dp))
-            .border(width = 1.dp, color = BorderCyan, shape = RoundedCornerShape(12.dp))
-            .background(DarkCard)
+            .border(width = 1.dp, color = GVTheme.colors.border, shape = RoundedCornerShape(12.dp))
+            .background(GVTheme.colors.card)
             .clickable(onClick = onClick)
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
@@ -307,7 +271,7 @@ private fun CollectionGameCard(
                             .align(Alignment.BottomStart)
                             .padding(4.dp)
                             .background(
-                                color = DarkNavy.copy(alpha = 0.85f),
+                                color = GVTheme.colors.background.copy(alpha = 0.85f),
                                 shape = RoundedCornerShape(4.dp)
                             )
                             .padding(horizontal = 4.dp, vertical = 2.dp)
@@ -315,7 +279,7 @@ private fun CollectionGameCard(
                         Text(
                             text = platform.take(8),
                             style = MaterialTheme.typography.labelSmall,
-                            color = TextSecondary,
+                            color = GVTheme.colors.textSecondary,
                             fontSize = 8.sp
                         )
                     }
@@ -334,7 +298,7 @@ private fun CollectionGameCard(
                     Text(
                         text = game.name,
                         style = MaterialTheme.typography.titleMedium,
-                        color = TextPrimary,
+                        color = GVTheme.colors.textPrimary,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -342,7 +306,7 @@ private fun CollectionGameCard(
                     Text(
                         text = game.genres.firstGenre().uppercase(),
                         style = MaterialTheme.typography.labelSmall,
-                        color = TextMuted
+                        color = GVTheme.colors.textMuted
                     )
                 }
 
@@ -392,13 +356,13 @@ private fun CollectionGameCard(
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "Options",
-                        tint = TextMuted
+                        tint = GVTheme.colors.textMuted
                     )
                 }
                 DropdownMenu(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false },
-                    modifier = Modifier.background(DarkCard)
+                    modifier = Modifier.background(GVTheme.colors.card)
                 ) {
                     PlayStatus.entries.forEach { status ->
                         if (status != currentStatus) {
@@ -410,7 +374,7 @@ private fun CollectionGameCard(
                                             PlayStatus.PLAYING -> "Mark as Playing"
                                             PlayStatus.PLAYED -> "Mark as Played"
                                         },
-                                        color = TextPrimary
+                                        color = GVTheme.colors.textPrimary
                                     )
                                 },
                                 onClick = {
@@ -420,7 +384,7 @@ private fun CollectionGameCard(
                             )
                         }
                     }
-                    HorizontalDivider(color = BorderCyan.copy(alpha = 0.3f))
+                    HorizontalDivider(color = GVTheme.colors.border.copy(alpha = 0.3f))
                     DropdownMenuItem(
                         text = { Text("Remove", color = StatusRed) },
                         onClick = {
@@ -470,8 +434,8 @@ private fun WishlistGameCard(
             .fillMaxWidth()
             .height(110.dp)
             .clip(RoundedCornerShape(12.dp))
-            .border(width = 1.dp, color = BorderCyan, shape = RoundedCornerShape(12.dp))
-            .background(DarkCard)
+            .border(width = 1.dp, color = GVTheme.colors.border, shape = RoundedCornerShape(12.dp))
+            .background(GVTheme.colors.card)
             .clickable(onClick = onClick)
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
@@ -495,7 +459,7 @@ private fun WishlistGameCard(
                     Text(
                         text = game.name,
                         style = MaterialTheme.typography.titleMedium,
-                        color = TextPrimary,
+                        color = GVTheme.colors.textPrimary,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -503,17 +467,17 @@ private fun WishlistGameCard(
                     Text(
                         text = game.genres.firstGenre().uppercase(),
                         style = MaterialTheme.typography.labelSmall,
-                        color = TextMuted
+                        color = GVTheme.colors.textMuted
                     )
                 }
 
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .background(NeonPurple.copy(alpha = 0.15f))
+                        .background(GVTheme.colors.accent.copy(alpha = 0.15f))
                         .border(
                             width = 1.dp,
-                            color = NeonPurple,
+                            color = GVTheme.colors.accent,
                             shape = RoundedCornerShape(6.dp)
                         )
                         .clickable(onClick = onMoveToCollection)
@@ -522,7 +486,7 @@ private fun WishlistGameCard(
                     Text(
                         text = "+ Add to Collection",
                         style = MaterialTheme.typography.labelSmall,
-                        color = NeonPurple,
+                        color = GVTheme.colors.accent,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -533,16 +497,16 @@ private fun WishlistGameCard(
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "Options",
-                        tint = TextMuted
+                        tint = GVTheme.colors.textMuted
                     )
                 }
                 DropdownMenu(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false },
-                    modifier = Modifier.background(DarkCard)
+                    modifier = Modifier.background(GVTheme.colors.card)
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Add to Collection", color = TextPrimary) },
+                        text = { Text("Add to Collection", color = GVTheme.colors.textPrimary) },
                         onClick = {
                             showMenu = false
                             onMoveToCollection()
@@ -571,14 +535,14 @@ private fun EmptyLibraryMessage(message: String) {
             Icon(
                 imageVector = Icons.Default.VideoLibrary,
                 contentDescription = null,
-                tint = TextMuted,
+                tint = GVTheme.colors.textMuted,
                 modifier = Modifier.size(64.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = message,
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextMuted,
+                color = GVTheme.colors.textMuted,
                 textAlign = TextAlign.Center
             )
         }
