@@ -28,7 +28,7 @@
     <color name="status_red">#FFE53935</color>
     <color name="status_yellow">#FFFFD700</color>
 
-    <!-- Legacy (nu le sterge, folosite de system) -->
+    <!-- Legacy -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>

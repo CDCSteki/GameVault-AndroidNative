@@ -1,8 +1,10 @@
 package com.example.gamevault.ui.screens.search
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.gamevault.R
 import com.example.gamevault.data.local.entity.SearchHistoryEntity
 import com.example.gamevault.data.remote.dto.GameDto
 import com.example.gamevault.data.repository.GameRepository
@@ -25,13 +27,13 @@ data class SearchFilters(
 data class SearchUiState(
     val query: String = "",
     val searchResults: List<GameDto> = emptyList(),
-    val defaultGames: List<GameDto> = emptyList(), // Nou: Jocurile afișate implicit
+    val defaultGames: List<GameDto> = emptyList(),
     val searchHistory: List<SearchHistoryEntity> = emptyList(),
     val filters: SearchFilters = SearchFilters(),
     val isLoading: Boolean = false,
     val isFilterSheetVisible: Boolean = false,
     val hasSearched: Boolean = false,
-    val errorMessage: String? = null,
+    @param:StringRes val errorMessageRes: Int? = null,
     val totalResults: Int = 0
 )
 
@@ -47,13 +49,12 @@ class SearchViewModel(
 
     init {
         loadSearchHistory()
-        loadDefaultGames() // Încărcăm jocurile de bază la deschiderea ecranului
+        loadDefaultGames()
     }
 
     private fun loadDefaultGames() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-            // Aducem 20 de jocuri populare ca sugestii
             val result = gameRepository.getPopularGames(20)
             _uiState.value = _uiState.value.copy(
                 defaultGames = result.getOrElse { emptyList() },
@@ -73,9 +74,8 @@ class SearchViewModel(
     fun onQueryChange(query: String) {
         _uiState.value = _uiState.value.copy(
             query = query,
-            errorMessage = null
+            errorMessageRes = null
         )
-        // Debounce search
         searchJob?.cancel()
 
         if (query.length >= 2) {
@@ -86,13 +86,11 @@ class SearchViewModel(
         } else if (query.isEmpty()) {
             val filters = _uiState.value.filters
             if (filters != SearchFilters()) {
-                // Dacă ștergem textul, dar avem filtre active, facem search pe baza filtrelor
                 searchJob = viewModelScope.launch {
                     delay(500)
                     performSearch("")
                 }
             } else {
-                // Fără text, fără filtre -> Afișăm înapoi starea implicită
                 _uiState.value = _uiState.value.copy(
                     searchResults = emptyList(),
                     hasSearched = false
@@ -103,7 +101,6 @@ class SearchViewModel(
 
     fun onSearchSubmit() {
         val query = _uiState.value.query
-        // Permitem submit și dacă e gol, cu condiția să existe filtre
         if (query.isBlank() && _uiState.value.filters == SearchFilters()) return
 
         searchJob?.cancel()
@@ -114,9 +111,8 @@ class SearchViewModel(
 
     private suspend fun performSearch(query: String) {
         val filters = _uiState.value.filters
-        _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+        _uiState.value = _uiState.value.copy(isLoading = true, errorMessageRes = null)
 
-        // Salvăm în istoric doar dacă s-a scris efectiv un text
         if (query.isNotBlank()) {
             searchRepository.saveSearch(query)
         }
@@ -144,7 +140,7 @@ class SearchViewModel(
             searchResults = result.getOrElse { emptyList() },
             isLoading = false,
             hasSearched = true,
-            errorMessage = if (result.isFailure) "Search failed. Check your connection." else null
+            errorMessageRes = if (result.isFailure) R.string.general_error_connection else null
         )
     }
 
@@ -178,7 +174,6 @@ class SearchViewModel(
             filters = filters,
             isFilterSheetVisible = false
         )
-        // Declanșează automat căutarea cu noile filtre, chiar și cu query gol
         viewModelScope.launch {
             performSearch(_uiState.value.query)
         }

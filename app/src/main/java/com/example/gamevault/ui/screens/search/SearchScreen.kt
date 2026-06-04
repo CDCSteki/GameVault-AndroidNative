@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,12 +29,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.example.gamevault.R
 import com.example.gamevault.data.remote.dto.GameDto
 import com.example.gamevault.data.repository.GameRepository
 import com.example.gamevault.data.repository.SearchRepository
 import com.example.gamevault.ui.components.GameVaultTopBar
 import com.example.gamevault.ui.theme.*
-import java.util.Locale
+import androidx.compose.ui.platform.LocalLocale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,10 +57,8 @@ fun SearchScreen(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            // Top Bar
             GameVaultTopBar()
 
-            // Search Field
             SearchField(
                 query = uiState.query,
                 onQueryChange = viewModel::onQueryChange,
@@ -68,27 +68,29 @@ fun SearchScreen(
                 }
             )
 
-            // Filter Button
             FilterButton(
                 hasActiveFilters = uiState.filters != SearchFilters(),
                 onClick = viewModel::onToggleFilterSheet
             )
 
-            if (uiState.errorMessage != null) {
+            if (uiState.errorMessageRes != null) {
                 Text(
-                    text = uiState.errorMessage!!,
+                    text = stringResource(uiState.errorMessageRes!!),
                     color = StatusRed,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
             }
-            // Content Area Unificat
+
+            val isDefaultState = uiState.query.isEmpty() && uiState.filters == SearchFilters()
+            val displayList = if (isDefaultState) uiState.defaultGames else uiState.searchResults
+            val listTitle = if (isDefaultState) stringResource(R.string.search_trending_suggestions) else stringResource(R.string.search_results)
+
             Box(modifier = Modifier.weight(1f)) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
-                    val isDefaultState = uiState.query.isEmpty() && uiState.filters == SearchFilters()
 
                     if (isDefaultState && uiState.searchHistory.isNotEmpty()) {
                         item {
@@ -102,9 +104,6 @@ fun SearchScreen(
                             )
                         }
                     }
-
-                    val displayList = if (isDefaultState) uiState.defaultGames else uiState.searchResults
-                    val listTitle = if (isDefaultState) "Trending Suggestions" else "Search Results"
 
                     if (!isDefaultState && displayList.isEmpty() && !uiState.isLoading) {
                         item {
@@ -120,7 +119,7 @@ fun SearchScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = "${displayList.size} TITLES FOUND",
+                                    text = "${displayList.size} ${stringResource(R.string.search_titles_found)}",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = GVTheme.colors.accent,
                                     letterSpacing = 1.sp
@@ -139,7 +138,6 @@ fun SearchScreen(
                     }
                 }
 
-                // Loading Overlay fluid
                 if (uiState.isLoading) {
                     Box(
                         modifier = Modifier
@@ -153,7 +151,6 @@ fun SearchScreen(
             }
         }
 
-        // Filter Bottom Sheet
         if (uiState.isFilterSheetVisible) {
             FilterBottomSheet(
                 currentFilters = uiState.filters,
@@ -179,7 +176,7 @@ private fun SearchField(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         placeholder = {
             Text(
-                text = "Search titles, genres...",
+                text = stringResource(R.string.search_placeholder),
                 color = GVTheme.colors.textMuted,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -259,7 +256,7 @@ private fun FilterButton(
                     modifier = Modifier.size(18.dp)
                 )
                 Text(
-                    text = if (hasActiveFilters) "FILTER (ACTIVE)" else "FILTER",
+                    text = if (hasActiveFilters) stringResource(R.string.search_filter_active) else stringResource(R.string.search_filter),
                     style = MaterialTheme.typography.labelLarge,
                     color = GVTheme.colors.textPrimary,
                     letterSpacing = 1.sp
@@ -283,14 +280,14 @@ private fun SearchHistorySection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Recent Searches",
+                text = stringResource(R.string.search_recent),
                 style = MaterialTheme.typography.titleMedium,
                 color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.Bold
             )
             TextButton(onClick = onClearAll) {
                 Text(
-                    text = "CLEAR ALL",
+                    text = stringResource(R.string.search_clear_all),
                     style = MaterialTheme.typography.labelSmall,
                     color = GVTheme.colors.accent
                 )
@@ -358,7 +355,7 @@ private fun EmptySearchState() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "No results found",
+                text = stringResource(R.string.search_no_results),
                 style = MaterialTheme.typography.titleMedium,
                 color = GVTheme.colors.textMuted
             )
@@ -385,7 +382,6 @@ private fun SearchResultCard(
             .clickable(onClick = onClick)
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
-            // Cover image
             AsyncImage(
                 model = game.backgroundImage,
                 contentDescription = game.name,
@@ -395,7 +391,6 @@ private fun SearchResultCard(
                     .fillMaxHeight()
             )
 
-            // Info
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -403,7 +398,6 @@ private fun SearchResultCard(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    // Genre + Platform badges
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         game.genres?.firstOrNull()?.let { genre ->
                             BadgeChip(text = genre.name.uppercase())
@@ -449,7 +443,7 @@ private fun SearchResultCard(
                             modifier = Modifier.size(14.dp)
                         )
                         Text(
-                            text = String.format(Locale.US, "%.1f", game.rating),
+                            text = String.format(LocalLocale.current.platformLocale, stringResource(R.string.general_rating_format), game.rating),
                             style = MaterialTheme.typography.labelMedium,
                             color = GVTheme.colors.textSecondary
                         )
@@ -466,7 +460,7 @@ private fun SearchResultCard(
                                 modifier = Modifier.size(14.dp)
                             )
                             Text(
-                                text = "${playtime}h Playtime",
+                                text = String.format(LocalLocale.current.platformLocale, stringResource(R.string.general_playtime_format), playtime),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = GVTheme.colors.textMuted
                             )
@@ -513,7 +507,7 @@ private fun FilterBottomSheet(
 
     val genres = listOf("action", "rpg", "shooter", "strategy", "indie", "adventure", "puzzle")
     val platforms = listOf("4" to "PC", "187" to "PS5", "18" to "PS4", "1" to "Xbox", "7" to "Nintendo")
-    val orderings = listOf("-rating" to "Best Rated", "-released" to "Newest", "-added" to "Most Popular")
+    val orderings = listOf("-rating" to stringResource(R.string.search_best_rated), "-released" to stringResource(R.string.search_newest), "-added" to stringResource(R.string.search_most_popular))
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -538,7 +532,7 @@ private fun FilterBottomSheet(
                 .padding(bottom = 40.dp)
         ) {
             Text(
-                text = "Filter Games",
+                text = stringResource(R.string.filter_title),
                 style = MaterialTheme.typography.headlineSmall,
                 color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.Bold
@@ -546,8 +540,7 @@ private fun FilterBottomSheet(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Genre filter
-            FilterSectionTitle("Genre")
+            FilterSectionTitle(stringResource(R.string.filter_genre))
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(genres) { genre ->
                     FilterChipItem(
@@ -562,8 +555,7 @@ private fun FilterBottomSheet(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Platform filter
-            FilterSectionTitle("Platform")
+            FilterSectionTitle(stringResource(R.string.filter_platform))
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(platforms) { (id, name) ->
                     FilterChipItem(
@@ -578,8 +570,7 @@ private fun FilterBottomSheet(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Sort order
-            FilterSectionTitle("Sort By")
+            FilterSectionTitle(stringResource(R.string.filter_sort_by))
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(orderings) { (value, label) ->
                     FilterChipItem(
@@ -594,7 +585,6 @@ private fun FilterBottomSheet(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -612,7 +602,7 @@ private fun FilterBottomSheet(
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = GVTheme.colors.textSecondary),
                     border = androidx.compose.foundation.BorderStroke(1.dp, GVTheme.colors.border)
                 ) {
-                    Text("CLEAR")
+                    Text(stringResource(R.string.filter_clear))
                 }
 
                 Button(
@@ -632,7 +622,7 @@ private fun FilterBottomSheet(
                         containerColor = GVTheme.colors.accent
                     )
                 ) {
-                    Text("APPLY", color = GVTheme.colors.textPrimary)
+                    Text(stringResource(R.string.filter_apply), color = GVTheme.colors.textPrimary)
                 }
             }
         }

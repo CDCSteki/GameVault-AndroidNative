@@ -20,12 +20,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.example.gamevault.R
 import com.example.gamevault.data.local.entity.PlayStatus
 import com.example.gamevault.data.remote.dto.GameDetailDto
 import com.example.gamevault.data.remote.dto.GameScreenshotDto
@@ -45,10 +47,11 @@ fun GameDetailScreen(
     )
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarMessage = uiState.snackbarMessageRes?.let { stringResource(it) }
 
-    LaunchedEffect(uiState.snackbarMessage) {
-        uiState.snackbarMessage?.let {
-            snackbarHostState.showSnackbar(it)
+    LaunchedEffect(snackbarMessage) {
+        if (snackbarMessage != null) {
+            snackbarHostState.showSnackbar(snackbarMessage)
             viewModel.onSnackbarDismissed()
         }
     }
@@ -79,9 +82,9 @@ fun GameDetailScreen(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
-                uiState.errorMessage != null && uiState.gameDetail == null -> {
+                uiState.errorMessageRes != null && uiState.gameDetail == null -> {
                     ErrorSection(
-                        message = uiState.errorMessage!!,
+                        message = stringResource(uiState.errorMessageRes!!),
                         onRetry = viewModel::retry,
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -185,7 +188,6 @@ private fun HeroSection(
             modifier = Modifier.fillMaxSize()
         )
 
-        // Gradient overlay
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -199,7 +201,6 @@ private fun HeroSection(
                 )
         )
 
-        // Back button
         IconButton(
             onClick = onBackClick,
             modifier = Modifier
@@ -227,7 +228,6 @@ private fun TitleSection(detail: GameDetailDto) {
             .padding(horizontal = 16.dp)
             .offset(y = (-16).dp)
     ) {
-        // Genre badges
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             detail.genres?.take(2)?.forEach { genre ->
                 Box(
@@ -278,7 +278,6 @@ private fun ActionButtonsSection(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Collection Button
         Button(
             onClick = if (isInCollection) onRemoveFromCollection else onAddToCollection,
             modifier = Modifier.weight(1f).height(48.dp),
@@ -310,7 +309,7 @@ private fun ActionButtonsSection(
                         modifier = Modifier.size(16.dp)
                     )
                     Text(
-                        text = if (isInCollection) "IN COLLECTION" else "ADD TO COLLECTION",
+                        text = if (isInCollection) stringResource(R.string.detail_in_collection) else stringResource(R.string.detail_add_collection),
                         style = MaterialTheme.typography.labelSmall,
                         color = GVTheme.colors.textPrimary,
                         fontWeight = FontWeight.Bold
@@ -319,7 +318,6 @@ private fun ActionButtonsSection(
             }
         }
 
-        // Wishlist Button — dezactivat daca e in collection
         OutlinedButton(
             onClick = when {
                 isInCollection -> { {} }
@@ -364,11 +362,7 @@ private fun ActionButtonsSection(
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
-                    text = when {
-                        isInCollection -> "IN COLLECTION"
-                        isInWishlist -> "WISHLIST"
-                        else -> "WISHLIST"
-                    },
+                    text = if (isInCollection) stringResource(R.string.detail_in_collection) else stringResource(R.string.detail_wishlist),
                     style = MaterialTheme.typography.labelSmall,
                     color = when {
                         isInCollection -> GVTheme.colors.textMuted.copy(alpha = 0.3f)
@@ -393,7 +387,7 @@ private fun PlayStatusSection(
             .padding(horizontal = 16.dp, vertical = 4.dp)
     ) {
         Text(
-            text = "PLAY STATUS",
+            text = stringResource(R.string.detail_play_status),
             style = MaterialTheme.typography.labelSmall,
             color = GVTheme.colors.textMuted,
             letterSpacing = 1.sp,
@@ -443,9 +437,9 @@ private fun PlayStatusSection(
                         )
                         Text(
                             text = when (status) {
-                                PlayStatus.NOT_PLAYED -> "Not Played"
-                                PlayStatus.PLAYING -> "Playing"
-                                PlayStatus.PLAYED -> "Played"
+                                PlayStatus.NOT_PLAYED -> stringResource(R.string.status_not_played)
+                                PlayStatus.PLAYING -> stringResource(R.string.status_playing)
+                                PlayStatus.PLAYED -> stringResource(R.string.status_played)
                             },
                             style = MaterialTheme.typography.labelSmall,
                             color = if (isSelected) statusColor else GVTheme.colors.textMuted,
@@ -469,12 +463,12 @@ private fun InfoGridSection(detail: GameDetailDto) {
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
             InfoItem(
-                label = "DEVELOPER",
-                value = detail.developers?.firstOrNull()?.name ?: "N/A",
+                label = stringResource(R.string.detail_developer),
+                value = detail.developers?.firstOrNull()?.name ?: stringResource(R.string.general_na),
                 modifier = Modifier.weight(1f)
             )
             InfoItem(
-                label = "RELEASE",
+                label = stringResource(R.string.detail_release),
                 value = detail.released.formatReleaseDate(),
                 modifier = Modifier.weight(1f)
             )
@@ -482,15 +476,15 @@ private fun InfoGridSection(detail: GameDetailDto) {
         Spacer(modifier = Modifier.height(12.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
             InfoItem(
-                label = "PLATFORM",
+                label = stringResource(R.string.detail_platform),
                 value = detail.platforms
                     ?.take(3)
                     ?.joinToString(", ") { it.platform.name }
-                    ?: "N/A",
+                    ?: stringResource(R.string.general_na),
                 modifier = Modifier.weight(1f)
             )
             InfoItem(
-                label = "PLAYTIME",
+                label = stringResource(R.string.detail_playtime),
                 value = detail.playtime.toPlaytimeString(),
                 modifier = Modifier.weight(1f)
             )
@@ -549,12 +543,11 @@ private fun PrivateNotesSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Private Notes",
+                text = stringResource(R.string.detail_private_notes),
                 style = MaterialTheme.typography.titleMedium,
                 color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.Bold
             )
-            // Star Rating
             Row {
                 repeat(5) { index ->
                     val starRating = (index + 1).toFloat()
@@ -581,7 +574,7 @@ private fun PrivateNotesSection(
                 .padding(12.dp)
         ) {
             Text(
-                text = if (notes.isBlank()) "Your private notes on this game..." else notes,
+                text = notes.ifBlank { stringResource(R.string.detail_notes_placeholder) },
                 style = MaterialTheme.typography.bodySmall,
                 color = if (notes.isBlank()) GVTheme.colors.textMuted else GVTheme.colors.textSecondary,
                 maxLines = 3,
@@ -611,7 +604,7 @@ private fun AboutSection(description: String?) {
                     .background(GVTheme.colors.accent, RoundedCornerShape(2.dp))
             )
             Text(
-                text = "About the Game",
+                text = stringResource(R.string.detail_about),
                 style = MaterialTheme.typography.titleMedium,
                 color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.Bold
@@ -636,7 +629,7 @@ private fun ScreenshotsSection(screenshots: List<GameScreenshotDto>) {
             .padding(vertical = 8.dp)
     ) {
         Text(
-            text = "Screenshots",
+            text = stringResource(R.string.detail_screenshots),
             style = MaterialTheme.typography.titleMedium,
             color = GVTheme.colors.textPrimary,
             fontWeight = FontWeight.Bold,
@@ -689,7 +682,7 @@ private fun SystemRequirementsSection(detail: GameDetailDto) {
                     .background(GVTheme.colors.accentSecondary, RoundedCornerShape(2.dp))
             )
             Text(
-                text = "PC System Requirements",
+                text = stringResource(R.string.pc_system_requirements),
                 style = MaterialTheme.typography.titleMedium,
                 color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.Bold
@@ -730,7 +723,7 @@ private fun UserSentimentSection(detail: GameDetailDto) {
             .padding(16.dp)
     ) {
         Text(
-            text = "USER SENTIMENT",
+            text = stringResource(R.string.detail_user_sentiment),
             style = MaterialTheme.typography.labelSmall,
             color = GVTheme.colors.textMuted,
             letterSpacing = 1.sp
@@ -760,7 +753,6 @@ private fun UserSentimentSection(detail: GameDetailDto) {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Rating breakdown
         detail.ratings?.take(3)?.forEach { rating ->
             Row(
                 modifier = Modifier
@@ -823,7 +815,7 @@ private fun ErrorSection(
             onClick = onRetry,
             colors = ButtonDefaults.buttonColors(containerColor = GVTheme.colors.accent)
         ) {
-            Text("Retry", color = GVTheme.colors.textPrimary)
+            Text(stringResource(R.string.detail_retry), color = GVTheme.colors.textPrimary)
         }
     }
 }
@@ -840,7 +832,7 @@ private fun NotesDialog(
         containerColor = GVTheme.colors.card,
         title = {
             Text(
-                text = "Private Notes",
+                text = stringResource(R.string.detail_private_notes),
                 color = GVTheme.colors.textPrimary,
                 fontWeight = FontWeight.Bold
             )
@@ -854,7 +846,7 @@ private fun NotesDialog(
                     .height(150.dp),
                 placeholder = {
                     Text(
-                        text = "Write your notes here...",
+                        text = stringResource(R.string.detail_notes_write),
                         color = GVTheme.colors.textMuted
                     )
                 },
@@ -875,12 +867,12 @@ private fun NotesDialog(
                 onClick = onSave,
                 colors = ButtonDefaults.buttonColors(containerColor = GVTheme.colors.accent)
             ) {
-                Text("Save", color = GVTheme.colors.textPrimary)
+                Text(stringResource(R.string.detail_notes_save), color = GVTheme.colors.textPrimary)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel", color = GVTheme.colors.textSecondary)
+                Text(stringResource(R.string.detail_notes_cancel), color = GVTheme.colors.textSecondary)
             }
         }
     )

@@ -21,6 +21,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -28,10 +29,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.gamevault.R
 import com.example.gamevault.data.repository.AuthRepository
 import com.example.gamevault.ui.components.GameVaultTextField
 import com.example.gamevault.ui.theme.*
-
 
 @Composable
 fun LoginScreen(
@@ -69,7 +70,6 @@ fun LoginScreen(
         ) {
             Spacer(modifier = Modifier.height(60.dp))
 
-            // Card container cu border cyan
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -90,9 +90,8 @@ fun LoginScreen(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Logo
                     Text(
-                        text = "GAMEVAULT",
+                        text = stringResource(R.string.login_title),
                         style = MaterialTheme.typography.displayMedium.copy(
                             brush = Brush.linearGradient(
                                 colors = listOf(GVTheme.colors.accent, GVTheme.colors.accentSecondary)
@@ -105,19 +104,18 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Welcome back, Hunter",
+                        text = stringResource(R.string.login_subtitle),
                         style = MaterialTheme.typography.titleMedium,
                         color = GVTheme.colors.textSecondary
                     )
 
                     Spacer(modifier = Modifier.height(36.dp))
 
-                    // Email / Username field
                     Column(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "Email or Username",
+                            text = stringResource(R.string.login_email_label),
                             style = MaterialTheme.typography.labelMedium,
                             color = GVTheme.colors.textSecondary
                         )
@@ -125,7 +123,7 @@ fun LoginScreen(
                         GameVaultTextField(
                             value = uiState.emailOrUsername,
                             onValueChange = viewModel::onEmailOrUsernameChange,
-                            placeholder = "Enter your credentials",
+                            placeholder = stringResource(R.string.login_email_placeholder),
                             leadingIcon = Icons.Default.Person,
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Email,
@@ -139,7 +137,6 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // Password field
                     Column(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -149,20 +146,10 @@ fun LoginScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Password",
+                                text = stringResource(R.string.login_password_label),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = GVTheme.colors.textSecondary
                             )
-                            TextButton(
-                                onClick = { /* TODO: Forgot password */ },
-                                contentPadding = PaddingValues(0.dp)
-                            ) {
-                                Text(
-                                    text = "Forgot Password?",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = GVTheme.colors.accent
-                                )
-                            }
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         GameVaultTextField(
@@ -186,11 +173,10 @@ fun LoginScreen(
                         )
                     }
 
-                    // Error message
-                    if (uiState.errorMessage != null) {
+                    if (uiState.errorMessageRes != null) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = uiState.errorMessage!!,
+                            text = stringResource(uiState.errorMessageRes!!),
                             color = StatusRed,
                             style = MaterialTheme.typography.bodySmall,
                             textAlign = TextAlign.Center,
@@ -200,7 +186,6 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(28.dp))
 
-                    // Login Button
                     Button(
                         onClick = {
                             focusManager.clearFocus()
@@ -235,7 +220,7 @@ fun LoginScreen(
                                 )
                             } else {
                                 Text(
-                                    text = "LOGIN",
+                                    text = stringResource(R.string.login_button),
                                     style = MaterialTheme.typography.labelLarge,
                                     color = GVTheme.colors.textPrimary,
                                     letterSpacing = 2.sp
@@ -246,13 +231,12 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // Register link
                     Row(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Don't have an account? ",
+                            text = stringResource(R.string.login_no_account) + " ",
                             style = MaterialTheme.typography.bodySmall,
                             color = GVTheme.colors.textSecondary
                         )
@@ -261,7 +245,7 @@ fun LoginScreen(
                             contentPadding = PaddingValues(0.dp)
                         ) {
                             Text(
-                                text = "Sign Up",
+                                text = stringResource(R.string.login_sign_up),
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     fontWeight = FontWeight.Bold
                                 ),

@@ -22,12 +22,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.example.gamevault.R
 import com.example.gamevault.data.remote.dto.GameDto
 import com.example.gamevault.data.repository.AuthRepository
 import com.example.gamevault.data.repository.GameRepository
@@ -70,7 +72,7 @@ fun HomeScreen(
                 if (uiState.popularThisYear.isNotEmpty()) {
                     item {
                         SectionHeader(
-                            title = "Popular This Year",
+                            title = stringResource(R.string.home_popular_this_year),
                             icon = Icons.AutoMirrored.Filled.TrendingUp,
                             onViewAll = {
                                 onViewAllClick(NavRoutes.GameList.TYPE_THIS_YEAR)
@@ -85,7 +87,7 @@ fun HomeScreen(
                             items(uiState.popularThisYear) { game ->
                                 GameCardMedium(
                                     game = game,
-                                    badge = if (game == uiState.popularThisYear.first()) "ONLINE" else if (game == uiState.popularThisYear[1]) "TRENDING" else null,
+                                    badge = if (game == uiState.popularThisYear.first()) stringResource(R.string.home_online) else if (game == uiState.popularThisYear[1]) stringResource(R.string.home_trending) else null,
                                     onClick = { onGameClick(game.id) }
                                 )
                             }
@@ -98,7 +100,7 @@ fun HomeScreen(
                 if (uiState.allTimeLegends.isNotEmpty()) {
                     item {
                         SectionHeader(
-                            title = "All-Time Legends",
+                            title = stringResource(R.string.home_all_time_legends),
                             icon = Icons.Default.EmojiEvents,
                             onViewAll = {
                                 onViewAllClick(NavRoutes.GameList.TYPE_ALL_TIME)
@@ -115,10 +117,10 @@ fun HomeScreen(
                 }
 
                 // Discover Section
-                if (uiState.errorMessage == null && (uiState.indieGems.isNotEmpty() || uiState.competitive.isNotEmpty() || uiState.coop.isNotEmpty() || uiState.retro.isNotEmpty())) {
+                if (uiState.errorMessageRes == null && (uiState.indieGems.isNotEmpty() || uiState.competitive.isNotEmpty() || uiState.coop.isNotEmpty() || uiState.retro.isNotEmpty())) {
                     item {
                         SectionHeader(
-                            title = "Discover",
+                            title = stringResource(R.string.home_discover),
                             icon = Icons.Default.Star,
                             onViewAll = null
                         )
@@ -136,10 +138,10 @@ fun HomeScreen(
                 }
 
                 // Error
-                if (uiState.errorMessage != null) {
+                if (uiState.errorMessageRes != null) {
                     item {
                         Text(
-                            text = uiState.errorMessage!!,
+                            text = stringResource(uiState.errorMessageRes!!),
                             color = StatusRed,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(16.dp)
@@ -193,7 +195,7 @@ private fun HomeHeader(username: String) {
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Welcome,",
+                text = stringResource(R.string.home_welcome),
                 style = MaterialTheme.typography.headlineSmall,
                 color = GVTheme.colors.textSecondary
             )
@@ -208,7 +210,7 @@ private fun HomeHeader(username: String) {
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Your next legendary adventure is just a click away.",
+                text = stringResource(R.string.home_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 color = GVTheme.colors.textMuted
             )
@@ -249,7 +251,7 @@ private fun SectionHeader(
         if (onViewAll != null) {
             TextButton(onClick = onViewAll) {
                 Text(
-                    text = "VIEW ALL",
+                    text = stringResource(R.string.home_view_all),
                     style = MaterialTheme.typography.labelSmall,
                     color = GVTheme.colors.accent,
                     letterSpacing = 1.sp
@@ -300,7 +302,7 @@ private fun GameCardMedium(
                     .align(Alignment.TopEnd)
                     .padding(8.dp)
                     .background(
-                        color = if (badge == "ONLINE") GVTheme.colors.accentSecondary else GVTheme.colors.accent,
+                        color = if (badge == stringResource(R.string.home_online)) GVTheme.colors.accentSecondary else GVTheme.colors.accent,
                         shape = RoundedCornerShape(4.dp)
                     )
                     .padding(horizontal = 6.dp, vertical = 2.dp)
@@ -384,7 +386,7 @@ private fun AllTimeLegendCard(
                     .padding(horizontal = 8.dp, vertical = 3.dp)
             ) {
                 Text(
-                    text = "HALL OF FAME",
+                    text = stringResource(R.string.home_hall_of_fame),
                     style = MaterialTheme.typography.labelSmall,
                     color = GVTheme.colors.background,
                     fontWeight = FontWeight.ExtraBold
@@ -415,10 +417,10 @@ private fun DiscoverGrid(
     onViewAllGenre: (String) -> Unit
 ) {
     val categories = listOf(
-        DiscoverCategory("Indie Gems", GVTheme.colors.accent, indieGames, "discover_indie"),
-        DiscoverCategory("Competitive", GVTheme.colors.accentSecondary, competitiveGames, "discover_competitive"),
-        DiscoverCategory("Co-op", StatusGreen, coOpGames, "discover_coop"),
-        DiscoverCategory("Retro", StatusOrange, retroGames, "discover_retro")
+        DiscoverCategory(stringResource(R.string.discover_indie), GVTheme.colors.accent, indieGames, "discover_indie"),
+        DiscoverCategory(stringResource(R.string.discover_competitive), GVTheme.colors.accentSecondary, competitiveGames, "discover_competitive"),
+        DiscoverCategory(stringResource(R.string.discover_coop), StatusGreen, coOpGames, "discover_coop"),
+        DiscoverCategory(stringResource(R.string.discover_retro), StatusOrange, retroGames, "discover_retro")
     )
 
     Column(
@@ -506,10 +508,10 @@ private fun DiscoverCategoryCard(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = when (category.name) {
-                        "Indie Gems" -> "◈"
-                        "Competitive" -> "⚡"
-                        "Co-Op" -> "◎"
+                    text = when (category.genre) {
+                        "discover_indie" -> "◈"
+                        "discover_competitive" -> "⚡"
+                        "discover_coop" -> "◎"
                         else -> "◀"
                     },
                     color = category.color,

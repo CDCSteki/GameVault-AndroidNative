@@ -1,0 +1,227 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">GameVault</string>
+
+    <!-- Auth -->
+    <string name="login_title">GAMEVAULT</string>
+    <string name="login_subtitle">Bine ai venit, Vânătorule</string>
+    <string name="login_email_label">Email sau Nume de utilizator</string>
+    <string name="login_email_placeholder">Introdu datele de conectare</string>
+    <string name="login_password_label">Parolă</string>
+    <string name="login_forgot_password">Ai uitat parola?</string>
+    <string name="login_button">CONECTARE</string>
+    <string name="login_no_account">Nu ai un cont?</string>
+    <string name="login_sign_up">Înregistrează-te</string>
+    <string name="register_title">Creează-ți contul</string>
+    <string name="register_username_label">Nume de utilizator</string>
+    <string name="register_username_placeholder">Alege un nume de utilizator</string>
+    <string name="register_email_label">Email</string>
+    <string name="register_email_placeholder">Introdu adresa de email</string>
+    <string name="register_password_label">Parolă</string>
+    <string name="register_password_placeholder">Min. 6 caractere</string>
+    <string name="register_confirm_password_label">Confirmă parola</string>
+    <string name="register_confirm_password_placeholder">Repetă parola</string>
+    <string name="register_button">CREEAZĂ CONT</string>
+    <string name="register_have_account">Ai deja un cont?</string>
+    <string name="register_sign_in">Conectează-te</string>
+
+    <!-- Validation -->
+    <string name="error_empty_email">Introdu adresa de email sau numele de utilizator</string>
+    <string name="error_empty_password">Introdu parola</string>
+    <string name="error_invalid_credentials">Email sau parolă incorecte</string>
+    <string name="error_empty_username">Introdu un nume de utilizator</string>
+    <string name="error_username_too_short">Numele de utilizator trebuie să aibă minim 3 caractere</string>
+    <string name="error_invalid_email">Introdu o adresă de email validă</string>
+    <string name="error_password_too_short">Parola trebuie să aibă minim 6 caractere</string>
+    <string name="error_passwords_no_match">Parolele nu se potrivesc</string>
+    <string name="error_email_exists">Această adresă de email este deja înregistrată</string>
+    <string name="error_username_exists">Acest nume de utilizator este deja folosit</string>
+
+    <!-- Bottom Nav -->
+    <string name="nav_home">ACASĂ</string>
+    <string name="nav_search">CAUTĂ</string>
+    <string name="nav_library">BIBLIOTECĂ</string>
+    <string name="nav_profile">PROFIL</string>
+    <string name="nav_settings">SETĂRI</string>
+
+    <!-- Home -->
+    <string name="home_welcome">Bine ai venit,</string>
+    <string name="home_subtitle">Următoarea ta aventură legendară e la un click distanță.</string>
+    <string name="home_popular_this_year">Popular anul acesta</string>
+    <string name="home_all_time_legends">Legende din toate timpurile</string>
+    <string name="home_discover">Descoperă</string>
+    <string name="home_view_all">VEZI TOT</string>
+    <string name="home_hall_of_fame">GALERIA CELEBRITĂȚILOR</string>
+    <string name="home_online">ONLINE</string>
+    <string name="home_trending">POPULARE</string>
+    <string name="discover_indie">Bijuterii Indie</string>
+    <string name="discover_competitive">Competitiv</string>
+    <string name="discover_coop">Co-Op</string>
+    <string name="discover_retro">Retro</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">Caută titluri, genuri…</string>
+    <string name="search_filter">FILTRE</string>
+    <string name="search_filter_active">FILTRE (ACTIVE)</string>
+    <string name="search_results">Rezultatele căutării</string>
+    <string name="search_titles_found">TITLURI GĂSITE</string>
+    <string name="search_no_results">Nu s-au găsit rezultate</string>
+    <string name="search_recent">Căutări recente</string>
+    <string name="search_clear_all">ȘTERGE TOT</string>
+    <string name="search_trending_tags">ETICHETE POPULARE</string>
+    <string name="filter_title">Filtrează jocurile</string>
+    <string name="filter_genre">Gen</string>
+    <string name="filter_platform">Platformă</string>
+    <string name="filter_sort_by">Sortează după</string>
+    <string name="filter_clear">GOLIRE</string>
+    <string name="filter_apply">APLICĂ</string>
+
+    <!-- Game Detail -->
+    <string name="detail_add_collection">ADAUGĂ ÎN COLECȚIE</string>
+    <string name="detail_in_collection">ÎN COLECȚIE</string>
+    <string name="detail_wishlist">LISTĂ DE DORINȚE</string>
+    <string name="detail_developer">DEZVOLTATOR</string>
+    <string name="detail_release">LANSAT</string>
+    <string name="detail_platform">PLATFORMĂ</string>
+    <string name="detail_playtime">TIMP DE JOC</string>
+    <string name="detail_private_notes">Notițe private</string>
+    <string name="detail_notes_placeholder">Notițele tale private despre acest joc…</string>
+    <string name="detail_about">Despre joc</string>
+    <string name="detail_screenshots">Capturi de ecran</string>
+    <string name="detail_trailers">Trailere</string>
+    <string name="detail_watch_trailer">URMĂREȘTE TRAILERUL OFICIAL</string>
+    <string name="detail_videos_available">Videoclipuri disponibile</string>
+    <string name="detail_user_sentiment">OPINIA UTILIZATORILOR</string>
+    <string name="detail_retry">Reîncearcă</string>
+    <string name="detail_notes_write">Scrie-ți notițele aici…</string>
+    <string name="detail_notes_save">Salvează</string>
+    <string name="detail_notes_cancel">Anulează</string>
+
+    <!-- Library -->
+    <string name="library_my_collection">COLECȚIA MEA</string>
+    <string name="library_wishlist">LISTĂ DE DORINȚE</string>
+    <string name="library_filter_all">Toate</string>
+    <string name="library_filter_played">Jucate</string>
+    <string name="library_filter_not_played">Nejucate</string>
+    <string name="library_games_count">Jocuri în colecție</string>
+    <string name="library_status_played">✓ Jucat</string>
+    <string name="library_status_not_played">Nejucat</string>
+    <string name="library_mark_played">Marchează ca jucat</string>
+    <string name="library_mark_not_played">Marchează ca nejucat</string>
+    <string name="library_remove">Elimină</string>
+    <string name="library_removed">Eliminat din colectie</string>
+    <string name="library_add_to_collection">+ Adaugă în colecție</string>
+    <string name="library_empty_collection">Colecția ta este goală.\nCaută jocuri pentru a le adăuga!</string>
+    <string name="library_empty_played">Niciun joc jucat încă</string>
+    <string name="library_empty_not_played">Niciun joc nejucat</string>
+    <string name="library_empty_wishlist">Lista ta de dorințe este goală.\nAdaugă jocuri pe care vrei să le joci!</string>
+    <string name="library_confirm_password_placeholder">Repetă noua parolă</string>
+    <string name="library_filter_playing">Playing</string>
+    <string name="Library_mark_as_playing">Mark as Playing</string>
+    <string name="detail_require">Componente PC recomandate</string>
+    <string name="already_in_col">Deja în colectia ta!</string>
+    <string name="library_added_to_collection">Adaugat in coletie!</string>
+
+    <!-- Profile -->
+    <string name="profile_username_label">Nume de utilizator</string>
+    <string name="profile_password_label">Parolă</string>
+    <string name="profile_save_changes">SALVEAZĂ MODIFICĂRILE</string>
+    <string name="profile_logout">DECONECTARE</string>
+    <string name="profile_updated">Profil actualizat cu succes!</string>
+    <string name="profile_error_empty_username">Numele de utilizator nu poate fi gol</string>
+    <string name="update_username">ACTUALIZEAZĂ NUMELE</string>
+    <string name="enter_username">Introdu numele de utilizator</string>
+    <string name="profile_current_password_label">Parola actuală</string>
+    <string name="profile_new_password_label">Parola nouă</string>
+    <string name="profile_confirm_new_password_label">Confirmă noua parolă</string>
+    <string name="take_photo">Fă o poză</string>
+    <string name="use_your_camera">Folosește camera foto</string>
+    <string name="choose_from_gallery">Alege din galerie</string>
+    <string name="pick_from_your_photos">Alege din pozele tale</string>
+    <string name="profile_change_picture">Schimbă poza de profil</string>
+
+
+    <!-- Settings -->
+    <string name="settings_title">Setări</string>
+    <string name="settings_system_prefs">PREFERINȚE SISTEM</string>
+    <string name="settings_display_theme">Tema aplicației</string>
+    <string name="settings_theme_dark">Cyber Dark (Implicit)</string>
+    <string name="settings_theme_light">Mod luminos</string>
+    <string name="settings_language">Limba sistemului</string>
+    <string name="settings_language_en">Engleză (SUA)</string>
+    <string name="settings_language_ro">Română</string>
+    <string name="settings_privacy">CONFIDENȚIALITATE ȘI DATE</string>
+    <string name="settings_search_history">Istoric căutări</string>
+    <string name="settings_clear_now">Șterge acum</string>
+    <string name="settings_history_cleared">Șters!</string>
+    <string name="settings_history_never">Ultima ștergere: Niciodată</string>
+    <string name="settings_account_control">CONTROL CONT</string>
+    <string name="settings_deactivate_title">Dezactivează contul</string>
+    <string name="settings_deactivate_desc">Îți șterge permanent profilul, colecția de jocuri și toate datele asociate. Această acțiune este ireversibilă.</string>
+    <string name="settings_delete_profile">ȘTERGE PROFILUL</string>
+
+    <!-- Delete Dialog -->
+    <string name="delete_dialog_title">Ștergere Cont</string>
+    <string name="delete_dialog_message">Ești sigur? Toate datele tale vor fi șterse permanent.</string>
+    <string name="delete_dialog_confirm">ȘTERGE</string>
+    <string name="delete_dialog_cancel">Anulează</string>
+
+    <!-- General -->
+    <string name="general_na">N/A</string>
+    <string name="general_loading">Se încarcă…</string>
+    <string name="general_error_connection">Încărcare eșuată. Verifică conexiunea.</string>
+    <string name="fail_to_load_games">Încărcarea jocurilor a eșuat. Verifică conexiunea.</string>
+    <string name="hide_pass">Ascunde parola</string>
+    <string name="show_pass">Arată parola</string>
+    <string name="general_playtime_format">%1$sh medie</string>
+    <string name="general_rating_format">%.1f</string>
+    <string name="general_sentiment_format">%1$d%%</string>
+
+    <!-- Pass strength -->
+    <string name="tooweak">Prea slabă</string>
+    <string name="weak">Slabă</string>
+    <string name="good">Bună</string>
+    <string name="strong">Puternică</string>
+    <string name="password_strength">Puterea parolei</string>
+
+    <string name="msg_added_collection">Adăugat în colecție!</string>
+    <string name="msg_already_in_collection">Deja în colecția ta!</string>
+    <string name="msg_removed_collection">Eliminat din colecție</string>
+    <string name="msg_added_wishlist">Adăugat la lista de dorințe!</string>
+    <string name="msg_already_in_wishlist">Deja în lista ta de dorințe!</string>
+    <string name="msg_game_in_collection">Acest joc este deja în colecția ta!</string>
+    <string name="msg_removed_wishlist">Eliminat din lista de dorințe</string>
+    <string name="error_no_internet_local">Fără conexiune la internet și jocul nu este în librăria locală.</string>
+    <string name="detail_play_status">STARE JOC</string>
+    <string name="status_playing">În curs de joc</string>
+    <string name="status_played">Jucat</string>
+    <string name="status_not_played">Nejucat</string>
+    <string name="list_showing_titles">Se afișează %1$d titluri</string>
+    <string name="list_show">Afișează:</string>
+    <string name="pc_system_requirements">Cerințe de Sistem PC</string>
+
+    <string name="library_empty_playing">Niciun joc în curs de joc</string>
+    <string name="library_mark_playing">Marchează ca În curs de joc</string>
+    <string name="profile_change_password">SCHIMBĂ PAROLA</string>
+    <string name="profile_current_password_placeholder">Introdu parola curentă</string>
+    <string name="profile_update_password">ACTUALIZEAZĂ PAROLA</string>
+    <string name="search_trending_suggestions">Sugestii în Tendințe</string>
+    <string name="search_best_rated">Cele mai bine cotate</string>
+    <string name="search_newest">Cele mai noi</string>
+    <string name="search_most_popular">Cele mai populare</string>
+
+    <!-- Theme names -->
+    <string name="theme_cyber">Cyber</string>
+    <string name="theme_ocean">Ocean</string>
+    <string name="theme_forest">Pădure</string>
+    <string name="theme_sunset">Apus</string>
+    <string name="theme_blood">Sânge</string>
+    <string name="theme_matrix">Matrix</string>
+    <string name="theme_rose">Trandafir</string>
+
+    <string name="error_user_not_found">Utilizatorul nu a fost găsit</string>
+    <string name="error_empty_current_password">Introdu parola curentă</string>
+    <string name="error_password_same">Noua parolă trebuie să fie diferită</string>
+    <string name="profile_password_updated">Parolă actualizată cu succes!</string>
+    <string name="error_wrong_current_password">Parola curentă este incorectă</string>
+</resources>

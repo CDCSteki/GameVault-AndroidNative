@@ -18,16 +18,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.example.gamevault.R
 import com.example.gamevault.data.remote.dto.GameDto
 import com.example.gamevault.data.repository.GameRepository
 import com.example.gamevault.ui.theme.*
-import java.util.Locale
+import androidx.compose.ui.platform.LocalLocale
 
 @Composable
 fun GameListScreen(
@@ -49,7 +51,7 @@ fun GameListScreen(
         Column(modifier = Modifier.fillMaxSize()) {
 
             GameListTopBar(
-                title = uiState.title,
+                title = stringResource(uiState.titleRes),
                 onBackClick = onBackClick
             )
 
@@ -63,7 +65,7 @@ fun GameListScreen(
                     }
                 }
 
-                uiState.errorMessage != null -> {
+                uiState.errorMessageRes != null -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -77,7 +79,7 @@ fun GameListScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = uiState.errorMessage!!,
+                                text = stringResource(uiState.errorMessageRes!!),
                                 color = GVTheme.colors.textSecondary,
                                 style = MaterialTheme.typography.bodyMedium
                             )
@@ -88,7 +90,7 @@ fun GameListScreen(
                                     containerColor = GVTheme.colors.accent
                                 )
                             ) {
-                                Text("Retry", color = GVTheme.colors.textPrimary)
+                                Text(stringResource(R.string.detail_retry), color = GVTheme.colors.textPrimary)
                             }
                         }
                     }
@@ -100,7 +102,7 @@ fun GameListScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "No games found",
+                            text = stringResource(R.string.search_no_results),
                             color = GVTheme.colors.textMuted,
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -115,7 +117,6 @@ fun GameListScreen(
                         ),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        // Header cu count + page size selector
                         item {
                             PageSizeSelector(
                                 currentSize = uiState.pageSize,
@@ -156,7 +157,7 @@ private fun PageSizeSelector(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Showing $totalShown titles",
+                text = stringResource(R.string.list_showing_titles, totalShown),
                 style = MaterialTheme.typography.labelSmall,
                 color = GVTheme.colors.accent,
                 letterSpacing = 1.sp
@@ -167,7 +168,7 @@ private fun PageSizeSelector(
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
-                    text = "Show:",
+                    text = stringResource(R.string.list_show),
                     style = MaterialTheme.typography.labelSmall,
                     color = GVTheme.colors.textMuted
                 )
@@ -323,7 +324,7 @@ private fun GameListCard(
                             modifier = Modifier.size(14.dp)
                         )
                         Text(
-                            text = String.format(Locale.US, "%.1f", game.rating),
+                            text = String.format(LocalLocale.current.platformLocale, stringResource(R.string.general_rating_format), game.rating),
                             style = MaterialTheme.typography.labelMedium,
                             color = GVTheme.colors.textSecondary
                         )

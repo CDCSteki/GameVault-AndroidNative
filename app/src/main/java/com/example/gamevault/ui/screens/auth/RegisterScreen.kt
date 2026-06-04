@@ -22,6 +22,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.gamevault.R
 import com.example.gamevault.data.repository.AuthRepository
 import com.example.gamevault.ui.components.GameVaultTextField
 import com.example.gamevault.ui.components.PasswordStrengthIndicator
@@ -90,7 +92,7 @@ fun RegisterScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
                     Text(
-                        text = "GAMEVAULT",
+                        text = stringResource(R.string.login_title),
                         style = MaterialTheme.typography.displayMedium.copy(
                             brush = Brush.linearGradient(
                                 colors = listOf(GVTheme.colors.accent, GVTheme.colors.accentSecondary)
@@ -103,17 +105,16 @@ fun RegisterScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Create your account",
+                        text = stringResource(R.string.register_title),
                         style = MaterialTheme.typography.titleMedium,
                         color = GVTheme.colors.textSecondary
                     )
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // Username
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "Username",
+                            text = stringResource(R.string.register_username_label),
                             style = MaterialTheme.typography.labelMedium,
                             color = GVTheme.colors.textSecondary
                         )
@@ -121,7 +122,7 @@ fun RegisterScreen(
                         GameVaultTextField(
                             value = uiState.username,
                             onValueChange = viewModel::onUsernameChange,
-                            placeholder = "Choose a username",
+                            placeholder = stringResource(R.string.register_username_placeholder),
                             leadingIcon = Icons.Default.Person,
                             keyboardOptions = KeyboardOptions(
                                 imeAction = ImeAction.Next
@@ -134,10 +135,9 @@ fun RegisterScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Email
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "Email",
+                            text = stringResource(R.string.register_email_label),
                             style = MaterialTheme.typography.labelMedium,
                             color = GVTheme.colors.textSecondary
                         )
@@ -145,7 +145,7 @@ fun RegisterScreen(
                         GameVaultTextField(
                             value = uiState.email,
                             onValueChange = viewModel::onEmailChange,
-                            placeholder = "Enter your email",
+                            placeholder = stringResource(R.string.register_email_placeholder),
                             leadingIcon = Icons.Default.Email,
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Email,
@@ -159,10 +159,9 @@ fun RegisterScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Password
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "Password",
+                            text = stringResource(R.string.register_password_label),
                             style = MaterialTheme.typography.labelMedium,
                             color = GVTheme.colors.textSecondary
                         )
@@ -170,7 +169,7 @@ fun RegisterScreen(
                         GameVaultTextField(
                             value = uiState.password,
                             onValueChange = viewModel::onPasswordChange,
-                            placeholder = "Min. 6 characters",
+                            placeholder = stringResource(R.string.register_password_placeholder),
                             leadingIcon = Icons.Default.Lock,
                             isPassword = true,
                             isPasswordVisible = uiState.isPasswordVisible,
@@ -192,10 +191,9 @@ fun RegisterScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Confirm Password
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "Confirm Password",
+                            text = stringResource(R.string.register_confirm_password_label),
                             style = MaterialTheme.typography.labelMedium,
                             color = GVTheme.colors.textSecondary
                         )
@@ -203,7 +201,7 @@ fun RegisterScreen(
                         GameVaultTextField(
                             value = uiState.confirmPassword,
                             onValueChange = viewModel::onConfirmPasswordChange,
-                            placeholder = "Repeat your password",
+                            placeholder = stringResource(R.string.register_confirm_password_placeholder),
                             leadingIcon = Icons.Default.Lock,
                             isPassword = true,
                             isPasswordVisible = uiState.isConfirmPasswordVisible,
@@ -221,11 +219,10 @@ fun RegisterScreen(
                         )
                     }
 
-                    // Error
-                    if (uiState.errorMessage != null) {
+                    if (uiState.errorMessageRes != null) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = uiState.errorMessage!!,
+                            text = stringResource(uiState.errorMessageRes!!),
                             color = StatusRed,
                             style = MaterialTheme.typography.bodySmall,
                             textAlign = TextAlign.Center,
@@ -235,7 +232,6 @@ fun RegisterScreen(
 
                     Spacer(modifier = Modifier.height(28.dp))
 
-                    // Register Button
                     Button(
                         onClick = {
                             focusManager.clearFocus()
@@ -270,7 +266,7 @@ fun RegisterScreen(
                                 )
                             } else {
                                 Text(
-                                    text = "CREATE ACCOUNT",
+                                    text = stringResource(R.string.register_button),
                                     style = MaterialTheme.typography.labelLarge,
                                     color = GVTheme.colors.textPrimary,
                                     letterSpacing = 2.sp
@@ -281,13 +277,12 @@ fun RegisterScreen(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // Login link
                     Row(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Already have an account? ",
+                            text = stringResource(R.string.register_have_account) + " ",
                             style = MaterialTheme.typography.bodySmall,
                             color = GVTheme.colors.textSecondary
                         )
@@ -296,7 +291,7 @@ fun RegisterScreen(
                             contentPadding = PaddingValues(0.dp)
                         ) {
                             Text(
-                                text = "Sign In",
+                                text = stringResource(R.string.register_sign_in),
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     fontWeight = FontWeight.Bold
                                 ),

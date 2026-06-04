@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.example.gamevault.R
 import com.example.gamevault.data.local.entity.GameEntity
 import com.example.gamevault.data.local.entity.PlayStatus
 import com.example.gamevault.data.repository.GameRepository
@@ -67,10 +69,10 @@ fun LibraryScreen(
                 if (filteredCollection.isEmpty()) {
                     EmptyLibraryMessage(
                         message = when (uiState.collectionFilter) {
-                            CollectionFilter.PLAYING -> "No games currently being played"
-                            CollectionFilter.PLAYED -> "No played games yet"
-                            CollectionFilter.NOT_PLAYED -> "No unplayed games"
-                            CollectionFilter.ALL -> "Your collection is empty.\nSearch for games to add!"
+                            CollectionFilter.PLAYING -> stringResource(R.string.library_empty_playing)
+                            CollectionFilter.PLAYED -> stringResource(R.string.library_empty_played)
+                            CollectionFilter.NOT_PLAYED -> stringResource(R.string.library_empty_not_played)
+                            CollectionFilter.ALL -> stringResource(R.string.library_empty_collection)
                         }
                     )
                 } else {
@@ -86,7 +88,7 @@ fun LibraryScreen(
             } else {
                 if (uiState.wishlist.isEmpty()) {
                     EmptyLibraryMessage(
-                        message = "Your wishlist is empty.\nAdd games you want to play!"
+                        message = stringResource(R.string.library_empty_wishlist)
                     )
                 } else {
                     WishlistList(
@@ -130,8 +132,8 @@ private fun LibraryTabs(
             ) {
                 Text(
                     text = when (tab) {
-                        LibraryTab.COLLECTION -> "MY COLLECTION"
-                        LibraryTab.WISHLIST -> "WISHLIST"
+                        LibraryTab.COLLECTION -> stringResource(R.string.library_my_collection)
+                        LibraryTab.WISHLIST -> stringResource(R.string.library_wishlist)
                     },
                     style = MaterialTheme.typography.labelMedium,
                     color = if (isSelected) GVTheme.colors.textPrimary else GVTheme.colors.textMuted,
@@ -178,10 +180,10 @@ private fun CollectionFilterRow(
             ) {
                 Text(
                     text = when (filter) {
-                        CollectionFilter.ALL -> "All"
-                        CollectionFilter.PLAYING -> "Playing"
-                        CollectionFilter.PLAYED -> "Played"
-                        CollectionFilter.NOT_PLAYED -> "Not Played"
+                        CollectionFilter.ALL -> stringResource(R.string.library_filter_all)
+                        CollectionFilter.PLAYING -> stringResource(R.string.status_playing)
+                        CollectionFilter.PLAYED -> stringResource(R.string.library_filter_played)
+                        CollectionFilter.NOT_PLAYED -> stringResource(R.string.library_filter_not_played)
                     },
                     style = MaterialTheme.typography.labelSmall,
                     color = if (isSelected) filterColor else GVTheme.colors.textMuted,
@@ -200,7 +202,7 @@ private fun CollectionList(
     onRemove: (GameEntity) -> Unit
 ) {
     Text(
-        text = "${games.size} Games in library",
+        text = "${games.size} ${stringResource(R.string.library_games_count)}",
         style = MaterialTheme.typography.bodySmall,
         color = GVTheme.colors.textMuted,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
@@ -253,7 +255,6 @@ private fun CollectionGameCard(
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
 
-            // Cover image
             Box(
                 modifier = Modifier
                     .width(90.dp)
@@ -286,7 +287,6 @@ private fun CollectionGameCard(
                 }
             }
 
-            // Info
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -310,7 +310,6 @@ private fun CollectionGameCard(
                     )
                 }
 
-                // Play status badge
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
@@ -338,9 +337,9 @@ private fun CollectionGameCard(
                         )
                         Text(
                             text = when (currentStatus) {
-                                PlayStatus.NOT_PLAYED -> "Not Played"
-                                PlayStatus.PLAYING -> "Playing"
-                                PlayStatus.PLAYED -> "Played"
+                                PlayStatus.NOT_PLAYED -> stringResource(R.string.status_not_played)
+                                PlayStatus.PLAYING -> stringResource(R.string.status_playing)
+                                PlayStatus.PLAYED -> stringResource(R.string.status_played)
                             },
                             style = MaterialTheme.typography.labelSmall,
                             color = statusColor,
@@ -350,7 +349,6 @@ private fun CollectionGameCard(
                 }
             }
 
-            // Dropdown Menu
             Box {
                 IconButton(onClick = { showMenu = true }) {
                     Icon(
@@ -370,9 +368,9 @@ private fun CollectionGameCard(
                                 text = {
                                     Text(
                                         text = when (status) {
-                                            PlayStatus.NOT_PLAYED -> "Mark as Not Played"
-                                            PlayStatus.PLAYING -> "Mark as Playing"
-                                            PlayStatus.PLAYED -> "Mark as Played"
+                                            PlayStatus.NOT_PLAYED -> stringResource(R.string.library_mark_not_played)
+                                            PlayStatus.PLAYING -> stringResource(R.string.library_mark_playing)
+                                            PlayStatus.PLAYED -> stringResource(R.string.library_mark_played)
                                         },
                                         color = GVTheme.colors.textPrimary
                                     )
@@ -386,7 +384,7 @@ private fun CollectionGameCard(
                     }
                     HorizontalDivider(color = GVTheme.colors.border.copy(alpha = 0.3f))
                     DropdownMenuItem(
-                        text = { Text("Remove", color = StatusRed) },
+                        text = { Text(stringResource(R.string.library_remove), color = StatusRed) },
                         onClick = {
                             showMenu = false
                             onRemove()
@@ -484,7 +482,7 @@ private fun WishlistGameCard(
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = "+ Add to Collection",
+                        text = stringResource(R.string.library_add_to_collection),
                         style = MaterialTheme.typography.labelSmall,
                         color = GVTheme.colors.accent,
                         fontWeight = FontWeight.SemiBold
@@ -506,14 +504,14 @@ private fun WishlistGameCard(
                     modifier = Modifier.background(GVTheme.colors.card)
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Add to Collection", color = GVTheme.colors.textPrimary) },
+                        text = { Text(stringResource(R.string.detail_add_collection), color = GVTheme.colors.textPrimary) },
                         onClick = {
                             showMenu = false
                             onMoveToCollection()
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Remove", color = StatusRed) },
+                        text = { Text(stringResource(R.string.library_remove), color = StatusRed) },
                         onClick = {
                             showMenu = false
                             onRemove()

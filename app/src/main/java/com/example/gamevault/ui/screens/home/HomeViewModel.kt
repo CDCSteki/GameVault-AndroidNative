@@ -1,8 +1,10 @@
 package com.example.gamevault.ui.screens.home
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.gamevault.R
 import com.example.gamevault.data.remote.dto.GameDto
 import com.example.gamevault.data.repository.GameRepository
 import com.example.gamevault.data.repository.AuthRepository
@@ -22,7 +24,7 @@ data class HomeUiState(
     val coop: List<GameDto> = emptyList(),
     val retro: List<GameDto> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    @param:StringRes val errorMessageRes: Int? = null
 )
 
 class HomeViewModel(
@@ -54,7 +56,7 @@ class HomeViewModel(
 
     fun loadHomeData() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+            _uiState.value = _uiState.value.copy(isLoading = true, errorMessageRes = null)
 
             val currentYear = Calendar.getInstance().get(Calendar.YEAR)
             val dates = "$currentYear-01-01,$currentYear-12-31"
@@ -81,8 +83,8 @@ class HomeViewModel(
                 coop = coopResult.getOrElse { emptyList() },
                 retro = retroResult.getOrElse { emptyList() },
                 isLoading = false,
-                errorMessage = if (thisYearResult.isFailure && allTimeResult.isFailure) {
-                    "Failed to load games. Check your connection."
+                errorMessageRes = if (thisYearResult.isFailure && allTimeResult.isFailure) {
+                    R.string.fail_to_load_games
                 } else null
             )
         }

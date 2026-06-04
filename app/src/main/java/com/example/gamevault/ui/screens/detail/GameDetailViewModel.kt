@@ -1,8 +1,10 @@
 package com.example.gamevault.ui.screens.detail
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.gamevault.R
 import com.example.gamevault.data.local.entity.GameEntity
 import com.example.gamevault.data.local.entity.PlayStatus
 import com.example.gamevault.data.remote.dto.GameDetailDto
@@ -18,8 +20,8 @@ data class GameDetailUiState(
     val localGame: GameEntity? = null,
     val screenshots: List<GameScreenshotDto> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null,
-    val snackbarMessage: String? = null,
+    @param: StringRes val errorMessageRes: Int? = null,
+    @param: StringRes val snackbarMessageRes: Int? = null,
     val isInCollection: Boolean = false,
     val isInWishlist: Boolean = false,
     val playStatus: PlayStatus = PlayStatus.NOT_PLAYED,
@@ -43,21 +45,19 @@ class GameDetailViewModel(
 
     private fun loadGameDetail() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+            _uiState.value = _uiState.value.copy(isLoading = true, errorMessageRes = null)
 
             val detailResult = gameRepository.getGameDetails(gameId)
 
             if (detailResult.isSuccess) {
-                // Online: date complete de la API
                 val screenshotsResult = gameRepository.getGameScreenshots(gameId)
                 _uiState.value = _uiState.value.copy(
                     gameDetail = detailResult.getOrNull(),
                     screenshots = screenshotsResult.getOrNull()?.results ?: emptyList(),
                     isLoading = false,
-                    errorMessage = null
+                    errorMessageRes = null
                 )
             } else {
-                // Offline: încearcă din Room
                 val localGame = gameRepository.getGameById(gameId)
                 if (localGame != null) {
                     val localDetail = with(gameRepository) { localGame.toDetailDto() }
@@ -65,13 +65,13 @@ class GameDetailViewModel(
                         gameDetail = localDetail,
                         screenshots = emptyList(),
                         isLoading = false,
-                        errorMessage = null
+                        errorMessageRes = null
                     )
                 } else {
                     _uiState.value = _uiState.value.copy(
                         gameDetail = null,
                         isLoading = false,
-                        errorMessage = "No internet connection and game not in local library."
+                        errorMessageRes = R.string.error_no_internet_local
                     )
                 }
             }
@@ -105,11 +105,11 @@ class GameDetailViewModel(
             when (result) {
                 is GameRepository.AddToCollectionResult.Success ->
                     _uiState.value = _uiState.value.copy(
-                        snackbarMessage = "Added to collection!"
+                        snackbarMessageRes = R.string.msg_added_collection
                     )
                 is GameRepository.AddToCollectionResult.AlreadyInCollection ->
                     _uiState.value = _uiState.value.copy(
-                        snackbarMessage = "Already in your collection!"
+                        snackbarMessageRes = R.string.msg_already_in_collection
                     )
             }
         }
@@ -119,7 +119,7 @@ class GameDetailViewModel(
         viewModelScope.launch {
             gameRepository.removeFromCollection(gameId)
             _uiState.value = _uiState.value.copy(
-                snackbarMessage = "Removed from collection"
+                snackbarMessageRes = R.string.msg_removed_collection
             )
         }
     }
@@ -132,15 +132,15 @@ class GameDetailViewModel(
             when (result) {
                 is GameRepository.AddToWishlistResult.Success ->
                     _uiState.value = _uiState.value.copy(
-                        snackbarMessage = "Added to wishlist!"
+                        snackbarMessageRes = R.string.msg_added_wishlist
                     )
                 is GameRepository.AddToWishlistResult.AlreadyInWishlist ->
                     _uiState.value = _uiState.value.copy(
-                        snackbarMessage = "Already in your wishlist!"
+                        snackbarMessageRes = R.string.msg_already_in_wishlist
                     )
                 is GameRepository.AddToWishlistResult.AlreadyInCollection ->
                     _uiState.value = _uiState.value.copy(
-                        snackbarMessage = "This game is already in your collection!"
+                        snackbarMessageRes = R.string.msg_game_in_collection
                     )
             }
         }
@@ -150,7 +150,7 @@ class GameDetailViewModel(
         viewModelScope.launch {
             gameRepository.removeFromWishlist(gameId)
             _uiState.value = _uiState.value.copy(
-                snackbarMessage = "Removed from wishlist"
+                snackbarMessageRes = R.string.msg_removed_wishlist
             )
         }
     }
@@ -191,7 +191,7 @@ class GameDetailViewModel(
     }
 
     fun onSnackbarDismissed() {
-        _uiState.value = _uiState.value.copy(snackbarMessage = null)
+        _uiState.value = _uiState.value.copy(snackbarMessageRes = null)
     }
 
     fun retry() {

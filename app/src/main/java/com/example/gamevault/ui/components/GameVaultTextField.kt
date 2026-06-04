@@ -16,12 +16,13 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.gamevault.R
 import com.example.gamevault.ui.theme.TextMuted
 import com.example.gamevault.ui.theme.GVTheme
-
 
 @Composable
 fun GameVaultTextField(
@@ -58,7 +59,6 @@ fun GameVaultTextField(
             Icon(
                 imageVector = leadingIcon,
                 contentDescription = null,
-                tint = TextMuted,
                 modifier = Modifier.size(20.dp)
             )
         },
@@ -71,7 +71,7 @@ fun GameVaultTextField(
                         } else {
                             Icons.Default.VisibilityOff
                         },
-                        contentDescription = if (isPasswordVisible) "Hide password" else "Show password",
+                        contentDescription = if (isPasswordVisible) stringResource(R.string.hide_pass) else stringResource(R.string.show_pass),
                         tint = TextMuted,
                         modifier = Modifier.size(20.dp)
                     )

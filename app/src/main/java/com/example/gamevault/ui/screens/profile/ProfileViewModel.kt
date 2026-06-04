@@ -2,9 +2,11 @@ package com.example.gamevault.ui.screens.profile
 
 import android.content.Context
 import android.net.Uri
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.gamevault.R
 import com.example.gamevault.data.local.entity.UserEntity
 import com.example.gamevault.data.repository.AuthRepository
 import com.example.gamevault.ui.util.copyImageToInternalStorage
@@ -16,20 +18,17 @@ import kotlinx.coroutines.launch
 data class ProfileUiState(
     val user: UserEntity? = null,
     val username: String = "",
-    // Password fields
     val currentPassword: String = "",
     val newPassword: String = "",
     val confirmNewPassword: String = "",
     val isCurrentPasswordVisible: Boolean = false,
     val isNewPasswordVisible: Boolean = false,
     val isConfirmPasswordVisible: Boolean = false,
-    // Profile picture
     val profilePictureUri: String? = null,
     val showImagePickerDialog: Boolean = false,
-    // Loading / messages
     val isLoading: Boolean = false,
-    val successMessage: String? = null,
-    val errorMessage: String? = null,
+    @param:StringRes val successMessageRes: Int? = null,
+    @param:StringRes val errorMessageRes: Int? = null,
     val showDeleteDialog: Boolean = false
 )
 
@@ -60,37 +59,35 @@ class ProfileViewModel(
         }
     }
 
-    // --- USERNAME ---
     fun onUsernameChange(value: String) {
         _uiState.value = _uiState.value.copy(
             username = value,
-            errorMessage = null,
-            successMessage = null
+            errorMessageRes = null,
+            successMessageRes = null
         )
     }
 
-    // --- PASSWORD ---
     fun onCurrentPasswordChange(value: String) {
         _uiState.value = _uiState.value.copy(
             currentPassword = value,
-            errorMessage = null,
-            successMessage = null
+            errorMessageRes = null,
+            successMessageRes = null
         )
     }
 
     fun onNewPasswordChange(value: String) {
         _uiState.value = _uiState.value.copy(
             newPassword = value,
-            errorMessage = null,
-            successMessage = null
+            errorMessageRes = null,
+            successMessageRes = null
         )
     }
 
     fun onConfirmNewPasswordChange(value: String) {
         _uiState.value = _uiState.value.copy(
             confirmNewPassword = value,
-            errorMessage = null,
-            successMessage = null
+            errorMessageRes = null,
+            successMessageRes = null
         )
     }
 
@@ -112,17 +109,16 @@ class ProfileViewModel(
         )
     }
 
-    // --- SAVE USERNAME ---
     fun onSaveUsername() {
         val state = _uiState.value
         val user = state.user ?: return
 
         if (state.username.isBlank()) {
-            _uiState.value = state.copy(errorMessage = "Username cannot be empty")
+            _uiState.value = state.copy(errorMessageRes = R.string.profile_error_empty_username)
             return
         }
         if (state.username.length < 3) {
-            _uiState.value = state.copy(errorMessage = "Username must be at least 3 characters")
+            _uiState.value = state.copy(errorMessageRes = R.string.error_username_too_short)
             return
         }
 
@@ -135,38 +131,37 @@ class ProfileViewModel(
             )
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
-                successMessage = when (result) {
-                    AuthRepository.UpdateProfileResult.Success -> "Username updated!"
+                successMessageRes = when (result) {
+                    AuthRepository.UpdateProfileResult.Success -> R.string.profile_updated
                     else -> null
                 },
-                errorMessage = when (result) {
-                    AuthRepository.UpdateProfileResult.UsernameAlreadyExists -> "Username already taken"
-                    AuthRepository.UpdateProfileResult.UserNotFound -> "User not found"
+                errorMessageRes = when (result) {
+                    AuthRepository.UpdateProfileResult.UsernameAlreadyExists -> R.string.error_username_exists
+                    AuthRepository.UpdateProfileResult.UserNotFound -> R.string.error_user_not_found
                     else -> null
                 }
             )
         }
     }
 
-    // --- SAVE PASSWORD ---
     fun onSavePassword() {
         val state = _uiState.value
         val user = state.user ?: return
 
         if (state.currentPassword.isBlank()) {
-            _uiState.value = state.copy(errorMessage = "Enter your current password")
+            _uiState.value = state.copy(errorMessageRes = R.string.error_empty_current_password)
             return
         }
         if (state.newPassword.length < 6) {
-            _uiState.value = state.copy(errorMessage = "New password must be at least 6 characters")
+            _uiState.value = state.copy(errorMessageRes = R.string.error_password_too_short)
             return
         }
         if (state.newPassword != state.confirmNewPassword) {
-            _uiState.value = state.copy(errorMessage = "New passwords do not match")
+            _uiState.value = state.copy(errorMessageRes = R.string.error_passwords_no_match)
             return
         }
         if (state.currentPassword == state.newPassword) {
-            _uiState.value = state.copy(errorMessage = "New password must be different")
+            _uiState.value = state.copy(errorMessageRes = R.string.error_password_same)
             return
         }
 
@@ -182,20 +177,19 @@ class ProfileViewModel(
                 currentPassword = "",
                 newPassword = "",
                 confirmNewPassword = "",
-                successMessage = when (result) {
-                    AuthRepository.UpdatePasswordResult.Success -> "Password updated successfully!"
+                successMessageRes = when (result) {
+                    AuthRepository.UpdatePasswordResult.Success -> R.string.profile_password_updated
                     else -> null
                 },
-                errorMessage = when (result) {
-                    AuthRepository.UpdatePasswordResult.WrongCurrentPassword -> "Current password is incorrect"
-                    AuthRepository.UpdatePasswordResult.UserNotFound -> "User not found"
+                errorMessageRes = when (result) {
+                    AuthRepository.UpdatePasswordResult.WrongCurrentPassword -> R.string.error_wrong_current_password
+                    AuthRepository.UpdatePasswordResult.UserNotFound -> R.string.error_user_not_found
                     else -> null
                 }
             )
         }
     }
 
-    // --- PROFILE PICTURE ---
     fun onShowImagePickerDialog() {
         _uiState.value = _uiState.value.copy(showImagePickerDialog = true)
     }
@@ -222,7 +216,6 @@ class ProfileViewModel(
         }
     }
 
-    // --- LOGOUT ---
     fun onLogout(onSuccess: () -> Unit) {
         viewModelScope.launch {
             authRepository.logout()
@@ -230,11 +223,10 @@ class ProfileViewModel(
         }
     }
 
-    // --- CLEAR MESSAGE ---
     fun clearMessages() {
         _uiState.value = _uiState.value.copy(
-            successMessage = null,
-            errorMessage = null
+            successMessageRes = null,
+            errorMessageRes = null
         )
     }
 

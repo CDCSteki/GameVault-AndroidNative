@@ -24,11 +24,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.example.gamevault.R
 import com.example.gamevault.data.repository.AuthRepository
 import com.example.gamevault.ui.components.GameVaultTextField
 import com.example.gamevault.ui.components.GameVaultTopBar
@@ -50,24 +52,21 @@ fun ProfileScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    LaunchedEffect(uiState.successMessage, uiState.errorMessage) {
-        if (uiState.successMessage != null || uiState.errorMessage != null) {
+    LaunchedEffect(uiState.successMessageRes, uiState.errorMessageRes) {
+        if (uiState.successMessageRes != null || uiState.errorMessageRes != null) {
             delay(5000)
             viewModel.clearMessages()
         }
     }
 
-    // Camera URI
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Gallery launcher
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         uri?.let { viewModel.onImageSelected(context, it) }
     }
 
-    // Camera launcher
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
@@ -76,7 +75,6 @@ fun ProfileScreen(
         }
     }
 
-    // Camera permission launcher
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -98,10 +96,8 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            // Top Bar
             GameVaultTopBar()
 
-            // Avatar Section
             AvatarSection(
                 profilePictureUri = uiState.profilePictureUri,
                 username = uiState.user?.username ?: "",
@@ -112,8 +108,7 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Messages
-            uiState.successMessage?.let {
+            uiState.successMessageRes?.let {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -134,7 +129,7 @@ fun ProfileScreen(
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
-                            text = it,
+                            text = stringResource(it),
                             color = StatusGreen,
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -143,7 +138,7 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            uiState.errorMessage?.let {
+            uiState.errorMessageRes?.let {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -164,7 +159,7 @@ fun ProfileScreen(
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
-                            text = it,
+                            text = stringResource(it),
                             color = StatusRed,
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -173,8 +168,7 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // Username Section
-            ProfileSectionCard(title = "USERNAME") {
+            ProfileSectionCard(title = stringResource(R.string.profile_username_label).uppercase()) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -184,11 +178,11 @@ fun ProfileScreen(
                     GameVaultTextField(
                         value = uiState.username,
                         onValueChange = viewModel::onUsernameChange,
-                        placeholder = "Enter username",
+                        placeholder = stringResource(R.string.enter_username),
                         leadingIcon = Icons.Default.Person
                     )
                     GradientButton(
-                        text = "UPDATE USERNAME",
+                        text = stringResource(R.string.update_username),
                         onClick = viewModel::onSaveUsername,
                         isLoading = uiState.isLoading
                     )
@@ -197,18 +191,16 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Password Section
-            ProfileSectionCard(title = "CHANGE PASSWORD") {
+            ProfileSectionCard(title = stringResource(R.string.profile_change_password)) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Current password
                     Column {
                         Text(
-                            text = "Current Password",
+                            text = stringResource(R.string.profile_current_password_label),
                             style = MaterialTheme.typography.labelMedium,
                             color = GVTheme.colors.textSecondary
                         )
@@ -216,7 +208,7 @@ fun ProfileScreen(
                         GameVaultTextField(
                             value = uiState.currentPassword,
                             onValueChange = viewModel::onCurrentPasswordChange,
-                            placeholder = "Enter current password",
+                            placeholder = stringResource(R.string.profile_current_password_placeholder),
                             leadingIcon = Icons.Default.Lock,
                             isPassword = true,
                             isPasswordVisible = uiState.isCurrentPasswordVisible,
@@ -224,10 +216,9 @@ fun ProfileScreen(
                         )
                     }
 
-                    // New password
                     Column {
                         Text(
-                            text = "New Password",
+                            text = stringResource(R.string.profile_new_password_label),
                             style = MaterialTheme.typography.labelMedium,
                             color = GVTheme.colors.textSecondary
                         )
@@ -235,7 +226,7 @@ fun ProfileScreen(
                         GameVaultTextField(
                             value = uiState.newPassword,
                             onValueChange = viewModel::onNewPasswordChange,
-                            placeholder = "Min. 6 characters",
+                            placeholder = stringResource(R.string.register_password_placeholder),
                             leadingIcon = Icons.Default.Lock,
                             isPassword = true,
                             isPasswordVisible = uiState.isNewPasswordVisible,
@@ -243,10 +234,9 @@ fun ProfileScreen(
                         )
                     }
 
-                    // Confirm new password
                     Column {
                         Text(
-                            text = "Confirm New Password",
+                            text = stringResource(R.string.profile_confirm_new_password_label),
                             style = MaterialTheme.typography.labelMedium,
                             color = GVTheme.colors.textSecondary
                         )
@@ -254,7 +244,7 @@ fun ProfileScreen(
                         GameVaultTextField(
                             value = uiState.confirmNewPassword,
                             onValueChange = viewModel::onConfirmNewPasswordChange,
-                            placeholder = "Repeat new password",
+                            placeholder = stringResource(R.string.library_confirm_password_placeholder),
                             leadingIcon = Icons.Default.Lock,
                             isPassword = true,
                             isPasswordVisible = uiState.isConfirmPasswordVisible,
@@ -262,13 +252,12 @@ fun ProfileScreen(
                         )
                     }
 
-                    // Password strength indicator
                     if (uiState.newPassword.isNotEmpty()) {
                         PasswordStrengthIndicator(password = uiState.newPassword)
                     }
 
                     GradientButton(
-                        text = "UPDATE PASSWORD",
+                        text = stringResource(R.string.profile_update_password),
                         onClick = viewModel::onSavePassword,
                         isLoading = uiState.isLoading
                     )
@@ -277,14 +266,12 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Actions Section
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Logout
                 OutlinedButton(
                     onClick = { viewModel.onLogout(onLogout) },
                     modifier = Modifier
@@ -304,7 +291,7 @@ fun ProfileScreen(
                             modifier = Modifier.size(18.dp)
                         )
                         Text(
-                            text = "LOGOUT",
+                            text = stringResource(R.string.profile_logout),
                             style = MaterialTheme.typography.labelLarge,
                             color = GVTheme.colors.textSecondary,
                             letterSpacing = 1.sp
@@ -317,21 +304,19 @@ fun ProfileScreen(
         }
     }
 
-    // Image Picker Dialog
     if (uiState.showImagePickerDialog) {
         AlertDialog(
             onDismissRequest = viewModel::onDismissImagePickerDialog,
             containerColor = GVTheme.colors.card,
             title = {
                 Text(
-                    "Change Profile Picture",
+                    stringResource(R.string.profile_change_picture),
                     color = GVTheme.colors.textPrimary,
                     fontWeight = FontWeight.Bold
                 )
             },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    // Camera option
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -353,20 +338,19 @@ fun ProfileScreen(
                         )
                         Column {
                             Text(
-                                text = "Take Photo",
+                                text = stringResource(R.string.take_photo),
                                 style = MaterialTheme.typography.titleSmall,
                                 color = GVTheme.colors.textPrimary,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "Use your camera",
+                                text = stringResource(R.string.use_your_camera),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = GVTheme.colors.textMuted
                             )
                         }
                     }
 
-                    // Gallery option
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -392,13 +376,13 @@ fun ProfileScreen(
                         )
                         Column {
                             Text(
-                                text = "Choose from Gallery",
+                                text = stringResource(R.string.choose_from_gallery),
                                 style = MaterialTheme.typography.titleSmall,
                                 color = GVTheme.colors.textPrimary,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "Pick from your photos",
+                                text = stringResource(R.string.pick_from_your_photos),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = GVTheme.colors.textMuted
                             )
@@ -409,7 +393,7 @@ fun ProfileScreen(
             confirmButton = {},
             dismissButton = {
                 TextButton(onClick = viewModel::onDismissImagePickerDialog) {
-                    Text("Cancel", color = GVTheme.colors.textSecondary)
+                    Text(stringResource(R.string.delete_dialog_cancel), color = GVTheme.colors.textSecondary)
                 }
             }
         )
@@ -468,7 +452,6 @@ private fun AvatarSection(
                 }
             }
 
-            // Edit button
             Box(
                 modifier = Modifier
                     .size(32.dp)

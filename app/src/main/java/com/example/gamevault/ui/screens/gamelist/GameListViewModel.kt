@@ -1,8 +1,10 @@
 package com.example.gamevault.ui.screens.gamelist
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.gamevault.R
 import com.example.gamevault.data.remote.dto.GameDto
 import com.example.gamevault.data.repository.GameRepository
 import com.example.gamevault.ui.navigation.NavRoutes
@@ -13,10 +15,10 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 
 data class GameListUiState(
-    val title: String = "",
+    @param: StringRes val titleRes: Int = R.string.app_name,
     val games: List<GameDto> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null,
+    @param: StringRes val errorMessageRes: Int? = null,
     val pageSize: Int = 10
 )
 
@@ -36,20 +38,20 @@ class GameListViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isLoading = true,
-                errorMessage = null,
+                errorMessageRes = null,
                 pageSize = pageSize
             )
 
             val cleanListType = listType.substringAfterLast("/")
 
-            val title = when (cleanListType) {
-                NavRoutes.GameList.TYPE_THIS_YEAR -> "Popular This Year"
-                NavRoutes.GameList.TYPE_ALL_TIME -> "All-Time Legends"
-                "discover_indie" -> "Indie Gems"
-                "discover_competitive" -> "Competitive Multiplayer"
-                "discover_coop" -> "Co-Op Adventures"
-                "discover_retro" -> "Retro Classics"
-                else -> "Games"
+            val titleRes = when (cleanListType) {
+                NavRoutes.GameList.TYPE_THIS_YEAR -> R.string.home_popular_this_year
+                NavRoutes.GameList.TYPE_ALL_TIME -> R.string.home_all_time_legends
+                "discover_indie" -> R.string.discover_indie
+                "discover_competitive" -> R.string.discover_competitive
+                "discover_coop" -> R.string.discover_coop
+                "discover_retro" -> R.string.discover_retro
+                else -> R.string.app_name
             }
 
             val result = when (cleanListType) {
@@ -79,10 +81,10 @@ class GameListViewModel(
             }
 
             _uiState.value = _uiState.value.copy(
-                title = title,
+                titleRes = titleRes,
                 games = result.getOrElse { emptyList() },
                 isLoading = false,
-                errorMessage = if (result.isFailure) "Failed to load games." else null
+                errorMessageRes = if (result.isFailure) R.string.fail_to_load_games else null
             )
         }
     }

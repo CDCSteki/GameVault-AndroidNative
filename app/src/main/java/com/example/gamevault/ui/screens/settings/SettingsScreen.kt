@@ -1,3 +1,4 @@
+// SettingsScreen.kt
 package com.example.gamevault.ui.screens.settings
 
 import androidx.compose.foundation.background
@@ -20,10 +21,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.gamevault.R
 import com.example.gamevault.data.local.preferences.AppPreferences
 import com.example.gamevault.data.repository.AuthRepository
 import com.example.gamevault.data.repository.SearchRepository
@@ -43,7 +46,6 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val loggedInUserId by authRepository.loggedInUserId.collectAsState(initial = -1)
 
-    // Accesăm culorile temei curente
     val colors = GVTheme.colors
 
     Box(
@@ -60,15 +62,13 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // System Preferences
             SettingsSectionCard(borderColor = colors.border) {
                 SettingsSectionHeader(
                     icon = Icons.Default.Settings,
-                    title = "SYSTEM PREFERENCES",
+                    title = stringResource(R.string.settings_system_prefs),
                     iconTint = colors.accent
                 )
 
-                // Theme selector
                 ThemeSelector(
                     currentTheme = uiState.appTheme,
                     onThemeSelect = viewModel::onSelectTheme,
@@ -80,7 +80,6 @@ fun SettingsScreen(
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
-                // Language
                 LanguageSelector(
                     currentLanguage = uiState.language,
                     onLanguageSelect = viewModel::onLanguageChange,
@@ -90,21 +89,20 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Privacy & Data
             SettingsSectionCard(borderColor = colors.border) {
                 SettingsSectionHeader(
                     icon = Icons.Default.Lock,
-                    title = "PRIVACY & DATA",
+                    title = stringResource(R.string.settings_privacy),
                     iconTint = colors.accent
                 )
                 SettingsRow(
-                    label = "Search History",
-                    value = if (uiState.historyCleared) "Cleared!" else "Last cleared: Never",
+                    label = stringResource(R.string.settings_search_history),
+                    value = if (uiState.historyCleared) stringResource(R.string.settings_history_cleared) else stringResource(R.string.settings_history_never),
                     colors = colors
                 ) {
                     TextButton(onClick = viewModel::onClearSearchHistory) {
                         Text(
-                            text = "Clear Now",
+                            text = stringResource(R.string.settings_clear_now),
                             color = colors.accentSecondary,
                             style = MaterialTheme.typography.labelSmall
                         )
@@ -114,11 +112,10 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Account Control
             SettingsSectionCard(borderColor = StatusRed.copy(alpha = 0.4f)) {
                 SettingsSectionHeader(
                     icon = Icons.Default.Warning,
-                    title = "ACCOUNT CONTROL",
+                    title = stringResource(R.string.settings_account_control),
                     iconTint = StatusRed
                 )
                 Column(
@@ -126,13 +123,13 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Deactivate Account",
+                        text = stringResource(R.string.settings_deactivate_title),
                         style = MaterialTheme.typography.titleSmall,
                         color = colors.textPrimary,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Permanently deletes your profile, game library, and all associated data. This action is irreversible.",
+                        text = stringResource(R.string.settings_deactivate_desc),
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.textSecondary
                     )
@@ -145,7 +142,7 @@ fun SettingsScreen(
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = StatusRed)
                     ) {
                         Text(
-                            text = "DELETE PROFILE",
+                            text = stringResource(R.string.settings_delete_profile),
                             style = MaterialTheme.typography.labelMedium,
                             color = StatusRed,
                             fontWeight = FontWeight.Bold,
@@ -159,17 +156,16 @@ fun SettingsScreen(
         }
     }
 
-    // Delete Dialog
     if (uiState.showDeleteDialog) {
         AlertDialog(
             onDismissRequest = viewModel::onDismissDeleteDialog,
             containerColor = colors.card,
             title = {
-                Text("Delete Account", color = StatusRed, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.delete_dialog_title), color = StatusRed, fontWeight = FontWeight.Bold)
             },
             text = {
                 Text(
-                    "Are you sure? All your data will be permanently deleted.",
+                    stringResource(R.string.delete_dialog_message),
                     color = colors.textSecondary
                 )
             },
@@ -178,35 +174,35 @@ fun SettingsScreen(
                     onClick = { viewModel.onDeleteAccount(loggedInUserId, onAccountDeleted) },
                     colors = ButtonDefaults.buttonColors(containerColor = StatusRed)
                 ) {
-                    Text("DELETE", color = colors.textPrimary)
+                    Text(stringResource(R.string.delete_dialog_confirm), color = colors.textPrimary)
                 }
             },
             dismissButton = {
                 TextButton(onClick = viewModel::onDismissDeleteDialog) {
-                    Text("Cancel", color = colors.textSecondary)
+                    Text(stringResource(R.string.delete_dialog_cancel), color = colors.textSecondary)
                 }
             }
         )
     }
 }
 
-// ---- Datele pentru fiecare temă afișată în selector ----
 data class ThemeOption(
     val theme: AppTheme,
-    val label: String,
+    val labelResId: Int,
     val primaryColor: Color,
     val secondaryColor: Color,
     val emoji: String
 )
 
-private val allThemeOptions = listOf(
-    ThemeOption(AppTheme.CYBER_DARK,    "Cyber",    NeonPurple,          NeonCyan,            "🌌"),
-    ThemeOption(AppTheme.OCEAN_BLUE,    "Ocean",    Color(0xFF48CAE4),   Color(0xFF90E0EF),   "🌊"),
-    ThemeOption(AppTheme.FOREST_GREEN,  "Forest",   Color(0xFF52B788),   Color(0xFFB7E4C7),   "🌿"),
-    ThemeOption(AppTheme.SUNSET,        "Sunset",   Color(0xFFFF6B35),   Color(0xFFFFD166),   "🌅"),
-    ThemeOption(AppTheme.MIDNIGHT_RED,  "Blood",    Color(0xFFE63946),   Color(0xFFFF6B6B),   "🔴"),
-    ThemeOption(AppTheme.NEON_GREEN,    "Matrix",   Color(0xFF39FF14),   Color(0xFF00FFFF),   "💚"),
-    ThemeOption(AppTheme.ROSE_GOLD,     "Rose",     Color(0xFFE8A598),   Color(0xFFF7D6CB),   "🌸"),
+@Composable
+private fun getThemeOptions(): List<ThemeOption> = listOf(
+    ThemeOption(AppTheme.CYBER_DARK,    R.string.theme_cyber,    NeonPurple,          NeonCyan,            "🌌"),
+    ThemeOption(AppTheme.OCEAN_BLUE,    R.string.theme_ocean,    Color(0xFF48CAE4),   Color(0xFF90E0EF),   "🌊"),
+    ThemeOption(AppTheme.FOREST_GREEN,  R.string.theme_forest,   Color(0xFF52B788),   Color(0xFFB7E4C7),   "🌿"),
+    ThemeOption(AppTheme.SUNSET,        R.string.theme_sunset,   Color(0xFFFF6B35),   Color(0xFFFFD166),   "🌅"),
+    ThemeOption(AppTheme.MIDNIGHT_RED,  R.string.theme_blood,    Color(0xFFE63946),   Color(0xFFFF6B6B),   "🔴"),
+    ThemeOption(AppTheme.NEON_GREEN,    R.string.theme_matrix,   Color(0xFF39FF14),   Color(0xFF00FFFF),   "💚"),
+    ThemeOption(AppTheme.ROSE_GOLD,     R.string.theme_rose,     Color(0xFFE8A598),   Color(0xFFF7D6CB),   "🌸"),
 )
 
 @Composable
@@ -215,15 +211,17 @@ private fun ThemeSelector(
     onThemeSelect: (AppTheme) -> Unit,
     colors: GameVaultColors
 ) {
+    val themeOptions = getThemeOptions()
+
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
-            text = "Display Theme",
+            text = stringResource(R.string.settings_display_theme),
             style = MaterialTheme.typography.bodyMedium,
             color = colors.textPrimary
         )
         Spacer(modifier = Modifier.height(12.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(allThemeOptions) { option ->
+            items(themeOptions) { option ->
                 val isSelected = currentTheme == option.theme
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -262,7 +260,7 @@ private fun ThemeSelector(
                     }
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = option.label,
+                        text = stringResource(option.labelResId),
                         style = MaterialTheme.typography.labelSmall,
                         color = if (isSelected) colors.accent else colors.textMuted,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
@@ -279,15 +277,14 @@ private fun LanguageSelector(
     onLanguageSelect: (String) -> Unit,
     colors: GameVaultColors
 ) {
-    // Perechi: cod ISO -> (numeFlagEmoji, numeAfisat)
     val languages = listOf(
-        "en" to ("🇬🇧" to "English"),
-        "ro" to ("🇷🇴" to "Română"),
+        "en" to ("🇬🇧" to stringResource(R.string.settings_language_en)),
+        "ro" to ("🇷🇴" to stringResource(R.string.settings_language_ro)),
     )
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
-            text = "System Language",
+            text = stringResource(R.string.settings_language),
             style = MaterialTheme.typography.bodyMedium,
             color = colors.textPrimary
         )

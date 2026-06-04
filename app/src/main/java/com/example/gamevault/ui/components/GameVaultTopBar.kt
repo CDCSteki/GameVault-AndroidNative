@@ -11,9 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.gamevault.R
 import com.example.gamevault.ui.theme.GVTheme
 
 @Composable
@@ -43,7 +45,7 @@ fun GameVaultTopBar(modifier: Modifier = Modifier) {
                 modifier = Modifier.size(28.dp)
             )
             Text(
-                text = "GAMEVAULT",
+                text = stringResource(R.string.app_name).uppercase(),
                 style = MaterialTheme.typography.titleMedium.copy(
                     brush = Brush.linearGradient(
                         colors = listOf(colors.accent, colors.accentSecondary)

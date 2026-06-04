@@ -8,8 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.gamevault.R
 import com.example.gamevault.ui.theme.*
 
 @Composable
@@ -26,10 +28,10 @@ fun PasswordStrengthIndicator(password: String) {
     }
 
     val strengthLabel = when (strength) {
-        0 -> "Too weak"
-        1 -> "Weak"
-        2 -> "Good"
-        3 -> "Strong"
+        0 -> stringResource(R.string.tooweak)
+        1 -> stringResource(R.string.weak)
+        2 -> stringResource(R.string.good)
+        3 -> stringResource(R.string.strong)
         else -> ""
     }
 
@@ -47,7 +49,7 @@ fun PasswordStrengthIndicator(password: String) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Password strength",
+                text = stringResource(R.string.password_strength),
                 style = MaterialTheme.typography.labelSmall,
                 color = GVTheme.colors.textMuted
             )

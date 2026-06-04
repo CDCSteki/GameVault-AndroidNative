@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -39,19 +39,14 @@ fun BottomNavigationBar(navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
-            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+            .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
             .border(
                 width = 1.dp,
-                brush = Brush.horizontalGradient(
-                    listOf(
-                        colors.accent.copy(alpha = 0.5f),
-                        colors.accentSecondary.copy(alpha = 0.5f)
-                    )
-                ),
-                shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                color = colors.border.copy(alpha = 0.5f),
+                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
             ),
         containerColor = colors.backgroundSecondary,
-        tonalElevation = 0.dp
+        tonalElevation = 8.dp
     ) {
         items.forEach { item ->
             val isSelected = currentRoute == item.route
@@ -69,14 +64,14 @@ fun BottomNavigationBar(navController: NavController) {
                 icon = {
                     Icon(
                         imageVector = item.icon,
-                        contentDescription = item.title,
+                        contentDescription = stringResource(item.titleResId),
                         modifier = Modifier.size(22.dp),
                         tint = if (isSelected) colors.accent else colors.textMuted
                     )
                 },
                 label = {
                     Text(
-                        text = item.title,
+                        text = stringResource(item.titleResId),
                         style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
                         color = if (isSelected) colors.accent else colors.textMuted
                     )

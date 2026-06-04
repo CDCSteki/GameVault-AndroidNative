@@ -42,22 +42,24 @@ class MainActivity : ComponentActivity() {
         val appContainer = (application as GameVaultApplication).container
 
         setContent {
+            val prefs = getSharedPreferences("gamevault_locale", MODE_PRIVATE)
+            val savedLanguage = prefs.getString("language", "en") ?: "en"
+
             val appTheme by appContainer.preferences.appTheme
                 .collectAsState(initial = AppTheme.CYBER_DARK)
-            val language by appContainer.preferences.language
-                .collectAsState(initial = "en")
 
-            // Când limba se schimbă, recreăm Activity pentru a reîncărca stringurile
-            var lastLanguage by remember { mutableStateOf(language) }
+            val language by appContainer.preferences.language
+                .collectAsState(initial = savedLanguage)
+
+            var lastLanguage by remember { mutableStateOf(savedLanguage) }
+
             LaunchedEffect(language) {
                 if (language != lastLanguage) {
-                    // Salvăm în SharedPreferences pentru attachBaseContext la recreare
-                    getSharedPreferences("gamevault_locale", MODE_PRIVATE)
-                        .edit {
-                            putString("language", language)
-                        }
+                    prefs.edit {
+                        putString("language", language)
+                    }
                     lastLanguage = language
-                    recreate() // Recreăm Activity — stringurile se reîncarcă
+                    recreate()
                 }
             }
 

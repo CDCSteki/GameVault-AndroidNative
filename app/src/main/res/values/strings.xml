@@ -4,7 +4,7 @@
 
     <!-- Auth -->
     <string name="login_title">GAMEVAULT</string>
-    <string name="login_subtitle">Welcome back, Hunter</string>
+    <string name="login_subtitle">Welcome, Hunter</string>
     <string name="login_email_label">Email or Username</string>
     <string name="login_email_placeholder">Enter your credentials</string>
     <string name="login_password_label">Password</string>
@@ -45,7 +45,7 @@
     <string name="nav_settings">SETTINGS</string>
 
     <!-- Home -->
-    <string name="home_welcome">Welcome Back,</string>
+    <string name="home_welcome">Welcome,</string>
     <string name="home_subtitle">Your next legendary adventure is just a click away.</string>
     <string name="home_popular_this_year">Popular This Year</string>
     <string name="home_all_time_legends">All-Time Legends</string>
@@ -84,6 +84,7 @@
     <string name="detail_release">RELEASE</string>
     <string name="detail_platform">PLATFORM</string>
     <string name="detail_playtime">PLAYTIME</string>
+    <string name="detail_require">PC System Requirements</string>
     <string name="detail_private_notes">Private Notes</string>
     <string name="detail_notes_placeholder">Your private notes on this game…</string>
     <string name="detail_about">About the Game</string>
@@ -103,26 +104,43 @@
     <string name="library_filter_all">All</string>
     <string name="library_filter_played">Played</string>
     <string name="library_filter_not_played">Not Played</string>
+    <string name="library_filter_playing">Playing</string>
     <string name="library_games_count">Games in library</string>
     <string name="library_status_played">✓ Played</string>
     <string name="library_status_not_played">Not Played</string>
     <string name="library_mark_played">Mark as Played</string>
     <string name="library_mark_not_played">Mark as Not Played</string>
+    <string name="Library_mark_as_playing">Mark as Playing</string>
     <string name="library_remove">Remove</string>
+    <string name="library_removed">Removed from colelction</string>
     <string name="library_add_to_collection">+ Add to Collection</string>
+    <string name="library_added_to_collection">Added to collection!</string>
+    <string name="already_in_col">Already in your collection!</string>
     <string name="library_empty_collection">Your collection is empty.\nSearch for games to add!</string>
     <string name="library_empty_played">No played games yet</string>
     <string name="library_empty_not_played">No unplayed games</string>
     <string name="library_empty_wishlist">Your wishlist is empty.\nAdd games you want to play!</string>
+    <string name="library_confirm_password_placeholder">Repeat new password</string>
 
     <!-- Profile -->
-    <string name="profile_title">← PROFILE</string>
     <string name="profile_username_label">Username</string>
     <string name="profile_password_label">Password</string>
     <string name="profile_save_changes">SAVE CHANGES</string>
     <string name="profile_logout">LOGOUT</string>
     <string name="profile_updated">Profile updated successfully!</string>
     <string name="profile_error_empty_username">Username cannot be empty</string>
+    <string name="update_username">UPDATE USERNAME</string>
+    <string name="enter_username">Enter username</string>"
+    <string name="profile_current_password_label">Current Password</string>
+    <string name="profile_new_password_label">New Password</string>
+    <string name="profile_confirm_new_password_label">Confirm New Password</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="use_your_camera">Use your camera</string>
+    <string name="choose_from_gallery">Choose from Gallery</string>
+    <string name="pick_from_your_photos">Pick from your photos</string>
+    <string name="profile_change_picture">Change Profile Picture</string>
+
+
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
@@ -153,7 +171,58 @@
     <string name="general_na">N/A</string>
     <string name="general_loading">Loading…</string>
     <string name="general_error_connection">Failed to load. Check your connection.</string>
+    <string name="fail_to_load_games">Failed to load games. Check your connection.</string>
+    <string name="hide_pass">Hide password</string>
+    <string name="show_pass">Show password</string>
     <string name="general_playtime_format">%1$sh avg</string>
     <string name="general_rating_format">%.1f</string>
     <string name="general_sentiment_format">%1$d%%</string>
+
+    <!-- Pass strength -->
+    <string name="tooweak">Too weak</string>
+    <string name="weak">Weak</string>
+    <string name="good">Good</string>
+    <string name="strong">Strong</string>
+    <string name="password_strength">Password strength</string>
+
+    <string name="msg_added_collection">Added to collection!</string>
+    <string name="msg_already_in_collection">Already in your collection!</string>
+    <string name="msg_removed_collection">Removed from collection</string>
+    <string name="msg_added_wishlist">Added to wishlist!</string>
+    <string name="msg_already_in_wishlist">Already in your wishlist!</string>
+    <string name="msg_game_in_collection">This game is already in your collection!</string>
+    <string name="msg_removed_wishlist">Removed from wishlist</string>
+    <string name="error_no_internet_local">No internet connection and game not in local library.</string>
+    <string name="detail_play_status">PLAY STATUS</string>
+    <string name="status_playing">Playing</string>
+    <string name="status_played">Played</string>
+    <string name="status_not_played">Not Played</string>
+    <string name="list_showing_titles">Showing %1$d titles</string>
+    <string name="list_show">Show:</string>
+    <string name="pc_system_requirements">PC System Requirements</string>
+
+    <string name="library_empty_playing">No games currently being played</string>
+    <string name="library_mark_playing">Mark as Playing</string>
+    <string name="profile_change_password">CHANGE PASSWORD</string>
+    <string name="profile_current_password_placeholder">Enter current password</string>
+    <string name="profile_update_password">UPDATE PASSWORD</string>
+    <string name="search_trending_suggestions">Trending Suggestions</string>
+    <string name="search_best_rated">Best Rated</string>
+    <string name="search_newest">Newest</string>
+    <string name="search_most_popular">Most Popular</string>
+
+    <!-- Theme names -->
+    <string name="theme_cyber">Cyber</string>
+    <string name="theme_ocean">Ocean</string>
+    <string name="theme_forest">Forest</string>
+    <string name="theme_sunset">Sunset</string>
+    <string name="theme_blood">Blood</string>
+    <string name="theme_matrix">Matrix</string>
+    <string name="theme_rose">Rose</string>
+
+    <string name="error_user_not_found">User not found</string>
+    <string name="error_empty_current_password">Enter your current password</string>
+    <string name="error_password_same">New password must be different</string>
+    <string name="profile_password_updated">Password updated successfully!</string>
+    <string name="error_wrong_current_password">Current password is incorrect</string>
 </resources>

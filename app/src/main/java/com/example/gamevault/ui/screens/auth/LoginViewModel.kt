@@ -1,8 +1,10 @@
 package com.example.gamevault.ui.screens.auth
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.gamevault.R
 import com.example.gamevault.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +16,7 @@ data class LoginUiState(
     val password: String = "",
     val isPasswordVisible: Boolean = false,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    @param: StringRes val errorMessageRes: Int? = null
 )
 
 class LoginViewModel(
@@ -27,14 +29,14 @@ class LoginViewModel(
     fun onEmailOrUsernameChange(value: String) {
         _uiState.value = _uiState.value.copy(
             emailOrUsername = value,
-            errorMessage = null
+            errorMessageRes = null
         )
     }
 
     fun onPasswordChange(value: String) {
         _uiState.value = _uiState.value.copy(
             password = value,
-            errorMessage = null
+            errorMessageRes = null
         )
     }
 
@@ -48,16 +50,16 @@ class LoginViewModel(
         val state = _uiState.value
 
         if (state.emailOrUsername.isBlank()) {
-            _uiState.value = state.copy(errorMessage = "Enter your email or username")
+            _uiState.value = state.copy(errorMessageRes = R.string.error_empty_email)
             return
         }
         if (state.password.isBlank()) {
-            _uiState.value = state.copy(errorMessage = "Enter your password")
+            _uiState.value = state.copy(errorMessageRes = R.string.error_empty_password)
             return
         }
 
         viewModelScope.launch {
-            _uiState.value = state.copy(isLoading = true, errorMessage = null)
+            _uiState.value = state.copy(isLoading = true, errorMessageRes = null)
 
             val result = authRepository.login(
                 emailOrUsername = state.emailOrUsername.trim(),
@@ -72,7 +74,7 @@ class LoginViewModel(
                 is AuthRepository.LoginResult.InvalidCredentials -> {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        errorMessage = "Invalid email or password"
+                        errorMessageRes = R.string.error_invalid_credentials
                     )
                 }
             }
