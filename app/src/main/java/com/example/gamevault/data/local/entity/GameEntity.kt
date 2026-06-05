@@ -1,18 +1,20 @@
 package com.example.gamevault.data.local.entity
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
-
 
 enum class PlayStatus {
     NOT_PLAYED,
     PLAYING,
     PLAYED
 }
-@Entity(tableName = "games")
+
+@Entity(
+    tableName = "games",
+    primaryKeys = ["rawgId", "userId"]
+)
 data class GameEntity(
-    @PrimaryKey
     val rawgId: Int,
+    val userId: Int,
     val name: String,
     val coverImageUrl: String?,
     val backgroundImageUrl: String?,

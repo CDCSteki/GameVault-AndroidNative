@@ -28,7 +28,8 @@ class AppContainer(context: Context) {
 
     val searchRepository = SearchRepository(
         searchHistoryDao = database.searchHistoryDao(),
-        apiService = apiService
+        apiService = apiService,
+        appPreferences = appPreferences
     )
 
     val preferences = appPreferences

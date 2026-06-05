@@ -2,14 +2,20 @@ package com.example.gamevault.data.repository
 
 import com.example.gamevault.data.local.db.dao.SearchHistoryDao
 import com.example.gamevault.data.local.entity.SearchHistoryEntity
+import com.example.gamevault.data.local.preferences.AppPreferences
 import com.example.gamevault.data.remote.api.Constants
 import com.example.gamevault.data.remote.api.RawgApiService
 import com.example.gamevault.data.remote.dto.GameDto
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.first
 
 class SearchRepository(
     private val searchHistoryDao: SearchHistoryDao,
-    private val apiService: RawgApiService
+    private val apiService: RawgApiService,
+    private val appPreferences: AppPreferences
 ) {
 
     // --- REMOTE SEARCH ---
@@ -40,24 +46,31 @@ class SearchRepository(
     }
 
     // --- HISTORY ---
-    fun getRecentSearches(): Flow<List<SearchHistoryEntity>> =
-        searchHistoryDao.getRecentSearches()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getRecentSearches(): Flow<List<SearchHistoryEntity>> = appPreferences.loggedInUserId.flatMapLatest { userId ->
+        if (userId != -1) searchHistoryDao.getRecentSearches(userId) else flowOf(emptyList())
+    }
 
     suspend fun saveSearch(query: String) {
         if (query.isBlank()) return
-        if (searchHistoryDao.queryExists(query) > 0) {
-            searchHistoryDao.deleteByQuery(query)
+        val userId = appPreferences.loggedInUserId.first()
+        if (userId == -1) return
+
+        if (searchHistoryDao.queryExists(query, userId) > 0) {
+            searchHistoryDao.deleteByQuery(query, userId)
         }
         searchHistoryDao.insertSearch(
-            SearchHistoryEntity(query = query)
+            SearchHistoryEntity(query = query, userId = userId)
         )
     }
 
     suspend fun deleteSearchById(id: Int) {
-        searchHistoryDao.deleteById(id)
+        val userId = appPreferences.loggedInUserId.first()
+        searchHistoryDao.deleteById(id, userId)
     }
 
     suspend fun clearAllHistory() {
-        searchHistoryDao.clearAllHistory()
+        val userId = appPreferences.loggedInUserId.first()
+        searchHistoryDao.clearAllHistory(userId)
     }
 }

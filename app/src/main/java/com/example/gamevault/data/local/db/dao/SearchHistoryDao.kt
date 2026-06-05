@@ -13,18 +13,18 @@ interface SearchHistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSearch(search: SearchHistoryEntity)
 
-    @Query("SELECT * FROM search_history ORDER BY searchedAt DESC LIMIT 20")
-    fun getRecentSearches(): Flow<List<SearchHistoryEntity>>
+    @Query("SELECT * FROM search_history WHERE userId = :userId ORDER BY searchedAt DESC LIMIT 20")
+    fun getRecentSearches(userId: Int): Flow<List<SearchHistoryEntity>>
 
-    @Query("DELETE FROM search_history")
-    suspend fun clearAllHistory()
+    @Query("DELETE FROM search_history WHERE userId = :userId")
+    suspend fun clearAllHistory(userId: Int)
 
-    @Query("DELETE FROM search_history WHERE id = :id")
-    suspend fun deleteById(id: Int)
+    @Query("DELETE FROM search_history WHERE id = :id AND userId = :userId")
+    suspend fun deleteById(id: Int, userId: Int)
 
-    @Query("SELECT COUNT(*) FROM search_history WHERE `query` = :searchQuery")
-    suspend fun queryExists(searchQuery: String): Int
+    @Query("SELECT COUNT(*) FROM search_history WHERE `query` = :searchQuery AND userId = :userId")
+    suspend fun queryExists(searchQuery: String, userId: Int): Int
 
-    @Query("DELETE FROM search_history WHERE `query` = :searchQuery")
-    suspend fun deleteByQuery(searchQuery: String)
+    @Query("DELETE FROM search_history WHERE `query` = :searchQuery AND userId = :userId")
+    suspend fun deleteByQuery(searchQuery: String, userId: Int)
 }

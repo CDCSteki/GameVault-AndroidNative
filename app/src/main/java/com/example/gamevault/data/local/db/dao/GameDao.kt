@@ -18,70 +18,70 @@ interface GameDao {
     suspend fun updateGame(game: GameEntity)
 
     // --- COLLECTION ---
-    @Query("SELECT * FROM games WHERE isInCollection = 1 ORDER BY addedAt DESC")
-    fun getCollection(): Flow<List<GameEntity>>
+    @Query("SELECT * FROM games WHERE isInCollection = 1 AND userId = :userId ORDER BY addedAt DESC")
+    fun getCollection(userId: Int): Flow<List<GameEntity>>
 
-    @Query("SELECT * FROM games WHERE isInCollection = 1 AND playStatus = 'PLAYED' ORDER BY addedAt DESC")
-    fun getPlayedGames(): Flow<List<GameEntity>>
+    @Query("SELECT * FROM games WHERE isInCollection = 1 AND playStatus = 'PLAYED' AND userId = :userId ORDER BY addedAt DESC")
+    fun getPlayedGames(userId: Int): Flow<List<GameEntity>>
 
-    @Query("SELECT * FROM games WHERE isInCollection = 1 AND playStatus = 'NOT_PLAYED' ORDER BY addedAt DESC")
-    fun getNotPlayedGames(): Flow<List<GameEntity>>
+    @Query("SELECT * FROM games WHERE isInCollection = 1 AND playStatus = 'NOT_PLAYED' AND userId = :userId ORDER BY addedAt DESC")
+    fun getNotPlayedGames(userId: Int): Flow<List<GameEntity>>
 
-    @Query("SELECT * FROM games WHERE isInCollection = 1 AND playStatus = 'PLAYING' ORDER BY addedAt DESC")
-    fun getPlayingGames(): Flow<List<GameEntity>>
+    @Query("SELECT * FROM games WHERE isInCollection = 1 AND playStatus = 'PLAYING' AND userId = :userId ORDER BY addedAt DESC")
+    fun getPlayingGames(userId: Int): Flow<List<GameEntity>>
 
     // --- WISHLIST ---
-    @Query("SELECT * FROM games WHERE isInWishlist = 1 ORDER BY addedAt DESC")
-    fun getWishlist(): Flow<List<GameEntity>>
+    @Query("SELECT * FROM games WHERE isInWishlist = 1 AND userId = :userId ORDER BY addedAt DESC")
+    fun getWishlist(userId: Int): Flow<List<GameEntity>>
 
     // --- SINGLE GAME ---
-    @Query("SELECT * FROM games WHERE rawgId = :rawgId LIMIT 1")
-    suspend fun getGameById(rawgId: Int): GameEntity?
+    @Query("SELECT * FROM games WHERE rawgId = :rawgId AND userId = :userId LIMIT 1")
+    suspend fun getGameById(rawgId: Int, userId: Int): GameEntity?
 
-    @Query("SELECT * FROM games WHERE rawgId = :rawgId LIMIT 1")
-    fun observeGameById(rawgId: Int): Flow<GameEntity?>
+    @Query("SELECT * FROM games WHERE rawgId = :rawgId AND userId = :userId LIMIT 1")
+    fun observeGameById(rawgId: Int, userId: Int): Flow<GameEntity?>
 
     // --- STATUS UPDATES ---
-    @Query("UPDATE games SET isInCollection = :inCollection WHERE rawgId = :rawgId")
-    suspend fun updateCollectionStatus(rawgId: Int, inCollection: Boolean)
+    @Query("UPDATE games SET isInCollection = :inCollection WHERE rawgId = :rawgId AND userId = :userId")
+    suspend fun updateCollectionStatus(rawgId: Int, userId: Int, inCollection: Boolean)
 
-    @Query("UPDATE games SET isInWishlist = :inWishlist WHERE rawgId = :rawgId")
-    suspend fun updateWishlistStatus(rawgId: Int, inWishlist: Boolean)
+    @Query("UPDATE games SET isInWishlist = :inWishlist WHERE rawgId = :rawgId AND userId = :userId")
+    suspend fun updateWishlistStatus(rawgId: Int, userId: Int, inWishlist: Boolean)
 
-    @Query("UPDATE games SET isPlayed = :isPlayed, playStatus = :playStatus WHERE rawgId = :rawgId")
-    suspend fun updatePlayedStatus(rawgId: Int, isPlayed: Boolean, playStatus: String)
+    @Query("UPDATE games SET isPlayed = :isPlayed, playStatus = :playStatus WHERE rawgId = :rawgId AND userId = :userId")
+    suspend fun updatePlayedStatus(rawgId: Int, userId: Int, isPlayed: Boolean, playStatus: String)
 
-    @Query("UPDATE games SET playStatus = :playStatus WHERE rawgId = :rawgId")
-    suspend fun updatePlayStatus(rawgId: Int, playStatus: String)
+    @Query("UPDATE games SET playStatus = :playStatus WHERE rawgId = :rawgId AND userId = :userId")
+    suspend fun updatePlayStatus(rawgId: Int, userId: Int, playStatus: String)
 
-    @Query("UPDATE games SET userRating = :rating WHERE rawgId = :rawgId")
-    suspend fun updateUserRating(rawgId: Int, rating: Float)
+    @Query("UPDATE games SET userRating = :rating WHERE rawgId = :rawgId AND userId = :userId")
+    suspend fun updateUserRating(rawgId: Int, userId: Int, rating: Float)
 
-    @Query("UPDATE games SET userNotes = :notes WHERE rawgId = :rawgId")
-    suspend fun updateUserNotes(rawgId: Int, notes: String?)
+    @Query("UPDATE games SET userNotes = :notes WHERE rawgId = :rawgId AND userId = :userId")
+    suspend fun updateUserNotes(rawgId: Int, userId: Int, notes: String?)
 
     // --- DELETE ---
-    @Query("DELETE FROM games WHERE rawgId = :rawgId")
-    suspend fun deleteGame(rawgId: Int)
+    @Query("DELETE FROM games WHERE rawgId = :rawgId AND userId = :userId")
+    suspend fun deleteGame(rawgId: Int, userId: Int)
 
     // --- COUNTS ---
-    @Query("SELECT COUNT(*) FROM games WHERE isInCollection = 1 AND playStatus = 'PLAYED'")
-    suspend fun getPlayedGamesCount(): Int
+    @Query("SELECT COUNT(*) FROM games WHERE isInCollection = 1 AND playStatus = 'PLAYED' AND userId = :userId")
+    suspend fun getPlayedGamesCount(userId: Int): Int
 
     // --- FILTER ---
     @Query("""
         SELECT * FROM games 
-        WHERE isInCollection = 1 
+        WHERE isInCollection = 1 AND userId = :userId
         AND (:genre IS NULL OR genres LIKE '%' || :genre || '%')
         ORDER BY addedAt DESC
     """)
-    fun filterCollection(genre: String?): Flow<List<GameEntity>>
+    fun filterCollection(userId: Int, genre: String?): Flow<List<GameEntity>>
 
     @Query("""
         SELECT * FROM games 
-        WHERE isInWishlist = 1 
+        WHERE isInWishlist = 1 AND userId = :userId
         AND (:genre IS NULL OR genres LIKE '%' || :genre || '%')
         ORDER BY addedAt DESC
     """)
-    fun filterWishlist(genre: String?): Flow<List<GameEntity>>
+    fun filterWishlist(userId: Int, genre: String?): Flow<List<GameEntity>>
 }
