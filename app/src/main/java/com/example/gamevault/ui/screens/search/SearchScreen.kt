@@ -37,6 +37,7 @@ import com.example.gamevault.data.repository.SearchRepository
 import com.example.gamevault.ui.components.GameVaultTopBar
 import com.example.gamevault.ui.theme.*
 import androidx.compose.ui.platform.LocalLocale
+import com.example.gamevault.ui.components.OfflineState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,7 +76,11 @@ fun SearchScreen(
                 onClick = viewModel::onToggleFilterSheet
             )
 
-            if (uiState.errorMessageRes != null) {
+            val isDefaultState = uiState.query.isEmpty() && uiState.filters == SearchFilters()
+            val displayList = if (isDefaultState) uiState.defaultGames else uiState.searchResults
+            val listTitle = if (isDefaultState) stringResource(R.string.search_trending_suggestions) else stringResource(R.string.search_results)
+
+            if (uiState.errorMessageRes != null && displayList.isNotEmpty()) {
                 Text(
                     text = stringResource(uiState.errorMessageRes!!),
                     color = StatusRed,
@@ -84,57 +89,60 @@ fun SearchScreen(
                 )
             }
 
-            val isDefaultState = uiState.query.isEmpty() && uiState.filters == SearchFilters()
-            val displayList = if (isDefaultState) uiState.defaultGames else uiState.searchResults
-            val listTitle = if (isDefaultState) stringResource(R.string.search_trending_suggestions) else stringResource(R.string.search_results)
-
             Box(modifier = Modifier.weight(1f)) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 80.dp)
-                ) {
+                if (uiState.errorMessageRes != null && displayList.isEmpty()) {
+                    OfflineState(
+                        messageRes = uiState.errorMessageRes!!,
+                        onRetry = viewModel::retry
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 80.dp)
+                    ) {
 
-                    if (isDefaultState && uiState.searchHistory.isNotEmpty()) {
-                        item {
-                            SearchHistorySection(
-                                history = uiState.searchHistory,
-                                onHistoryClick = { query ->
-                                    viewModel.onHistoryItemClick(query)
-                                },
-                                onDeleteItem = viewModel::onDeleteHistoryItem,
-                                onClearAll = viewModel::onClearHistory
-                            )
-                        }
-                    }
-
-                    if (!isDefaultState && displayList.isEmpty() && !uiState.isLoading) {
-                        item {
-                            EmptySearchState()
-                        }
-                    } else if (displayList.isNotEmpty()) {
-                        item {
-                            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                                Text(
-                                    text = listTitle,
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = GVTheme.colors.textPrimary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    text = "${displayList.size} ${stringResource(R.string.search_titles_found)}",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = GVTheme.colors.accent,
-                                    letterSpacing = 1.sp
+                        if (isDefaultState && uiState.searchHistory.isNotEmpty()) {
+                            item {
+                                SearchHistorySection(
+                                    history = uiState.searchHistory,
+                                    onHistoryClick = { query ->
+                                        viewModel.onHistoryItemClick(query)
+                                    },
+                                    onDeleteItem = viewModel::onDeleteHistoryItem,
+                                    onClearAll = viewModel::onClearHistory
                                 )
                             }
                         }
 
-                        items(displayList) { game ->
-                            Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
-                                SearchResultCard(
-                                    game = game,
-                                    onClick = { onGameClick(game.id) }
-                                )
+                        if (!isDefaultState && displayList.isEmpty() && !uiState.isLoading && uiState.hasSearched) {
+                            item {
+                                EmptySearchState()
+                            }
+                        } else if (displayList.isNotEmpty()) {
+                            item {
+                                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                                    Text(
+                                        text = listTitle,
+                                        style = MaterialTheme.typography.titleLarge,
+                                        color = GVTheme.colors.textPrimary,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = "${displayList.size} ${stringResource(R.string.search_titles_found)}",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = GVTheme.colors.accent,
+                                        letterSpacing = 1.sp
+                                    )
+                                }
+                            }
+
+                            items(displayList) { game ->
+                                Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
+                                    SearchResultCard(
+                                        game = game,
+                                        onClick = { onGameClick(game.id) }
+                                    )
+                                }
                             }
                         }
                     }

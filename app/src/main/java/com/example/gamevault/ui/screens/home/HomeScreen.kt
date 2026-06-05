@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.SportsEsports
-import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,6 +34,7 @@ import com.example.gamevault.R
 import com.example.gamevault.data.remote.dto.GameDto
 import com.example.gamevault.data.repository.AuthRepository
 import com.example.gamevault.data.repository.GameRepository
+import com.example.gamevault.ui.components.OfflineState
 import com.example.gamevault.ui.navigation.NavRoutes
 import com.example.gamevault.ui.theme.*
 
@@ -56,27 +56,34 @@ fun HomeScreen(
             .fillMaxSize()
             .background(GVTheme.colors.background)
     ) {
-        if (uiState.isLoading && uiState.popularThisYear.isEmpty()) {
-            CircularProgressIndicator(
-                color = GVTheme.colors.accent,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        } else if (!uiState.isLoading && uiState.popularThisYear.isEmpty() && uiState.errorMessageRes != null) {
-            OfflineState(
-                messageRes = uiState.errorMessageRes!!,
-                onRetry = viewModel::loadHomeData
-            )
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 100.dp)
-            ) {
-                // Header
-                item {
-                    HomeHeader(username = uiState.username)
-                }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 100.dp)
+        ) {
+            item {
+                HomeHeader(username = uiState.username)
+            }
 
-                // Popular This Year
+            if (uiState.isLoading && uiState.popularThisYear.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillParentMaxHeight(0.7f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = GVTheme.colors.accent)
+                    }
+                }
+            } else if (!uiState.isLoading && uiState.popularThisYear.isEmpty() && uiState.errorMessageRes != null) {
+                item {
+                    OfflineState(
+                        messageRes = uiState.errorMessageRes!!,
+                        onRetry = viewModel::loadHomeData,
+                        modifier = Modifier.fillParentMaxHeight(0.7f)
+                    )
+                }
+            } else {
                 if (uiState.popularThisYear.isNotEmpty()) {
                     item {
                         SectionHeader(
@@ -104,7 +111,6 @@ fun HomeScreen(
                     }
                 }
 
-                // All Time Legends
                 if (uiState.allTimeLegends.isNotEmpty()) {
                     item {
                         SectionHeader(
@@ -124,7 +130,6 @@ fun HomeScreen(
                     }
                 }
 
-                // Discover Section
                 if (uiState.errorMessageRes == null && (uiState.indieGems.isNotEmpty() || uiState.competitive.isNotEmpty() || uiState.coop.isNotEmpty() || uiState.retro.isNotEmpty())) {
                     item {
                         SectionHeader(
@@ -155,48 +160,6 @@ fun HomeScreen(
                         )
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun OfflineState(
-    messageRes: Int,
-    onRetry: () -> Unit
-) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(32.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.WifiOff,
-                contentDescription = null,
-                tint = GVTheme.colors.textMuted,
-                modifier = Modifier.size(72.dp)
-            )
-            Text(
-                text = stringResource(messageRes),
-                style = MaterialTheme.typography.bodyMedium,
-                color = GVTheme.colors.textMuted,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-            )
-            Button(
-                onClick = onRetry,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = GVTheme.colors.accent
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.detail_retry),
-                    color = GVTheme.colors.textPrimary
-                )
             }
         }
     }
@@ -330,7 +293,6 @@ private fun GameCardMedium(
             modifier = Modifier.fillMaxSize()
         )
 
-        // Gradient overlay
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -344,7 +306,6 @@ private fun GameCardMedium(
                 )
         )
 
-        // Badge
         if (badge != null) {
             Box(
                 modifier = Modifier
@@ -365,7 +326,6 @@ private fun GameCardMedium(
             }
         }
 
-        // Game info
         Column(
             modifier = Modifier
                 .align(Alignment.BottomStart)
@@ -420,7 +380,6 @@ private fun AllTimeLegendCard(
                 )
         )
 
-        // Hall of Fame badge
         Column(
             modifier = Modifier
                 .align(Alignment.BottomStart)

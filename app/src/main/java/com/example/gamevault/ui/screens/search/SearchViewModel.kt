@@ -111,12 +111,15 @@ class SearchViewModel(
     }
 
     fun onQueryChange(query: String) {
+        if (_uiState.value.isOffline) {
+            _uiState.value = _uiState.value.copy(query = query)
+            return
+        }
+
         _uiState.value = _uiState.value.copy(
             query = query,
             errorMessageRes = null
         )
-
-        if (_uiState.value.isOffline) return
 
         searchJob?.cancel()
 
@@ -149,6 +152,14 @@ class SearchViewModel(
         searchJob?.cancel()
         viewModelScope.launch {
             performSearch(query)
+        }
+    }
+
+    fun retry() {
+        if (_uiState.value.query.isBlank() && _uiState.value.filters == SearchFilters()) {
+            loadDefaultGames()
+        } else {
+            onSearchSubmit()
         }
     }
 
