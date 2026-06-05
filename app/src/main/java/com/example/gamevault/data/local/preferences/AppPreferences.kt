@@ -62,7 +62,6 @@ class AppPreferences(private val context: Context) {
     suspend fun setAppTheme(theme: AppTheme) {
         context.dataStore.edit { prefs ->
             prefs[KEY_APP_THEME] = theme.name
-            // Toate temele sunt "dark" — light mode rămâne un toggle separat
             prefs[KEY_IS_DARK_THEME] = true
         }
     }

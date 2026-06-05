@@ -1,5 +1,6 @@
 package com.example.gamevault.ui.screens.home
 
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -8,6 +9,8 @@ import com.example.gamevault.R
 import com.example.gamevault.data.remote.dto.GameDto
 import com.example.gamevault.data.repository.GameRepository
 import com.example.gamevault.data.repository.AuthRepository
+import com.example.gamevault.ui.util.NetworkConnectivityObserver
+import com.example.gamevault.ui.util.NetworkStatus
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,15 +32,17 @@ data class HomeUiState(
 
 class HomeViewModel(
     private val gameRepository: GameRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    applicationContext: Context
 ) : ViewModel() {
 
+    private val appContext = applicationContext.applicationContext
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
         loadUsername()
-        loadHomeData()
+        observeNetworkAndLoad()
     }
 
     private fun loadUsername() {
@@ -47,6 +52,33 @@ class HomeViewModel(
                     authRepository.getUserById(userId).collect { user ->
                         _uiState.value = _uiState.value.copy(
                             username = user?.username ?: "Hunter"
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun observeNetworkAndLoad() {
+        viewModelScope.launch {
+            NetworkConnectivityObserver.observe(appContext).collect { status ->
+                when (status) {
+                    NetworkStatus.Available -> {
+                        val state = _uiState.value
+                        if (state.popularThisYear.isEmpty() || state.errorMessageRes != null) {
+                            loadHomeData()
+                        }
+                    }
+                    NetworkStatus.Unavailable -> {
+                        _uiState.value = _uiState.value.copy(
+                            popularThisYear = emptyList(),
+                            allTimeLegends = emptyList(),
+                            indieGems = emptyList(),
+                            competitive = emptyList(),
+                            coop = emptyList(),
+                            retro = emptyList(),
+                            isLoading = false,
+                            errorMessageRes = R.string.fail_to_load_games
                         )
                     }
                 }
@@ -92,11 +124,12 @@ class HomeViewModel(
 
     class Factory(
         private val gameRepository: GameRepository,
-        private val authRepository: AuthRepository
+        private val authRepository: AuthRepository,
+        private val context: Context
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return HomeViewModel(gameRepository, authRepository) as T
+            return HomeViewModel(gameRepository, authRepository, context) as T
         }
     }
 }

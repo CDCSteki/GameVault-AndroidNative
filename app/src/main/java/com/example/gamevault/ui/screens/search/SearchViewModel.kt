@@ -1,5 +1,6 @@
 package com.example.gamevault.ui.screens.search
 
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -9,6 +10,8 @@ import com.example.gamevault.data.local.entity.SearchHistoryEntity
 import com.example.gamevault.data.remote.dto.GameDto
 import com.example.gamevault.data.repository.GameRepository
 import com.example.gamevault.data.repository.SearchRepository
+import com.example.gamevault.ui.util.NetworkConnectivityObserver
+import com.example.gamevault.ui.util.NetworkStatus
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,14 +37,17 @@ data class SearchUiState(
     val isFilterSheetVisible: Boolean = false,
     val hasSearched: Boolean = false,
     @param:StringRes val errorMessageRes: Int? = null,
-    val totalResults: Int = 0
+    val totalResults: Int = 0,
+    val isOffline: Boolean = false
 )
 
 class SearchViewModel(
     private val searchRepository: SearchRepository,
-    private val gameRepository: GameRepository
+    private val gameRepository: GameRepository,
+    applicationContext: Context
 ) : ViewModel() {
 
+    private val appContext = applicationContext.applicationContext
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
@@ -49,7 +55,39 @@ class SearchViewModel(
 
     init {
         loadSearchHistory()
-        loadDefaultGames()
+        observeNetworkAndLoad()
+    }
+
+    private fun observeNetworkAndLoad() {
+        viewModelScope.launch {
+            NetworkConnectivityObserver.observe(appContext).collect { status ->
+                when (status) {
+                    NetworkStatus.Available -> {
+                        _uiState.value = _uiState.value.copy(isOffline = false)
+                        val state = _uiState.value
+                        if (state.defaultGames.isEmpty()) {
+                            loadDefaultGames()
+                        }
+                        if (state.hasSearched || state.query.isNotBlank() || state.filters != SearchFilters()) {
+                            searchJob?.cancel()
+                            searchJob = viewModelScope.launch {
+                                performSearch(state.query)
+                            }
+                        }
+                    }
+                    NetworkStatus.Unavailable -> {
+                        searchJob?.cancel()
+                        _uiState.value = _uiState.value.copy(
+                            defaultGames = emptyList(),
+                            searchResults = emptyList(),
+                            isLoading = false,
+                            isOffline = true,
+                            errorMessageRes = R.string.general_error_connection
+                        )
+                    }
+                }
+            }
+        }
     }
 
     private fun loadDefaultGames() {
@@ -58,7 +96,8 @@ class SearchViewModel(
             val result = gameRepository.getPopularGames(20)
             _uiState.value = _uiState.value.copy(
                 defaultGames = result.getOrElse { emptyList() },
-                isLoading = false
+                isLoading = false,
+                errorMessageRes = if (result.isFailure) R.string.general_error_connection else null
             )
         }
     }
@@ -76,6 +115,9 @@ class SearchViewModel(
             query = query,
             errorMessageRes = null
         )
+
+        if (_uiState.value.isOffline) return
+
         searchJob?.cancel()
 
         if (query.length >= 2) {
@@ -100,6 +142,7 @@ class SearchViewModel(
     }
 
     fun onSearchSubmit() {
+        if (_uiState.value.isOffline) return
         val query = _uiState.value.query
         if (query.isBlank() && _uiState.value.filters == SearchFilters()) return
 
@@ -145,6 +188,7 @@ class SearchViewModel(
     }
 
     fun onHistoryItemClick(query: String) {
+        if (_uiState.value.isOffline) return
         _uiState.value = _uiState.value.copy(query = query)
         viewModelScope.launch {
             performSearch(query)
@@ -170,6 +214,7 @@ class SearchViewModel(
     }
 
     fun onApplyFilters(filters: SearchFilters) {
+        if (_uiState.value.isOffline) return
         _uiState.value = _uiState.value.copy(
             filters = filters,
             isFilterSheetVisible = false
@@ -181,6 +226,7 @@ class SearchViewModel(
 
     fun onClearFilters() {
         _uiState.value = _uiState.value.copy(filters = SearchFilters())
+        if (_uiState.value.isOffline) return
         val query = _uiState.value.query
         if (query.isNotBlank()) {
             viewModelScope.launch {
@@ -196,11 +242,12 @@ class SearchViewModel(
 
     class Factory(
         private val searchRepository: SearchRepository,
-        private val gameRepository: GameRepository
+        private val gameRepository: GameRepository,
+        private val context: Context
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return SearchViewModel(searchRepository, gameRepository) as T
+            return SearchViewModel(searchRepository, gameRepository, context) as T
         }
     }
 }

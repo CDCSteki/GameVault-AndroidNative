@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.SportsEsports
+import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,6 +23,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -43,8 +45,9 @@ fun HomeScreen(
     onGameClick: (Int) -> Unit,
     onViewAllClick: (String) -> Unit
 ) {
+    val context = LocalContext.current
     val viewModel: HomeViewModel = viewModel(
-        factory = HomeViewModel.Factory(gameRepository, authRepository)
+        factory = HomeViewModel.Factory(gameRepository, authRepository, context)
     )
     val uiState by viewModel.uiState.collectAsState()
 
@@ -57,6 +60,11 @@ fun HomeScreen(
             CircularProgressIndicator(
                 color = GVTheme.colors.accent,
                 modifier = Modifier.align(Alignment.Center)
+            )
+        } else if (!uiState.isLoading && uiState.popularThisYear.isEmpty() && uiState.errorMessageRes != null) {
+            OfflineState(
+                messageRes = uiState.errorMessageRes!!,
+                onRetry = viewModel::loadHomeData
             )
         } else {
             LazyColumn(
@@ -137,8 +145,7 @@ fun HomeScreen(
                     }
                 }
 
-                // Error
-                if (uiState.errorMessageRes != null) {
+                if (uiState.errorMessageRes != null && uiState.popularThisYear.isNotEmpty()) {
                     item {
                         Text(
                             text = stringResource(uiState.errorMessageRes!!),
@@ -148,6 +155,48 @@ fun HomeScreen(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OfflineState(
+    messageRes: Int,
+    onRetry: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.WifiOff,
+                contentDescription = null,
+                tint = GVTheme.colors.textMuted,
+                modifier = Modifier.size(72.dp)
+            )
+            Text(
+                text = stringResource(messageRes),
+                style = MaterialTheme.typography.bodyMedium,
+                color = GVTheme.colors.textMuted,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+            Button(
+                onClick = onRetry,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = GVTheme.colors.accent
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.detail_retry),
+                    color = GVTheme.colors.textPrimary
+                )
             }
         }
     }
