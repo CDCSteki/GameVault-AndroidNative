@@ -4,32 +4,21 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 data class GameVaultColors(
-    // Accent principal (ex: NeonPurple în Cyber Dark)
     val accent: Color,
-    // Accent secundar (ex: NeonCyan în Cyber Dark)
     val accentSecondary: Color,
-    // Fundal principal
     val background: Color,
-    // Fundal secundar (nav bar, carduri)
     val backgroundSecondary: Color,
-    // Fundal carduri
     val card: Color,
-    // Border subtil
     val border: Color,
-    // Text primar
     val textPrimary: Color,
-    // Text secundar
     val textSecondary: Color,
-    // Text slab / placeholder
     val textMuted: Color,
-    // Status colors (rămân constante între teme)
     val statusGreen: Color = StatusGreen,
     val statusOrange: Color = StatusOrange,
     val statusRed: Color = StatusRed,
     val statusYellow: Color = StatusYellow,
 )
 
-// ---- Definițiile tuturor temelor ----
 
 val CyberDarkColors = GameVaultColors(
     accent = NeonPurple,
@@ -44,9 +33,9 @@ val CyberDarkColors = GameVaultColors(
 )
 
 val OceanBlueColors = GameVaultColors(
-    accent = Color(0xFF48CAE4),        // albastru deschis
-    accentSecondary = Color(0xFF90E0EF), // aqua
-    background = Color(0xFF03045E),    // albastru foarte închis
+    accent = Color(0xFF48CAE4),
+    accentSecondary = Color(0xFF90E0EF),
+    background = Color(0xFF03045E),
     backgroundSecondary = Color(0xFF023E8A),
     card = Color(0xFF0077B6),
     border = Color(0xFF0096C7),
@@ -56,9 +45,9 @@ val OceanBlueColors = GameVaultColors(
 )
 
 val ForestGreenColors = GameVaultColors(
-    accent = Color(0xFF52B788),        // verde menta
-    accentSecondary = Color(0xFFB7E4C7), // verde deschis
-    background = Color(0xFF081C15),    // verde foarte închis
+    accent = Color(0xFF52B788),
+    accentSecondary = Color(0xFFB7E4C7),
+    background = Color(0xFF081C15),
     backgroundSecondary = Color(0xFF1B4332),
     card = Color(0xFF2D6A4F),
     border = Color(0xFF40916C),
@@ -68,9 +57,9 @@ val ForestGreenColors = GameVaultColors(
 )
 
 val SunsetColors = GameVaultColors(
-    accent = Color(0xFFFF6B35),        // portocaliu
-    accentSecondary = Color(0xFFFFD166), // galben auriu
-    background = Color(0xFF1A0A00),    // maro foarte închis
+    accent = Color(0xFFFF6B35),
+    accentSecondary = Color(0xFFFFD166),
+    background = Color(0xFF1A0A00),
     backgroundSecondary = Color(0xFF2D1500),
     card = Color(0xFF3D1F00),
     border = Color(0xFF7C3A00),
@@ -80,9 +69,9 @@ val SunsetColors = GameVaultColors(
 )
 
 val MidnightRedColors = GameVaultColors(
-    accent = Color(0xFFE63946),        // roșu intens
-    accentSecondary = Color(0xFFFF6B6B), // roșu coral
-    background = Color(0xFF0D0305),    // negru roșiatic
+    accent = Color(0xFFE63946),
+    accentSecondary = Color(0xFFFF6B6B),
+    background = Color(0xFF0D0305),
     backgroundSecondary = Color(0xFF1A0608),
     card = Color(0xFF2D0A0E),
     border = Color(0xFF6B1520),
@@ -92,9 +81,9 @@ val MidnightRedColors = GameVaultColors(
 )
 
 val NeonGreenColors = GameVaultColors(
-    accent = Color(0xFF39FF14),        // verde neon
-    accentSecondary = Color(0xFF00FFFF), // cyan
-    background = Color(0xFF050A05),    // aproape negru
+    accent = Color(0xFF39FF14),
+    accentSecondary = Color(0xFF00FFFF),
+    background = Color(0xFF050A05),
     backgroundSecondary = Color(0xFF0A140A),
     card = Color(0xFF0F1F0F),
     border = Color(0xFF1A3A1A),
@@ -104,9 +93,9 @@ val NeonGreenColors = GameVaultColors(
 )
 
 val RoseGoldColors = GameVaultColors(
-    accent = Color(0xFFE8A598),        // roz auriu
-    accentSecondary = Color(0xFFF7D6CB), // crem roz
-    background = Color(0xFF1A0D0A),    // maro roșiatic închis
+    accent = Color(0xFFE8A598),
+    accentSecondary = Color(0xFFF7D6CB),
+    background = Color(0xFF1A0D0A),
     backgroundSecondary = Color(0xFF2D1510),
     card = Color(0xFF3D1F18),
     border = Color(0xFF6B3028),
@@ -115,7 +104,6 @@ val RoseGoldColors = GameVaultColors(
     textMuted = Color(0xFFE8A598),
 )
 
-// Compoziție locală — accesibilă din orice Composable cu GVTheme.colors
 val LocalGameVaultColors = staticCompositionLocalOf { CyberDarkColors }
 
 fun appThemeColors(theme: AppTheme): GameVaultColors = when (theme) {

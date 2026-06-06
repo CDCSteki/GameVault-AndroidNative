@@ -2,7 +2,6 @@ package com.example.gamevault.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
-// Response pentru lista de jocuri (search, popular, etc.)
 data class GamesListResponse(
     @SerializedName("count") val count: Int,
     @SerializedName("next") val next: String?,

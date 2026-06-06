@@ -9,7 +9,6 @@ import retrofit2.http.Query
 
 interface RawgApiService {
 
-    // Home - Popular anul acesta
     @GET("games")
     suspend fun getGamesThisYear(
         @Query("key") apiKey: String,
@@ -18,7 +17,6 @@ interface RawgApiService {
         @Query("page_size") pageSize: Int = 10
     ): GamesListResponse
 
-    // Home - Cele mai populare din toate timpurile
     @GET("games")
     suspend fun getAllTimeTopGames(
         @Query("key") apiKey: String,
@@ -27,7 +25,6 @@ interface RawgApiService {
         @Query("page_size") pageSize: Int = 10
     ): GamesListResponse
 
-    // Home - Discover
     @GET("games")
     suspend fun getGamesByFilters(
         @Query("key") apiKey: String,
@@ -38,7 +35,6 @@ interface RawgApiService {
         @Query("page_size") pageSize: Int = 10
     ): GamesListResponse
 
-    // Search cu filtre avansate
     @GET("games")
     suspend fun searchGames(
         @Query("key") apiKey: String,
@@ -52,21 +48,18 @@ interface RawgApiService {
         @Query("page_size") pageSize: Int = 20
     ): GamesListResponse
 
-    // Game Details
     @GET("games/{id}")
     suspend fun getGameDetails(
         @Path("id") gameId: Int,
         @Query("key") apiKey: String
     ): GameDetailDto
 
-    // Screenshots
     @GET("games/{id}/screenshots")
     suspend fun getGameScreenshots(
         @Path("id") gameId: Int,
         @Query("key") apiKey: String
     ): GameScreenshotsResponse
 
-    // Popular / Trending general
     @GET("games")
     suspend fun getPopularGames(
         @Query("key") apiKey: String,

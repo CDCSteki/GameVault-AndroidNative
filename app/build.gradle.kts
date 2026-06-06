@@ -51,20 +51,15 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
 
-    // --- GAMEVAULT DEPENDENCIES ---
-    // Navigation Compose
     implementation(libs.navigation.compose)
 
-    // Room Database
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
-    // Retrofit (API)
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.gson)
 
-    // SharedPreferences moderne (DataStore)
     implementation(libs.datastore.preferences)
 
     implementation(libs.coil.compose)

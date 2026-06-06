@@ -29,7 +29,6 @@ import androidx.core.content.edit
 class MainActivity : ComponentActivity() {
 
     override fun attachBaseContext(newBase: Context) {
-        // Citim limba sincron din SharedPreferences (DataStore e async, folosim SP pentru attachBaseContext)
         val prefs = newBase.getSharedPreferences("gamevault_locale", MODE_PRIVATE)
         val lang = prefs.getString("language", "en") ?: "en"
         super.attachBaseContext(LocaleHelper.applyLanguage(newBase, lang))
@@ -63,7 +62,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            GameVaultTheme(darkTheme = true, appTheme = appTheme) {
+            GameVaultTheme( appTheme = appTheme) {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
