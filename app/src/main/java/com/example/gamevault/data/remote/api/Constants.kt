@@ -1,6 +1,6 @@
 package com.example.gamevault.data.remote.api
 
 object Constants {
-    const val RAWG_API_KEY = "f2e00623f6174bffb6280d80144152ee"
+    const val RAWG_API_KEY = "ffa6d66def914957acff9acd4806b419"
 
 }

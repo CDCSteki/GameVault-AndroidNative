@@ -138,7 +138,7 @@ class GameRepository(
         val userId = appPreferences.loggedInUserId.first()
         val isPlayed = status == PlayStatus.PLAYED
         gameDao.updatePlayedStatus(rawgId, userId, isPlayed, status.name)
-        if (isPlayed) recalculateUserLevel()
+        recalculateUserLevel()
     }
 
     // --- LOCAL - WISHLIST ---
